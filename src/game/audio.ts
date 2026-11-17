@@ -1,3 +1,5 @@
+import { soundBank } from './soundBank';
+
 type MusicStyle = 'samba_reggae' | 'pagode_rua' | 'ijexa' | 'percussao_baiana';
 
 class ArcadeAudioEngine {
@@ -25,8 +27,17 @@ class ArcadeAudioEngine {
     musicVolume: number;
     sfxVolume: number;
     voiceVolume: number;
+    ambientVolume?: number;
     sfxEnabled: boolean;
   }): void {
+    soundBank.setVolumes({
+      master: mix.masterVolume,
+      music: mix.musicVolume,
+      sfx: mix.sfxVolume,
+      voice: mix.voiceVolume,
+      ambient: mix.ambientVolume ?? 0.55,
+      muted: !mix.sfxEnabled,
+    });
     this.masterVolume = Math.max(0, Math.min(1, mix.masterVolume));
     this.musicVolume = Math.max(0, Math.min(1, mix.musicVolume));
     this.sfxVolume = Math.max(0, Math.min(1, mix.sfxVolume));
@@ -40,6 +51,7 @@ class ArcadeAudioEngine {
   public unlockAudio(): void {
     this.unlocked = true;
     const ctx = this.ensureContext();
+    if (ctx && this.wantedScreenMusic) soundBank.playMusic(this.wantedScreenMusic);
     if (ctx && ctx.state === 'suspended') {
       ctx.resume().catch(() => {});
     }
@@ -62,6 +74,8 @@ class ArcadeAudioEngine {
           (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
         if (!AudioCtx) return null;
         this.ctx = new AudioCtx();
+        soundBank.attach(this.ctx);
+        soundBank.preload(['ui/', 'combat/', 'announcer/']);
       } catch {
         return null;
       }
@@ -99,23 +113,116 @@ class ArcadeAudioEngine {
     return shaper;
   }
 
+  /** Narrador: textos conhecidos tocam a gravação; os demais são ignorados (sem TTS robótico do navegador). */
   public announce(text: string): void {
-    if (!this.enabled || this.voiceVolume <= 0.05 || this.masterVolume <= 0.05) return;
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-    try {
-      window.speechSynthesis.cancel();
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = 'pt-BR';
-      utter.rate = 1.12;
-      utter.pitch = 0.92;
-      utter.volume = Math.max(0, Math.min(1, this.masterVolume * this.voiceVolume));
-      const voices = window.speechSynthesis.getVoices();
-      const pt = voices.find((v) => v.lang.toLowerCase().startsWith('pt'));
-      if (pt) utter.voice = pt;
-      window.speechSynthesis.speak(utter);
-    } catch {
-      // ignore SpeechSynthesis restriction
+    const t = text.toLowerCase();
+    const round = /round (\d+)/.exec(t);
+    const key = round
+      ? Number(round[1]) === 1
+        ? 'round_1'
+        : Number(round[1]) === 2
+          ? 'round_2'
+          : 'round_final'
+      : t.includes('luta') || t.includes('lutem') || t === 'fight!'
+        ? 'fight'
+        : t.includes('nocaute') || t.includes('k.o')
+          ? 'ko'
+          : t.includes('tempo')
+            ? 'time_over'
+            : t.includes('perfeito')
+              ? 'perfect'
+              : t.includes('empate')
+                ? 'draw'
+                : null;
+    if (!key) return;
+    this.announcer(key);
+  }
+
+  public announcer(key: string): void {
+    this.ensureContext();
+    soundBank.stopGroup('announcer/');
+    soundBank.play(`announcer/${key}`, { maxVoices: 1 });
+  }
+
+  // ------------------------------------------------------------ vozes, torcida, cenários
+  private voiceCooldown = new Map<string, number>();
+
+  /** Voz de personagem. kind: attack, heavy, hurt, fall, taunt, special, super, victory, defeat, laugh, surprise, breath */
+  public voice(fighterId: string, kind: string, chance = 1): void {
+    if (Math.random() > chance) return;
+    const who = fighterId === 'maluco' ? 'maluco' : 'beto';
+    let group = `characters/${who}/${kind}`;
+    if (!soundBank.has(group)) {
+      // equivalentes entre personagens
+      const alt: Record<string, string> = { heavy: 'special', laugh: 'taunt', surprise: 'hurt', breath: 'hurt' };
+      group = `characters/${who}/${alt[kind] ?? 'attack'}`;
     }
+    const priority = kind === 'victory' || kind === 'defeat' || kind === 'super' || kind === 'special' || kind === 'fall';
+    const now = performance.now();
+    if (!priority && now - (this.voiceCooldown.get(who) ?? 0) < 700) return;
+    if (priority) soundBank.stopGroup(`characters/${who}/`);
+    this.voiceCooldown.set(who, now);
+    soundBank.play(group, { maxVoices: 1 });
+  }
+
+  public crowd(kind: 'cheer' | 'gasp' | 'ooh' | 'chant'): void {
+    const group =
+      kind === 'chant'
+        ? ['stages/crowd/chant_tricolor', 'stages/crowd/chant_rubronegro', 'stages/crowd/chant_luta'][Math.floor(Math.random() * 3)]
+        : `stages/crowd/${kind}`;
+    soundBank.play(group, { maxVoices: 2, cooldownMs: 900, gain: kind === 'chant' ? 0.7 : 1 });
+  }
+
+  public sfx(group: string, gain = 1): boolean {
+    this.ensureContext();
+    return soundBank.play(`combat/${group}`, { gain });
+  }
+
+  public ui(kind: 'nav' | 'select' | 'confirm' | 'back' | 'unlock' | 'transition' | 'locked'): void {
+    this.ensureContext();
+    soundBank.play(`ui/${kind}`, { maxVoices: 2, rateJitter: 0 });
+  }
+
+  /** Música + ambiente do cenário (arquivos); cai na síntese antiga se não houver arquivo. */
+  public startStage(arenaId: string, fallback: MusicStyle): void {
+    const map: Record<string, string> = { farol_barra: 'farol', favela_salvador: 'favela', pituba: 'shopping' };
+    const st = map[arenaId] ?? 'farol';
+    this.ensureContext();
+    this.wantedScreenMusic = `music/stage_${st}`;
+    if (soundBank.has(this.wantedScreenMusic)) {
+      this.stopStageMusic();
+      soundBank.playMusic(this.wantedScreenMusic);
+      soundBank.playAmbience(`stages/${st}/ambience`);
+      soundBank.preload([`characters/`, 'stages/crowd/', `stages/${st}/`]);
+    } else {
+      this.startStageMusic(fallback);
+    }
+  }
+
+  public stopStage(): void {
+    this.stopStageMusic();
+    soundBank.stopAmbience();
+  }
+
+  private wantedScreenMusic: string | null = null;
+
+  /** Trilha por tela (menu, seleção, resultado). */
+  public screenMusic(screen: string, didWin?: boolean): void {
+    const group =
+      screen === 'result'
+        ? didWin === false
+          ? 'defeat/defeat_jingle'
+          : 'victory/victory_jingle'
+        : screen === 'select' || screen === 'stage_select' || screen === 'bracket'
+          ? 'music/select'
+          : screen === 'arena'
+            ? null
+            : 'music/menu_theme';
+    if (!group) return;
+    if (screen !== 'result') soundBank.stopAmbience();
+    this.wantedScreenMusic = group;
+    if (this.unlocked) this.ensureContext();
+    soundBank.playMusic(group);
   }
 
   public startStageMusic(style: MusicStyle): void {
@@ -213,6 +320,8 @@ class ArcadeAudioEngine {
   }
 
   public playClick(): void {
+    this.ensureContext();
+    if (soundBank.play('ui/nav', { rateJitter: 0 })) return;
     const ctx = this.ensureContext();
     if (!ctx || this.sfxGain <= 0.01) return;
     const now = ctx.currentTime;
@@ -229,6 +338,8 @@ class ArcadeAudioEngine {
   }
 
   public playSelectSnap(): void {
+    this.ensureContext();
+    if (soundBank.play('ui/select', { rateJitter: 0 })) return;
     const ctx = this.ensureContext();
     if (!ctx || this.sfxGain <= 0.01) return;
     const now = ctx.currentTime;
@@ -246,6 +357,8 @@ class ArcadeAudioEngine {
   }
 
   public playWhoosh(): void {
+    this.ensureContext();
+    if (soundBank.play('combat/whoosh')) return;
     const ctx = this.ensureContext();
     if (!ctx || this.sfxGain <= 0.01) return;
     const now = ctx.currentTime;
@@ -265,6 +378,8 @@ class ArcadeAudioEngine {
   }
 
   public playDodge(): void {
+    this.ensureContext();
+    if (soundBank.play('combat/dodge')) return;
     const ctx = this.ensureContext();
     if (!ctx || this.sfxGain <= 0.01) return;
     const now = ctx.currentTime;
@@ -284,6 +399,11 @@ class ArcadeAudioEngine {
   }
 
   public playParry(): void {
+    this.ensureContext();
+    if (soundBank.play('combat/block', { gain: 1.2 })) {
+      soundBank.play('combat/special_charge', { gain: 0.5 });
+      return;
+    }
     const ctx = this.ensureContext();
     if (!ctx || this.sfxGain <= 0.01) return;
     const now = ctx.currentTime;
@@ -301,6 +421,8 @@ class ArcadeAudioEngine {
   }
 
   public playGrabBreak(): void {
+    this.ensureContext();
+    if (soundBank.play('combat/block')) return;
     const ctx = this.ensureContext();
     if (!ctx || this.sfxGain <= 0.01) return;
     const now = ctx.currentTime;
@@ -317,6 +439,8 @@ class ArcadeAudioEngine {
   }
 
   public playStun(): void {
+    this.ensureContext();
+    if (soundBank.play('combat/hit_body')) return;
     const ctx = this.ensureContext();
     if (!ctx || this.sfxGain <= 0.01) return;
     const now = ctx.currentTime;
@@ -334,6 +458,11 @@ class ArcadeAudioEngine {
   }
 
   public playPunch(heavy = false): void {
+    this.ensureContext();
+    if (soundBank.play(heavy ? 'combat/punch_heavy' : 'combat/punch_light')) {
+      soundBank.play(heavy ? 'combat/hit_body' : 'combat/hit_face', { gain: 0.8 });
+      return;
+    }
     const ctx = this.ensureContext();
     if (!ctx || this.sfxGain <= 0.01) return;
     const now = ctx.currentTime;
@@ -366,6 +495,8 @@ class ArcadeAudioEngine {
   }
 
   public playSlap(): void {
+    this.ensureContext();
+    if (soundBank.play('combat/hit_face', { gain: 1.1 })) return;
     const ctx = this.ensureContext();
     if (!ctx || this.sfxGain <= 0.01) return;
     const now = ctx.currentTime;
@@ -411,6 +542,11 @@ class ArcadeAudioEngine {
   }
 
   public playKick(): void {
+    this.ensureContext();
+    if (soundBank.play(Math.random() < 0.5 ? 'combat/kick_heavy' : 'combat/kick_light')) {
+      soundBank.play('combat/hit_body', { gain: 0.8 });
+      return;
+    }
     const ctx = this.ensureContext();
     if (!ctx || this.sfxGain <= 0.01) return;
     const now = ctx.currentTime;
@@ -440,6 +576,8 @@ class ArcadeAudioEngine {
   }
 
   public playBlock(): void {
+    this.ensureContext();
+    if (soundBank.play('combat/block')) return;
     const ctx = this.ensureContext();
     if (!ctx || this.sfxGain <= 0.01) return;
     const now = ctx.currentTime;
@@ -458,6 +596,8 @@ class ArcadeAudioEngine {
   }
 
   public playSpecial(): void {
+    this.ensureContext();
+    if (soundBank.play('combat/special_whoosh')) return;
     const ctx = this.ensureContext();
     if (!ctx || this.sfxGain <= 0.01) return;
     const now = ctx.currentTime;
@@ -476,6 +616,8 @@ class ArcadeAudioEngine {
   }
 
   public playFinisher(): void {
+    this.ensureContext();
+    if (soundBank.play('combat/special_impact', { gain: 1.2 })) return;
     const ctx = this.ensureContext();
     if (!ctx || this.sfxGain <= 0.01) return;
     const now = ctx.currentTime;
@@ -494,6 +636,8 @@ class ArcadeAudioEngine {
   }
 
   public playCatSwarm(): void {
+    this.ensureContext();
+    if (soundBank.play('combat/cat_swarm')) return;
     const ctx = this.ensureContext();
     if (!ctx || this.sfxGain <= 0.01) return;
     const now = ctx.currentTime;
@@ -514,6 +658,8 @@ class ArcadeAudioEngine {
   }
 
   public playKO(): void {
+    this.ensureContext();
+    if (soundBank.play('combat/ko_impact', { maxVoices: 1 })) return;
     const ctx = this.ensureContext();
     if (!ctx || this.sfxGain <= 0.01) return;
     const now = ctx.currentTime;
@@ -532,6 +678,8 @@ class ArcadeAudioEngine {
   }
 
   public playRoundBell(): void {
+    this.ensureContext();
+    if (soundBank.play('combat/round_bell', { maxVoices: 1, rateJitter: 0 })) return;
     const ctx = this.ensureContext();
     if (!ctx || this.sfxGain <= 0.01) return;
     const now = ctx.currentTime;

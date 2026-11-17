@@ -509,6 +509,7 @@ export function SettingsScreen({ settings, onUpdate, onBack }: SettingsScreenPro
       musicVolume: next.musicVolume,
       sfxVolume: next.sfxVolume,
       voiceVolume: next.voiceVolume,
+      ambientVolume: next.ambientVolume ?? 0.55,
       sfxEnabled: next.sfxEnabled,
     });
     onUpdate(next);
@@ -547,9 +548,10 @@ export function SettingsScreen({ settings, onUpdate, onBack }: SettingsScreenPro
           {(
             [
               { key: 'masterVolume', label: 'Volume Geral' },
-              { key: 'musicVolume', label: 'Música de Arena' },
+              { key: 'musicVolume', label: 'Música' },
               { key: 'sfxVolume', label: 'Efeitos de Golpes' },
-              { key: 'voiceVolume', label: 'Voz Narrador (PT-BR)' },
+              { key: 'voiceVolume', label: 'Vozes e Narrador' },
+              { key: 'ambientVolume', label: 'Ambiente e Torcida' },
             ] as const
           ).map((vol) => (
             <div key={vol.key}>
@@ -578,7 +580,7 @@ export function SettingsScreen({ settings, onUpdate, onBack }: SettingsScreenPro
               className="w-full"
               onClick={() => update({ sfxEnabled: !settings.sfxEnabled })}
             >
-              Áudio: {settings.sfxEnabled ? 'Sim' : 'Não'}
+              Som: {settings.sfxEnabled ? 'Ligado' : 'Mudo'}
             </ActionButton>
             <ActionButton
               variant={settings.cameraShake ? 'gold' : 'steel'}

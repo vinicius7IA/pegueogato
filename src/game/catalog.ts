@@ -476,6 +476,7 @@ export const DEFAULT_PROFILE: PlayerProfile = {
 
 export const DEFAULT_SETTINGS: GameSettings = {
   masterVolume: 0.85,
+  ambientVolume: 0.55,
   musicVolume: 0.55,
   sfxVolume: 0.9,
   voiceVolume: 0.9,

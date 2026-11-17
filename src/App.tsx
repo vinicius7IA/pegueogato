@@ -163,6 +163,12 @@ function AppShell() {
     }, 3200);
   }, []);
 
+  // Trilha sonora por tela (menu, seleção, resultado); a arena cuida da própria música
+  useEffect(() => {
+    gameAudio.screenMusic(screen, lastResult ? lastResult.winner === 'p1' || lastResult.mode === 'local_2p' : undefined);
+    if (screen !== 'menu' && screen !== 'splash' && screen !== 'login') gameAudio.ui('transition');
+  }, [screen]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Configure Web Audio mix whenever settings change
   useEffect(() => {
     gameAudio.configureMix({
@@ -170,10 +176,12 @@ function AppShell() {
       musicVolume: settings.musicVolume,
       sfxVolume: settings.sfxVolume,
       voiceVolume: settings.voiceVolume,
+      ambientVolume: settings.ambientVolume ?? 0.55,
       sfxEnabled: settings.sfxEnabled,
     });
   }, [
     settings.masterVolume,
+    settings.ambientVolume,
     settings.musicVolume,
     settings.sfxVolume,
     settings.voiceVolume,

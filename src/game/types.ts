@@ -339,6 +339,7 @@ export interface GameSettings {
   musicVolume: number;
   sfxVolume: number;
   voiceVolume: number;
+  ambientVolume: number;
   sfxEnabled: boolean;
   cameraShake: boolean;
   showHitEffects: boolean;

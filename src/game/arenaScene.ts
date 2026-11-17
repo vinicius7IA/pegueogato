@@ -238,6 +238,17 @@ export class ArenaCombatEngine {
   private lighthouseBeacon: THREE.Mesh | null = null;
   private stageAnimators: Array<(dt: number, elapsed: number, hitPulse: number) => void> = [];
   private stageHitPulse = 0;
+  private chantTimer = 9;
+  private timeouts: number[] = [];
+
+  /** setTimeout que é cancelado se a luta for encerrada. */
+  private later(ms: number, fn: () => void): void {
+    this.timeouts.push(
+      window.setTimeout(() => {
+        if (!this.disposed) fn();
+      }, ms),
+    );
+  }
   private superFlashTimer = 0;
   private keyLight!: THREE.DirectionalLight;
 
@@ -350,7 +361,7 @@ export class ArenaCombatEngine {
     this.resizeObserver = new ResizeObserver(() => this.handleResize());
     this.resizeObserver.observe(cfg.container);
 
-    gameAudio.startStageMusic(arenaDef.musicStyle);
+    gameAudio.startStage(arenaDef.id, arenaDef.musicStyle);
     if (cfg.mode === 'training') {
       this.roundPhase = 'fight';
       this.bannerText = 'MODO TREINO';
@@ -362,6 +373,7 @@ export class ArenaCombatEngine {
       gameAudio.playRoundBell();
       gameAudio.announce('Round 1');
       this.triggerRandomQuote(this.p1, 'left');
+      this.later(900, () => gameAudio.voice(this.p1.fighterId, 'taunt', 0.7));
     }
 
     this.handleResize();
@@ -1964,6 +1976,14 @@ export class ArenaCombatEngine {
     this.updateVfx(rawDt);
 
     if (this.stageHitPulse > 0) this.stageHitPulse = Math.max(0, this.stageHitPulse - rawDt * 3.0);
+    // Torcida canta de tempos em tempos durante a luta
+    if (this.roundPhase === 'fight') {
+      this.chantTimer -= rawDt;
+      if (this.chantTimer <= 0) {
+        gameAudio.crowd('chant');
+        this.chantTimer = 14 + Math.random() * 10;
+      }
+    }
     for (let i = 0; i < this.stageAnimators.length; i++) {
       this.stageAnimators[i](rawDt, elapsed, this.stageHitPulse);
     }
@@ -2261,6 +2281,7 @@ export class ArenaCombatEngine {
         f.y = 0;
         f.vy = 0;
         if (f.state === 'jump' || f.state === 'air_punch' || f.state === 'air_kick') {
+          gameAudio.sfx('land', 0.8);
           f.state = 'idle';
           f.stateTime = 0;
           f.stateDuration = 0;
@@ -2316,7 +2337,7 @@ export class ArenaCombatEngine {
         f.state = 'jump';
         f.stateTime = 0;
         f.stateDuration = 0.72;
-        gameAudio.playWhoosh();
+        if (!gameAudio.sfx('jump')) gameAudio.playWhoosh();
       } else if (f.y > 0.02) {
         f.state = 'jump';
       } else if (input.block && input.crouch) {
@@ -2390,6 +2411,7 @@ export class ArenaCombatEngine {
 
       if (f.stateTime >= f.stateDuration) {
         if (f.state === 'stun') f.stun = 0;
+        if (f.state === 'knockdown') gameAudio.sfx('getup');
         f.state = f.y > 0.05 ? 'jump' : 'idle';
         f.stateTime = 0;
         f.stateDuration = 0;
@@ -2457,15 +2479,19 @@ export class ArenaCombatEngine {
       f.vx = 0;
       f.energy = Math.min(100, f.energy + 12);
       this.triggerRandomQuote(f, f.slot === 'p1' ? 'left' : 'right');
+      gameAudio.voice(f.fighterId, f.fighterId === 'maluco' && Math.random() < 0.5 ? 'laugh' : 'taunt');
     } else if (moveId === 'special_1' || moveId === 'special_2' || moveId === 'special_combo' || moveId === 'punch_heavy') {
       f.vx = f.facing * 2.85;
     } else if (f.y <= 0.05) {
       f.vx = f.facing * 1.15;
     }
 
-    if (moveId === 'dodge') gameAudio.playDodge();
-    else if (moveId === 'special_1' || moveId === 'special_2' || moveId === 'special_combo') {
+    if (moveId === 'dodge') {
+      gameAudio.playDodge();
+      if (f.fighterId === 'maluco') gameAudio.voice(f.fighterId, 'laugh', 0.25);
+    } else if (moveId === 'special_1' || moveId === 'special_2' || moveId === 'special_combo') {
       gameAudio.playSpecial();
+      gameAudio.voice(f.fighterId, 'special');
       const custom =
         moveId === 'special_1'
           ? FIGHTERS[f.fighterId].specialMoves.special_1.name
@@ -2531,7 +2557,8 @@ export class ArenaCombatEngine {
     const finName = FIGHTERS[f.fighterId].finisherName;
     this.triggerCallout(`GOLPE FINAL: ${finName}!`, f.slot === 'p1' ? 'left' : 'right');
     gameAudio.playFinisher();
-    gameAudio.announce(finName);
+    gameAudio.voice(f.fighterId, 'super');
+    gameAudio.crowd('cheer');
     this.spawnImpactVfx(f.x, 1.25, f.z, 0xfacc15, 22);
   }
 
@@ -2737,6 +2764,7 @@ export class ArenaCombatEngine {
     _hitPos.set((attacker.x + defender.x) * 0.5, 1.32 + defender.y * 0.6, 0.12);
     if (isBlocked) {
       gameAudio.playBlock();
+      if (Math.random() < 0.15) gameAudio.crowd('gasp');
       this.spawnImpactVfx(_hitPos.x, _hitPos.y, _hitPos.z, 0x38bdf8, 6);
       defender.vx = attacker.facing * (spec.knockback * 0.45);
       this.addDamagePopup(defender.x, 1.5 + defender.y, finalDamage, 'normal');
@@ -2772,6 +2800,16 @@ export class ArenaCombatEngine {
       this.spawnImpactVfx(_hitPos.x, _hitPos.y, _hitPos.z, vfxColor, finalDamage >= 14 ? 16 : 10);
       this.stageHitPulse = Math.min(1, this.stageHitPulse + 0.45);
 
+      // Vozes e torcida reagem ao golpe
+      const heavyHit = finalDamage >= 14;
+      gameAudio.voice(attacker.fighterId, heavyHit ? 'heavy' : 'attack', heavyHit ? 0.45 : 0.22);
+      gameAudio.voice(defender.fighterId, 'hurt', heavyHit ? 0.85 : 0.3);
+      if (heavyHit) gameAudio.crowd(Math.random() < 0.5 ? 'ooh' : 'cheer');
+      if (attacker.comboCount >= 3) {
+        gameAudio.sfx('combo');
+        if (attacker.comboCount === 4) gameAudio.crowd('cheer');
+      }
+
       const popKind: DamagePopup['kind'] =
         attacker.state === 'finisher_move'
           ? 'finisher'
@@ -2800,6 +2838,10 @@ export class ArenaCombatEngine {
           this.triggerCallout('ATORDOADO!', defender.slot === 'p1' ? 'left' : 'right');
         } else if (defender.state !== 'stun') {
           defender.state = finalDamage >= 18 ? 'knockdown' : 'hitstun';
+          if (defender.state === 'knockdown') {
+            gameAudio.sfx('fall');
+            gameAudio.voice(defender.fighterId, 'fall');
+          }
           defender.stateTime = 0;
           defender.stateDuration = spec.hitstun;
         }
@@ -2946,6 +2988,9 @@ export class ArenaCombatEngine {
     if (this.p1.hp <= 0 || this.p2.hp <= 0) {
       this.bannerText = 'K.O.!';
       gameAudio.announce('Nocaute!');
+      gameAudio.crowd('cheer');
+      const loser = this.p1.hp <= 0 ? this.p1 : this.p2;
+      gameAudio.voice(loser.fighterId, 'fall');
       if (this.p1.hp <= 0) this.p1.state = 'ko';
       if (this.p2.hp <= 0) this.p2.state = 'ko';
     } else {
@@ -2971,17 +3016,34 @@ export class ArenaCombatEngine {
       this.p1.state = vStates[(this.roundNumber - 1) % 3];
       this.bannerText = `${p1Name} VENCEU!`;
       this.triggerRandomQuote(this.p1, 'left');
-      if (this.p1.hp === this.p1.maxHp) this.perfectRoundsP1 += 1;
+      if (this.p1.hp === this.p1.maxHp) {
+        this.perfectRoundsP1 += 1;
+        this.later(1700, () => gameAudio.announcer('perfect'));
+      }
+      this.roundWinVoices(this.p1, this.p2);
     } else if (p2Ratio > p1Ratio) {
       this.p2.roundsWon += 1;
       const vStates: MoveId[] = ['victory', 'victory_1', 'victory_2'];
       this.p2.state = vStates[(this.roundNumber - 1) % 3];
       this.bannerText = `${p2Name} VENCEU!`;
       this.triggerRandomQuote(this.p2, 'right');
+      if (this.p2.hp === this.p2.maxHp) this.later(1700, () => gameAudio.announcer('perfect'));
+      this.roundWinVoices(this.p2, this.p1);
     } else {
       this.bannerText = 'EMPATE!';
+      gameAudio.announcer('draw');
     }
     this.emitHud();
+  }
+
+  /** Vencedor comemora; no fim da partida o perdedor lamenta e o narrador anuncia. */
+  private roundWinVoices(winner: FighterRuntime, loser: FighterRuntime): void {
+    this.later(900, () => gameAudio.voice(winner.fighterId, 'victory'));
+    if (winner.roundsWon >= 2) {
+      this.later(2600, () => gameAudio.voice(loser.fighterId, 'defeat'));
+      const key = winner.fighterId === 'maluco' ? 'wins_maluco' : winner.fighterId === 'policial' ? 'wins_beto' : null;
+      if (key) this.later(250, () => gameAudio.announcer(key));
+    }
   }
 
   private finishMatch(): void {
@@ -3219,7 +3281,8 @@ export class ArenaCombatEngine {
     this.resizeObserver.disconnect();
     this.renderer.domElement.removeEventListener('webglcontextlost', this.onContextLost);
     this.renderer.domElement.removeEventListener('webglcontextrestored', this.onContextRestored);
-    gameAudio.stopStageMusic();
+    gameAudio.stopStage();
+    this.timeouts.forEach((t) => clearTimeout(t));
 
     this.p1?.rig.dispose();
     this.p2?.rig.dispose();

@@ -1,0 +1,334 @@
+{
+ "announcer/beto": [
+  "announcer/beto"
+ ],
+ "announcer/challenger": [
+  "announcer/challenger"
+ ],
+ "announcer/champion": [
+  "announcer/champion"
+ ],
+ "announcer/choose": [
+  "announcer/choose"
+ ],
+ "announcer/draw": [
+  "announcer/draw"
+ ],
+ "announcer/farol": [
+  "announcer/farol"
+ ],
+ "announcer/favela": [
+  "announcer/favela"
+ ],
+ "announcer/fight": [
+  "announcer/fight"
+ ],
+ "announcer/final": [
+  "announcer/final"
+ ],
+ "announcer/ko": [
+  "announcer/ko"
+ ],
+ "announcer/maluco": [
+  "announcer/maluco"
+ ],
+ "announcer/perfect": [
+  "announcer/perfect"
+ ],
+ "announcer/round": [
+  "announcer/round_1",
+  "announcer/round_2"
+ ],
+ "announcer/round_final": [
+  "announcer/round_final"
+ ],
+ "announcer/shopping": [
+  "announcer/shopping"
+ ],
+ "announcer/time_over": [
+  "announcer/time_over"
+ ],
+ "announcer/title": [
+  "announcer/title"
+ ],
+ "announcer/wins_beto": [
+  "announcer/wins_beto"
+ ],
+ "announcer/wins_maluco": [
+  "announcer/wins_maluco"
+ ],
+ "announcer/you_lose": [
+  "announcer/you_lose"
+ ],
+ "announcer/you_win": [
+  "announcer/you_win"
+ ],
+ "characters/beto/attack": [
+  "characters/beto/attack_1",
+  "characters/beto/attack_2",
+  "characters/beto/attack_3",
+  "characters/beto/attack_4",
+  "characters/beto/attack_5"
+ ],
+ "characters/beto/breath": [
+  "characters/beto/breath_1"
+ ],
+ "characters/beto/defeat": [
+  "characters/beto/defeat_1",
+  "characters/beto/defeat_2"
+ ],
+ "characters/beto/fall": [
+  "characters/beto/fall_1"
+ ],
+ "characters/beto/heavy": [
+  "characters/beto/heavy_1",
+  "characters/beto/heavy_2",
+  "characters/beto/heavy_3"
+ ],
+ "characters/beto/hurt": [
+  "characters/beto/hurt_1",
+  "characters/beto/hurt_2",
+  "characters/beto/hurt_3"
+ ],
+ "characters/beto/special": [
+  "characters/beto/special_1",
+  "characters/beto/special_2",
+  "characters/beto/special_3"
+ ],
+ "characters/beto/super": [
+  "characters/beto/super_1",
+  "characters/beto/super_2"
+ ],
+ "characters/beto/taunt": [
+  "characters/beto/taunt_1",
+  "characters/beto/taunt_2",
+  "characters/beto/taunt_3"
+ ],
+ "characters/beto/victory": [
+  "characters/beto/victory_1",
+  "characters/beto/victory_2",
+  "characters/beto/victory_3"
+ ],
+ "characters/maluco/attack": [
+  "characters/maluco/attack_1",
+  "characters/maluco/attack_2",
+  "characters/maluco/attack_3",
+  "characters/maluco/attack_4",
+  "characters/maluco/attack_5"
+ ],
+ "characters/maluco/defeat": [
+  "characters/maluco/defeat_1",
+  "characters/maluco/defeat_2"
+ ],
+ "characters/maluco/fall": [
+  "characters/maluco/fall_1"
+ ],
+ "characters/maluco/hurt": [
+  "characters/maluco/hurt_1",
+  "characters/maluco/hurt_2",
+  "characters/maluco/hurt_3"
+ ],
+ "characters/maluco/laugh": [
+  "characters/maluco/laugh_1",
+  "characters/maluco/laugh_2",
+  "characters/maluco/laugh_3"
+ ],
+ "characters/maluco/special": [
+  "characters/maluco/special_1",
+  "characters/maluco/special_2",
+  "characters/maluco/special_3"
+ ],
+ "characters/maluco/super": [
+  "characters/maluco/super_1",
+  "characters/maluco/super_2"
+ ],
+ "characters/maluco/surprise": [
+  "characters/maluco/surprise_1",
+  "characters/maluco/surprise_2",
+  "characters/maluco/surprise_3"
+ ],
+ "characters/maluco/taunt": [
+  "characters/maluco/taunt_1",
+  "characters/maluco/taunt_2",
+  "characters/maluco/taunt_3"
+ ],
+ "characters/maluco/victory": [
+  "characters/maluco/victory_1",
+  "characters/maluco/victory_2",
+  "characters/maluco/victory_3"
+ ],
+ "combat/block": [
+  "combat/block_1",
+  "combat/block_2",
+  "combat/block_3"
+ ],
+ "combat/cat_swarm": [
+  "combat/cat_swarm_1"
+ ],
+ "combat/combo": [
+  "combat/combo_1",
+  "combat/combo_2",
+  "combat/combo_3"
+ ],
+ "combat/dodge": [
+  "combat/dodge_1",
+  "combat/dodge_2"
+ ],
+ "combat/fall": [
+  "combat/fall_1",
+  "combat/fall_2"
+ ],
+ "combat/getup": [
+  "combat/getup_1"
+ ],
+ "combat/hit_body": [
+  "combat/hit_body_1",
+  "combat/hit_body_2",
+  "combat/hit_body_3"
+ ],
+ "combat/hit_face": [
+  "combat/hit_face_1",
+  "combat/hit_face_2",
+  "combat/hit_face_3"
+ ],
+ "combat/jump": [
+  "combat/jump_1",
+  "combat/jump_2"
+ ],
+ "combat/kick_heavy": [
+  "combat/kick_heavy_1",
+  "combat/kick_heavy_2",
+  "combat/kick_heavy_3"
+ ],
+ "combat/kick_light": [
+  "combat/kick_light_1",
+  "combat/kick_light_2",
+  "combat/kick_light_3"
+ ],
+ "combat/ko_impact": [
+  "combat/ko_impact_1"
+ ],
+ "combat/land": [
+  "combat/land_1",
+  "combat/land_2"
+ ],
+ "combat/punch_heavy": [
+  "combat/punch_heavy_1",
+  "combat/punch_heavy_2",
+  "combat/punch_heavy_3"
+ ],
+ "combat/punch_light": [
+  "combat/punch_light_1",
+  "combat/punch_light_2",
+  "combat/punch_light_3"
+ ],
+ "combat/round_bell": [
+  "combat/round_bell_1"
+ ],
+ "combat/special_charge": [
+  "combat/special_charge_1"
+ ],
+ "combat/special_impact": [
+  "combat/special_impact_1",
+  "combat/special_impact_2"
+ ],
+ "combat/special_whoosh": [
+  "combat/special_whoosh_1",
+  "combat/special_whoosh_2"
+ ],
+ "combat/whoosh": [
+  "combat/whoosh_1",
+  "combat/whoosh_2",
+  "combat/whoosh_3"
+ ],
+ "defeat/defeat_jingle": [
+  "defeat/defeat_jingle"
+ ],
+ "music/menu_theme": [
+  "music/menu_theme"
+ ],
+ "music/select": [
+  "music/select"
+ ],
+ "music/stage_farol": [
+  "music/stage_farol"
+ ],
+ "music/stage_favela": [
+  "music/stage_favela"
+ ],
+ "music/stage_shopping": [
+  "music/stage_shopping"
+ ],
+ "stages/crowd/chant_luta": [
+  "stages/crowd/chant_luta_1"
+ ],
+ "stages/crowd/chant_rubronegro": [
+  "stages/crowd/chant_rubronegro_1"
+ ],
+ "stages/crowd/chant_tricolor": [
+  "stages/crowd/chant_tricolor_1"
+ ],
+ "stages/crowd/cheer": [
+  "stages/crowd/cheer_1",
+  "stages/crowd/cheer_2",
+  "stages/crowd/cheer_3"
+ ],
+ "stages/crowd/gasp": [
+  "stages/crowd/gasp_1",
+  "stages/crowd/gasp_2"
+ ],
+ "stages/crowd/ooh": [
+  "stages/crowd/ooh_1",
+  "stages/crowd/ooh_2"
+ ],
+ "stages/farol/ambience": [
+  "stages/farol/ambience"
+ ],
+ "stages/farol/vendor": [
+  "stages/farol/vendor_1",
+  "stages/farol/vendor_2",
+  "stages/farol/vendor_3",
+  "stages/farol/vendor_4"
+ ],
+ "stages/favela/ambience": [
+  "stages/favela/ambience"
+ ],
+ "stages/favela/dog": [
+  "stages/favela/dog_1",
+  "stages/favela/dog_2",
+  "stages/favela/dog_3"
+ ],
+ "stages/shopping/ambience": [
+  "stages/shopping/ambience"
+ ],
+ "stages/shopping/door": [
+  "stages/shopping/door_1"
+ ],
+ "stages/shopping/pa": [
+  "stages/shopping/pa_1"
+ ],
+ "ui/back": [
+  "ui/back"
+ ],
+ "ui/confirm": [
+  "ui/confirm"
+ ],
+ "ui/locked": [
+  "ui/locked"
+ ],
+ "ui/nav": [
+  "ui/nav"
+ ],
+ "ui/select": [
+  "ui/select"
+ ],
+ "ui/transition": [
+  "ui/transition"
+ ],
+ "ui/unlock": [
+  "ui/unlock"
+ ],
+ "victory/victory_jingle": [
+  "victory/victory_jingle"
+ ]
+}
