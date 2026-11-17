@@ -14,6 +14,7 @@ import {
   PowerId,
   TrainingDummyMode,
 } from '../game/types';
+import { CombatHud } from './ui/CombatHud';
 import { CombatControls } from './CombatControls';
 import { ActionButton, StreetPanel } from './ui/FightingUI';
 
@@ -341,155 +342,34 @@ export function ArenaView({
       </div>
 
       {/* Top AAA Street Fighting Combat HUD */}
-      <div className="pointer-events-none absolute top-0 inset-x-0 z-20 px-2.5 sm:px-5 pt-2.5 max-w-5xl mx-auto">
-        <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-2 sm:gap-3">
-          {/* P1 Slanted Gauge Block */}
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center justify-between gap-2 text-xs sm:text-sm font-display italic font-black text-white drop-shadow-[0_2px_0_rgba(0,0,0,0.95)]">
-              <span className="truncate uppercase tracking-wide flex items-center gap-1.5">
-                <span className="inline-block w-1.5 h-3.5 bg-sf-gold -skew-x-12 shrink-0" />
-                {p1Meta.name}
-                {arcadeStage ? ` · FASE ${arcadeStage}/4` : ''}
-              </span>
-              <div className="flex items-center gap-1.5 shrink-0">
-                {[0, 1].map((i) => (
-                  <span
-                    key={i}
-                    className={`w-2.5 h-2.5 rotate-45 border ${
-                      hud.p1Rounds > i
-                        ? 'bg-sf-gold border-white'
-                        : 'bg-black/80 border-white/35'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Slanted P1 Vitality Bar with Trailing Red Drain */}
-            <div className="relative h-4 sm:h-5 w-full bg-sf-ink/95 border-b-2 border-sf-gold/60 sf-hp-p1 overflow-hidden shadow-[0_4px_14px_rgba(0,0,0,0.85)]">
-              <div
-                className="absolute inset-y-0 left-0 bg-sf-crimson transition-all duration-700 ease-out"
-                style={{ width: `${p1Pct}%` }}
-              />
-              <div
-                className={`relative h-full transition-all duration-100 ${
-                  p1Low
-                    ? 'bg-gradient-to-r from-red-600 via-sf-crimson to-orange-400'
-                    : 'bg-gradient-to-r from-sf-amber via-sf-gold to-[#ffe66d]'
-                }`}
-                style={{ width: `${p1Pct}%` }}
-              />
-            </div>
-
-            {/* P1 Segmented Super Drive Bar + Guard Stun */}
-            <div className="flex items-center gap-2 pr-3">
-              <div className="relative h-2 flex-1 bg-sf-ink/95 border border-white/15 -skew-x-12 overflow-hidden">
-                <div
-                  className={`h-full transition-all duration-100 ${
-                    hud.p1Energy >= 100
-                      ? 'bg-gradient-to-r from-sf-crimson via-sf-gold to-white'
-                      : 'bg-gradient-to-r from-[#0ea5e9] to-sf-cyan'
-                  }`}
-                  style={{ width: `${hud.p1Energy}%` }}
-                />
-                {/* 3 Drive Bar Dividers */}
-                <div className="pointer-events-none absolute inset-0 grid grid-cols-3">
-                  <div className="border-r border-black/80" />
-                  <div className="border-r border-black/80" />
-                  <div />
-                </div>
-              </div>
-              {hud.p1Energy >= 100 && (
-                <span className="font-display italic text-[10px] font-black text-sf-gold tracking-wider whitespace-nowrap">
-                  SUPER MAX
-                </span>
-              )}
-              {hud.p1Stun > 5 && (
-                <div className="h-1.5 w-12 bg-black/90 border border-white/15 -skew-x-12 overflow-hidden">
-                  <div className="h-full bg-sf-gold" style={{ width: `${hud.p1Stun}%` }} />
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Center Championship Timer + Pause */}
-          <div className="flex flex-col items-center gap-1 shrink-0">
-            <div className="sf-chamfer-sm bg-sf-ink/95 border-2 border-sf-gold/70 px-3.5 sm:px-4 py-1 shadow-[0_6px_18px_rgba(0,0,0,0.9)]">
-              <div className="font-mono-num text-xl sm:text-2xl font-black text-white leading-none tracking-tight text-center">
-                {mode === 'training' ? '∞' : String(hud.timer).padStart(2, '0')}
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                gameAudio.playClick();
-                togglePause();
-              }}
-              aria-label="Pausar"
-              className="pointer-events-auto px-2.5 py-1 sf-chamfer-sm bg-sf-surface/95 border border-white/20 hover:border-sf-gold text-slate-200 hover:text-sf-gold transition-colors focus-visible:outline-2 focus-visible:outline-sf-gold"
-            >
-              <Pause className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* P2 Slanted Gauge Block */}
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center flex-row-reverse justify-between gap-2 text-xs sm:text-sm font-display italic font-black text-white drop-shadow-[0_2px_0_rgba(0,0,0,0.95)]">
-              <span className="truncate uppercase tracking-wide flex items-center flex-row-reverse gap-1.5">
-                <span className="inline-block w-1.5 h-3.5 bg-sf-cyan skew-x-12 shrink-0" />
-                {p2Meta.name}
-              </span>
-              <div className="flex items-center gap-1.5 shrink-0">
-                {[0, 1].map((i) => (
-                  <span
-                    key={i}
-                    className={`w-2.5 h-2.5 rotate-45 border ${
-                      hud.p2Rounds > i
-                        ? 'bg-sf-cyan border-white'
-                        : 'bg-black/80 border-white/35'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Slanted P2 Vitality Bar with Trailing Red Drain */}
-            <div className="relative h-4 sm:h-5 w-full bg-sf-ink/95 border-b-2 border-sf-cyan/60 sf-hp-p2 overflow-hidden shadow-[0_4px_14px_rgba(0,0,0,0.85)]">
-              <div
-                className="ml-auto h-full bg-sf-crimson transition-all duration-700 ease-out"
-                style={{ width: `${p2Pct}%` }}
-              />
-              <div
-                className={`absolute inset-y-0 right-0 transition-all duration-100 ${
-                  p2Low
-                    ? 'bg-gradient-to-l from-red-600 via-sf-crimson to-orange-400'
-                    : 'bg-gradient-to-l from-[#0284c7] via-sf-cyan to-[#a5f3fc]'
-                }`}
-                style={{ width: `${p2Pct}%` }}
-              />
-            </div>
-
-            {/* P2 Super Bar */}
-            <div className="flex items-center flex-row-reverse gap-2 pl-3">
-              <div className="relative h-2 flex-1 bg-sf-ink/95 border border-white/15 skew-x-12 overflow-hidden">
-                <div
-                  className="ml-auto h-full bg-gradient-to-l from-sf-purple to-sf-cyan transition-all duration-100"
-                  style={{ width: `${hud.p2Energy}%` }}
-                />
-                <div className="pointer-events-none absolute inset-0 grid grid-cols-3">
-                  <div className="border-r border-black/80" />
-                  <div className="border-r border-black/80" />
-                  <div />
-                </div>
-              </div>
-              {hud.p2Stun > 5 && (
-                <div className="h-1.5 w-12 bg-black/90 border border-white/15 skew-x-12 overflow-hidden">
-                  <div className="ml-auto h-full bg-sf-gold" style={{ width: `${hud.p2Stun}%` }} />
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+      <div className="pointer-events-none absolute top-0 inset-x-0 z-20 px-2.5 sm:px-5 pt-2.5 max-w-6xl mx-auto">
+        <CombatHud
+          round={hud.roundNumber}
+          timer={mode === 'training' ? '∞' : String(hud.timer).padStart(2, '0')}
+          onPause={() => {
+            gameAudio.playClick();
+            togglePause();
+          }}
+          p1={{
+            name: p1Meta.name,
+            subtitle: arcadeStage ? `FASE ${arcadeStage}/4` : undefined,
+            photoUrl: p1Meta.showPortraitPhoto ? p1Def.portraitUrl : null,
+            badgeColor: p1Def.badgeColor,
+            hpPct: p1Pct,
+            energy: hud.p1Energy,
+            rounds: hud.p1Rounds,
+            stun: hud.p1Stun,
+          }}
+          p2={{
+            name: p2Meta.name,
+            photoUrl: p2Meta.showPortraitPhoto ? p2Def.portraitUrl : null,
+            badgeColor: p2Def.badgeColor,
+            hpPct: p2Pct,
+            energy: hud.p2Energy,
+            rounds: hud.p2Rounds,
+            stun: hud.p2Stun,
+          }}
+        />
 
         {/* Training Toolbar */}
         {mode === 'training' && (

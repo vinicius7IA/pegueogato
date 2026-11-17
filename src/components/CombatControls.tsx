@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, ReactNode } from 'react';
+import { Flame, Footprints, Hand, Shield, Sparkles, Wind, Zap } from 'lucide-react';
 import { createEmptyInput, FighterInputState } from '../game/arenaScene';
 import { InputMethod, KeyBindings, MobileOrientation } from '../game/types';
 
@@ -28,6 +29,53 @@ function formatKeyShort(code: string): string {
   if (code === 'Space') return 'ESPAÇO';
   if (code.startsWith('Arrow')) return code.replace('Arrow', '');
   return code.slice(0, 5).toUpperCase();
+}
+
+const ROUND_TONES = {
+  gold: 'bg-gradient-to-b from-sf-gold to-sf-amber text-black border-white',
+  sky: 'bg-sf-raised/95 text-sky-300 border-sky-400/70',
+  cyan: 'bg-sf-raised/95 text-sf-cyan border-sf-cyan/70',
+  emerald: 'bg-sf-raised/95 text-emerald-300 border-emerald-400/70',
+  crimson: 'bg-gradient-to-b from-sf-crimson to-red-800 text-white border-sf-gold',
+  orange: 'bg-sf-raised/95 text-orange-300 border-orange-400/70',
+} as const;
+
+function RoundButton({
+  label,
+  icon,
+  size,
+  pos,
+  tone,
+  pulse = false,
+  onDown,
+  onUp,
+}: {
+  label: string;
+  icon: ReactNode;
+  size: number;
+  pos: string;
+  tone: keyof typeof ROUND_TONES;
+  pulse?: boolean;
+  onDown: () => void;
+  onUp: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      onPointerDown={onDown}
+      onPointerUp={onUp}
+      onPointerCancel={onUp}
+      onContextMenu={(e) => e.preventDefault()}
+      style={{ width: size, height: size }}
+      className={`touch-control absolute ${pos} rounded-full border-2 flex flex-col items-center justify-center gap-0.5 shadow-[0_6px_16px_rgba(0,0,0,0.6),inset_0_2px_0_rgba(255,255,255,0.25)] active:scale-90 transition-transform ${ROUND_TONES[tone]} ${
+        pulse ? 'animate-hit-pop ring-2 ring-sf-gold/70' : ''
+      }`}
+    >
+      {icon}
+      <span className="text-[8px] font-black tracking-wide leading-none">{label}</span>
+    </button>
+  );
 }
 
 export function CombatControls({
@@ -370,7 +418,7 @@ export function CombatControls({
 
       {/* Right: Streamlined 4 Core Buttons + 1 Contextual Special/Finisher */}
       <div
-        className="pointer-events-auto flex flex-col items-end gap-2 touch-control"
+        className="pointer-events-auto relative w-[196px] h-[150px] shrink-0 touch-control"
         onPointerDown={(e) => {
           swipeOriginRef.current = { x: e.clientX, y: e.clientY, t: Date.now() };
         }}
@@ -392,97 +440,85 @@ export function CombatControls({
           }
         }}
       >
-        {/* Single Contextual Special / Super / Finisher Slot */}
+        {/* Botões redondos em arco, estilo arcade mobile */}
+        <RoundButton
+          label="SOCO"
+          icon={<Hand className="w-6 h-6" />}
+          size={74}
+          pos="right-0 bottom-0"
+          tone="gold"
+          onDown={() => setTouchAction('punchLight', true)}
+          onUp={() => setTouchAction('punchLight', false)}
+        />
+        <RoundButton
+          label="CHUTE"
+          icon={<Footprints className="w-5 h-5" />}
+          size={62}
+          pos="right-[84px] bottom-0"
+          tone="sky"
+          onDown={() => setTouchAction('kickMed', true)}
+          onUp={() => setTouchAction('kickMed', false)}
+        />
+        <RoundButton
+          label="DEFESA"
+          icon={<Shield className="w-5 h-5" />}
+          size={58}
+          pos="right-[70px] bottom-[70px]"
+          tone="cyan"
+          onDown={() => {
+            setTouchAction('block', true);
+            setTouchAction('parry', true);
+          }}
+          onUp={() => {
+            setTouchAction('block', false);
+            setTouchAction('parry', false);
+          }}
+        />
+        <RoundButton
+          label="ESQUIVA"
+          icon={<Wind className="w-5 h-5" />}
+          size={56}
+          pos="right-0 bottom-[84px]"
+          tone="emerald"
+          onDown={() => setTouchAction('dodge', true)}
+          onUp={() => setTouchAction('dodge', false)}
+        />
         {canUseFinisher ? (
-          <button
-            type="button"
-            onPointerDown={() => setTouchAction('finisher', true)}
-            onPointerUp={() => setTouchAction('finisher', false)}
-            onPointerCancel={() => setTouchAction('finisher', false)}
-            className="touch-control px-4 py-1.5 sf-chamfer-sm bg-gradient-to-r from-sf-crimson to-red-700 border border-sf-gold text-white text-[11px] font-black tracking-wide shadow-[0_4px_18px_rgba(255,70,46,0.55)] active:scale-95 animate-hit-pop"
-          >
-            FINAL: {finisherName.split(' ')[0]}
-          </button>
+          <RoundButton
+            label="FINAL"
+            icon={<Flame className="w-5 h-5" />}
+            size={58}
+            pos="right-[134px] bottom-[62px]"
+            tone="crimson"
+            pulse
+            onDown={() => setTouchAction('finisher', true)}
+            onUp={() => setTouchAction('finisher', false)}
+          />
         ) : canUseSpecial ? (
-          <button
-            type="button"
-            onPointerDown={() => setTouchAction('powerMove', true)}
-            onPointerUp={() => setTouchAction('powerMove', false)}
-            onPointerCancel={() => setTouchAction('powerMove', false)}
-            className="touch-control px-4 py-1.5 sf-chamfer-sm bg-gradient-to-r from-sf-gold to-sf-amber border border-white text-black text-[11px] font-black tracking-wide shadow-[0_4px_16px_rgba(255,200,21,0.45)] active:scale-95 animate-hit-pop"
-          >
-            {powerName.toUpperCase()}
-          </button>
+          <RoundButton
+            label="PODER"
+            icon={<Zap className="w-5 h-5" />}
+            size={58}
+            pos="right-[134px] bottom-[62px]"
+            tone="gold"
+            pulse
+            onDown={() => setTouchAction('powerMove', true)}
+            onUp={() => setTouchAction('powerMove', false)}
+          />
         ) : (
-          <button
-            type="button"
-            onPointerDown={() => setTouchAction(commandAssist ? 'special1' : 'special2', true)}
-            onPointerUp={() => {
+          <RoundButton
+            label="ESPECIAL"
+            icon={<Sparkles className="w-5 h-5" />}
+            size={54}
+            pos="right-[134px] bottom-[62px]"
+            tone="orange"
+            onDown={() => setTouchAction(commandAssist ? 'special1' : 'special2', true)}
+            onUp={() => {
               setTouchAction('special1', false);
               setTouchAction('special2', false);
             }}
-            onPointerCancel={() => {
-              setTouchAction('special1', false);
-              setTouchAction('special2', false);
-            }}
-            className="touch-control px-3.5 py-1.5 sf-chamfer-sm bg-[#c2410c]/95 border border-orange-300/65 text-white text-[10px] font-black tracking-wider active:scale-95"
-          >
-            ESPECIAL
-          </button>
+          />
         )}
-
-        {/* 2x2 Core Combat Cluster */}
-        <div className="grid grid-cols-2 gap-2.5 items-center">
-          <button
-            type="button"
-            onPointerDown={() => setTouchAction('dodge', true)}
-            onPointerUp={() => setTouchAction('dodge', false)}
-            onPointerCancel={() => setTouchAction('dodge', false)}
-            className="touch-control w-16 h-14 sf-chamfer-sm bg-[#0f292e]/95 border border-emerald-400/75 text-emerald-300 flex flex-col items-center justify-center leading-tight active:scale-90"
-          >
-            <span className="text-[11px] font-black tracking-wide">ESQUIVA</span>
-            <span className="text-[8px] font-bold text-emerald-200/80">→ AGARRA</span>
-          </button>
-
-          <button
-            type="button"
-            onPointerDown={() => {
-              setTouchAction('block', true);
-              setTouchAction('parry', true);
-            }}
-            onPointerUp={() => {
-              setTouchAction('block', false);
-              setTouchAction('parry', false);
-            }}
-            onPointerCancel={() => {
-              setTouchAction('block', false);
-              setTouchAction('parry', false);
-            }}
-            className="touch-control w-16 h-14 sf-chamfer-sm bg-[#09324a]/95 border border-sf-cyan/70 text-[11px] font-black text-sf-cyan active:scale-90"
-          >
-            DEFESA
-          </button>
-
-          <button
-            type="button"
-            onPointerDown={() => setTouchAction('kickMed', true)}
-            onPointerUp={() => setTouchAction('kickMed', false)}
-            onPointerCancel={() => setTouchAction('kickMed', false)}
-            className="touch-control w-16 h-15 sf-chamfer-sm bg-[#141926]/95 border border-sky-400/60 text-[12px] font-black text-sky-300 active:scale-90"
-          >
-            CHUTE
-          </button>
-
-          <button
-            type="button"
-            onPointerDown={() => setTouchAction('punchLight', true)}
-            onPointerUp={() => setTouchAction('punchLight', false)}
-            onPointerCancel={() => setTouchAction('punchLight', false)}
-            className="touch-control w-18 h-16 sf-chamfer-sm bg-gradient-to-br from-sf-gold to-sf-amber border-2 border-white text-black font-display italic text-sm font-black shadow-lg active:scale-90"
-          >
-            SOCO
-          </button>
-        </div>
       </div>
     </div>
   );
