@@ -1,4 +1,4 @@
-import { MapPin, Package, RotateCw, Shuffle, Sparkles, Swords } from 'lucide-react';
+import { ArrowLeft, Box, MapPin, Package, Shuffle, Sparkles, Swords, X } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import salvadorBackdrop from '../assets/images/salvador_arena_cinematic_1794790674658.jpg';
@@ -15,13 +15,7 @@ import {
 } from '../game/catalog';
 import { AiDifficulty, ArenaId, FighterId, MatchMode, PlayerProfile, PowerId } from '../game/types';
 import { FighterPreview3D } from './FighterPreview3D';
-import {
-  ActionButton,
-  ScreenHeader,
-  SegmentedTabs,
-  StatGauge,
-  StreetPanel,
-} from './ui/FightingUI';
+import { ActionButton, SegmentedTabs, StatGauge } from './ui/FightingUI';
 
 interface CharacterSelectScreenProps {
   profile: PlayerProfile;
@@ -75,6 +69,7 @@ export function CharacterSelectScreen({
   const [slotTab, setSlotTab] = useState<'p1' | 'p2'>('p1');
   const [difficulty, setDifficulty] = useState<AiDifficulty>(initialDifficulty);
   const [countdown, setCountdown] = useState(45);
+  const [show3D, setShow3D] = useState(false);
 
   useEffect(() => {
     const t = window.setInterval(() => {
@@ -124,204 +119,127 @@ export function CharacterSelectScreen({
     onEquipPower(activeId, next);
   };
 
+  const sides = [
+    { slot: 'p1' as const, id: p1Fighter, meta: p1Meta, tone: 'gold' as const },
+    { slot: 'p2' as const, id: p2Fighter, meta: p2Meta, tone: 'cyan' as const },
+  ];
+
   return (
-    <div className="w-full h-full overflow-y-auto bg-sf-bg text-slate-100 flex flex-col sf-halftone-bg">
-      <ScreenHeader
-        title="SELEÇÃO DE LUTADORES"
-        subtitle={`${FIGHTERS_LIST.length}/${FIGHTER_ROSTER_CAPACITY} lutadores disponíveis`}
-        onBack={onBack}
-        centerSlot={
-          <div className="px-3.5 py-1 sf-chamfer-sm bg-sf-ink border border-sf-gold/50 font-mono-num text-base font-black text-sf-gold">
-            {String(countdown).padStart(2, '0')}s
-          </div>
-        }
-        rightSlot={
-          <SegmentedTabs
-            items={[
-              { id: 'p1', label: 'Edit P1' },
-              { id: 'p2', label: 'Edit P2' },
-            ]}
-            value={slotTab}
-            onChange={setSlotTab}
-            tone={slotTab === 'p2' ? 'cyan' : 'gold'}
-            className="min-w-[140px]"
-          />
-        }
+    <div className="relative w-full h-full overflow-hidden bg-sf-bg text-slate-100 flex flex-col">
+      <img
+        src={salvadorBackdrop}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none"
       />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-sf-bg/70 to-black pointer-events-none" />
+      <div className="absolute inset-0 sf-halftone-bg pointer-events-none" />
 
-      <main className="flex-1 p-4 sm:p-5 max-w-6xl w-full mx-auto flex flex-col gap-4">
-        {/* Fighting-Game Side Portraits + Center VS + Interactive 3D Stage */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.4fr_1fr] gap-3.5 items-stretch">
-          {/* P1 Side Card */}
-          <motion.div
-            key={`p1_${p1Fighter}`}
-            initial={{ x: -16, opacity: 0.55 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.22 }}
-            className="h-full"
-          >
-            <StreetPanel
-              tone={slotTab === 'p1' ? 'gold' : 'neutral'}
-              chamfer="md"
-              className="h-full p-4 flex flex-col justify-between gap-3 bg-gradient-to-br from-sf-gold/14 via-sf-surface to-sf-ink"
-            >
-              <div className="flex items-center gap-3.5">
-                {p1Meta.showPortraitPhoto && FIGHTERS[p1Fighter].portraitUrl ? (
-                  <img
-                    src={FIGHTERS[p1Fighter].portraitUrl}
-                    alt={p1Meta.name}
-                    referrerPolicy="no-referrer"
-                    className="w-20 h-24 sf-chamfer-sm object-cover object-top border border-sf-gold/60 shrink-0"
-                  />
-                ) : (
-                  <div
-                    className="w-20 h-24 sf-chamfer-sm flex items-center justify-center font-display italic text-3xl font-black text-white shrink-0 border border-white/20"
-                    style={{ backgroundColor: FIGHTERS[p1Fighter].badgeColor }}
-                  >
-                    {p1Meta.name.slice(0, 2)}
-                  </div>
-                )}
-                <div className="min-w-0">
-                  <div className="text-[11px] font-black tracking-widest text-sf-gold">
-                    JOGADOR 1
-                  </div>
-                  <div className="font-display italic text-2xl sm:text-3xl font-black text-white leading-none truncate mt-0.5">
-                    {p1Meta.name}
-                  </div>
-                  <div className="text-xs text-slate-400 truncate mt-1">
-                    {ARCHETYPE_NAMES[FIGHTERS[p1Fighter].archetype]} · {FIGHTERS[p1Fighter].title}
-                  </div>
-                </div>
-              </div>
-              <p className="text-xs text-amber-100/90 italic border-t border-white/10 pt-2.5 truncate">
-                “{FIGHTERS[p1Fighter].catchphrase}”
-              </p>
-            </StreetPanel>
-          </motion.div>
-
-          {/* Center 3D Preview + VS Crest */}
-          <StreetPanel
-            tone={slotTab === 'p1' ? 'gold' : 'cyan'}
-            chamfer="lg"
-            className="relative h-64 lg:h-68 bg-sf-ink"
-          >
-            <img
-              src={salvadorBackdrop}
-              alt="Arena de Salvador"
-              referrerPolicy="no-referrer"
-              className="absolute inset-0 w-full h-full object-cover opacity-38"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-black/55" />
-            <FighterPreview3D
-              fighterId={activeId}
-              skinId={activeSkin}
-              authorizationMode={authorizationMode}
-            />
-
-            <div className="absolute top-3 left-3 flex items-center gap-1.5 z-10">
-              <button
-                type="button"
-                onClick={cycleActiveSkin}
-                className="flex items-center gap-1 text-[11px] font-black uppercase text-sf-gold bg-black/80 border border-sf-gold/45 px-2.5 py-1 sf-chamfer-sm hover:bg-black transition-colors"
-              >
-                Trocar Skin
-              </button>
-              <button
-                type="button"
-                onClick={cycleActivePower}
-                className="flex items-center gap-1 text-[11px] font-black uppercase text-sf-cyan bg-black/80 border border-sf-cyan/45 px-2.5 py-1 sf-chamfer-sm hover:bg-black transition-colors"
-              >
-                <Sparkles className="w-3 h-3" /> {POWERS[activePower].shortName}
-              </button>
-            </div>
-
-            <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10">
-              <button
-                type="button"
-                onClick={() => {
-                  gameAudio.playClick();
-                  onOpenInventory();
-                }}
-                className="flex items-center gap-1 text-[11px] font-bold text-white bg-black/80 border border-white/22 px-2.5 py-1 sf-chamfer-sm hover:border-sf-gold"
-              >
-                <Package className="w-3 h-3 text-sf-gold" /> Inventário
-              </button>
-              <span className="hidden sm:flex items-center gap-1 text-[10px] font-bold text-slate-300 bg-black/70 px-2 py-1 sf-chamfer-sm pointer-events-none">
-                <RotateCw className="w-3 h-3" /> 3D
-              </span>
-            </div>
-
-            <div className="absolute bottom-3 left-3.5 right-3.5 flex items-end justify-between gap-2 pointer-events-none z-10">
-              <div className="min-w-0">
-                <div className="text-[11px] font-bold text-sf-gold truncate">
-                  {slotTab === 'p1' ? 'Editando P1' : 'Editando Rival'} · Maestria Nv.{mastery.level} ·{' '}
-                  {activeDef.masteryTitles[mastery.titleIdx]}
-                </div>
-                <div className="font-display italic text-3xl font-black text-white leading-none truncate">
-                  {activeMeta.name}
-                </div>
-              </div>
-              <div className="px-3 py-1 sf-chamfer-sm bg-gradient-to-br from-sf-crimson to-sf-gold text-black font-display italic text-2xl font-black shrink-0 shadow-lg">
-                VS
-              </div>
-            </div>
-          </StreetPanel>
-
-          {/* P2 Side Card */}
-          <motion.div
-            key={`p2_${p2Fighter}`}
-            initial={{ x: 16, opacity: 0.55 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.22 }}
-            className="h-full"
-          >
-            <StreetPanel
-              tone={slotTab === 'p2' ? 'cyan' : 'neutral'}
-              chamfer="md"
-              className="h-full p-4 flex flex-col justify-between gap-3 bg-gradient-to-bl from-sf-cyan/14 via-sf-surface to-sf-ink"
-            >
-              <div className="flex items-center flex-row-reverse text-right gap-3.5">
-                {p2Meta.showPortraitPhoto && FIGHTERS[p2Fighter].portraitUrl ? (
-                  <img
-                    src={FIGHTERS[p2Fighter].portraitUrl}
-                    alt={p2Meta.name}
-                    referrerPolicy="no-referrer"
-                    className="w-20 h-24 sf-chamfer-sm object-cover object-top border border-sf-cyan/60 shrink-0"
-                  />
-                ) : (
-                  <div
-                    className="w-20 h-24 sf-chamfer-sm flex items-center justify-center font-display italic text-3xl font-black text-white shrink-0 border border-white/20"
-                    style={{ backgroundColor: FIGHTERS[p2Fighter].badgeColor }}
-                  >
-                    {p2Meta.name.slice(0, 2)}
-                  </div>
-                )}
-                <div className="min-w-0">
-                  <div className="text-[11px] font-black tracking-widest text-sf-cyan">
-                    DESAFIANTE (P2)
-                  </div>
-                  <div className="font-display italic text-2xl sm:text-3xl font-black text-white leading-none truncate mt-0.5">
-                    {p2Meta.name}
-                  </div>
-                  <div className="text-xs text-slate-400 truncate mt-1">
-                    {ARCHETYPE_NAMES[FIGHTERS[p2Fighter].archetype]} · {FIGHTERS[p2Fighter].title}
-                  </div>
-                </div>
-              </div>
-              <p className="text-xs text-cyan-100/90 italic text-right border-t border-white/10 pt-2.5 truncate">
-                “{FIGHTERS[p2Fighter].catchphrase}”
-              </p>
-            </StreetPanel>
-          </motion.div>
+      {/* Barra superior */}
+      <header className="relative z-20 flex items-center justify-between gap-2 px-3 sm:px-5 py-1.5 sm:py-2.5">
+        <button
+          type="button"
+          onClick={() => {
+            gameAudio.playClick();
+            onBack();
+          }}
+          aria-label="Voltar"
+          className="grid place-items-center w-11 h-11 sf-chamfer-sm bg-sf-ink/90 border border-white/20 hover:border-sf-gold focus-visible:outline-2 focus-visible:outline-sf-gold"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <div className="flex flex-col items-center leading-none">
+          <h1 className="font-display italic font-black text-xl sm:text-3xl tracking-wider text-white drop-shadow-[0_2px_0_rgba(0,0,0,0.9)]">
+            SELEÇÃO DE PERSONAGEM
+          </h1>
+          <span className="font-mono-num text-xs font-black text-sf-gold mt-0.5">
+            {String(countdown).padStart(2, '0')}
+          </span>
         </div>
+        <SegmentedTabs
+          items={[
+            { id: 'p1', label: 'P1' },
+            { id: 'p2', label: 'P2' },
+          ]}
+          value={slotTab}
+          onChange={setSlotTab}
+          tone={slotTab === 'p2' ? 'cyan' : 'gold'}
+          className="min-w-[110px]"
+        />
+      </header>
 
-        {/* Bottom Fighting Game Roster Grid (8 Fighters + Random "?") */}
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
-            <span className="font-bold text-white uppercase tracking-wide">Elenco Baiano</span>
-            <span className="truncate">{activeDef.lore}</span>
-          </div>
-          <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-2.5">
+      {/* Palco: lutador P1 | grade | lutador P2 */}
+      <main className="relative z-10 flex-1 min-h-0 grid grid-cols-[1fr_minmax(0,auto)_1fr] gap-0 items-stretch">
+        {sides.map(({ slot, id, meta, tone }, idx) => {
+          const def = FIGHTERS[id];
+          const isLeft = idx === 0;
+          const active = slotTab === slot;
+          const accent = tone === 'gold' ? 'text-sf-gold' : 'text-sf-cyan';
+          const glow = tone === 'gold' ? 'from-sf-gold/45' : 'from-sf-cyan/45';
+          return (
+            <motion.button
+              key={`${slot}_${id}`}
+              type="button"
+              onClick={() => setSlotTab(slot)}
+              initial={{ x: isLeft ? -24 : 24, opacity: 0.4 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.22 }}
+              aria-label={`Editar ${slot === 'p1' ? 'jogador 1' : 'jogador 2'}`}
+              className={`relative overflow-hidden min-w-0 text-left ${isLeft ? '' : 'text-right'} focus-visible:outline-2 focus-visible:outline-sf-gold ${
+                active ? '' : 'saturate-50 brightness-75'
+              } transition`}
+              style={{
+                clipPath: isLeft
+                  ? 'polygon(0 0, 100% 0, calc(100% - 26px) 100%, 0 100%)'
+                  : 'polygon(26px 0, 100% 0, 100% 100%, 0 100%)',
+              }}
+            >
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `linear-gradient(${isLeft ? '120deg' : '240deg'}, ${def.badgeColor}, #07080d 75%)`,
+                }}
+              />
+              {meta.showPortraitPhoto && def.portraitUrl ? (
+                <img
+                  src={def.portraitUrl}
+                  alt={meta.name}
+                  referrerPolicy="no-referrer"
+                  className="absolute inset-0 w-full h-full object-cover object-top"
+                />
+              ) : (
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 flex items-center justify-center font-display italic font-black text-white/25 text-[28vh] leading-none select-none"
+                >
+                  {meta.name.slice(0, 2)}
+                </span>
+              )}
+              <div className={`absolute inset-0 bg-gradient-to-t ${glow} via-transparent to-black/40`} />
+              <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/90 to-transparent" />
+
+              <div className={`absolute top-2 ${isLeft ? 'left-3' : 'right-3'} font-display italic font-black text-sm tracking-widest ${accent} drop-shadow-[0_2px_0_rgba(0,0,0,0.9)]`}>
+                {slot === 'p1' ? 'JOGADOR 1' : 'DESAFIANTE'}
+              </div>
+
+              <div className={`absolute bottom-2 sm:bottom-4 ${isLeft ? 'left-3 sm:left-5 pr-8' : 'right-3 sm:right-5 pl-8'}`}>
+                <div className="font-display italic font-black text-white uppercase leading-[0.9] text-[clamp(1.4rem,6.5vh,3.4rem)] drop-shadow-[0_3px_0_rgba(0,0,0,0.95)] break-words">
+                  {meta.name.replace(/^O /, '')}
+                </div>
+                <div className="text-[11px] sm:text-xs text-slate-300 font-semibold mt-1 truncate">
+                  {ARCHETYPE_NAMES[def.archetype]} · {def.title}
+                </div>
+                <div className="hidden md:block text-[11px] italic text-amber-100/85 mt-0.5 truncate">
+                  “{def.catchphrase}”
+                </div>
+              </div>
+            </motion.button>
+          );
+        })}
+
+        {/* Centro: grade de personagens (posicionada entre os dois painéis) */}
+        <div className="col-start-2 row-start-1 relative z-20 flex flex-col items-center justify-center gap-2 px-2 sm:px-4 w-[min(48vw,440px)]">
+          <div className="grid grid-cols-5 gap-1.5 sm:gap-2 w-full">
             {FIGHTERS_LIST.map((def) => {
               const id = def.id;
               const meta = getDisplayFighterMeta(id, authorizationMode);
@@ -333,147 +251,144 @@ export function CharacterSelectScreen({
                   key={id}
                   type="button"
                   disabled={!unlocked}
+                  aria-label={meta.name}
+                  title={meta.name}
                   onClick={() => {
                     gameAudio.playSelectSnap();
                     if (slotTab === 'p1') onSelectP1(id);
                     else onSelectP2(id);
                   }}
-                  className={`group relative sf-chamfer-sm border-2 overflow-hidden text-center transition-all duration-150 focus-visible:outline-2 focus-visible:outline-sf-gold active:scale-95 ${
+                  className={`relative aspect-square sf-chamfer-sm border-2 overflow-hidden transition active:scale-95 focus-visible:outline-2 focus-visible:outline-sf-gold ${
                     isP1 && isP2
-                      ? 'border-sf-crimson bg-[#1a1524] shadow-md'
+                      ? 'border-sf-crimson'
                       : isP1
-                        ? 'border-sf-gold bg-[#1b1a14] shadow-md'
+                        ? 'border-sf-gold shadow-[0_0_14px_rgba(255,200,21,0.55)]'
                         : isP2
-                          ? 'border-sf-cyan bg-[#101c24] shadow-md'
-                          : 'border-white/14 bg-sf-surface hover:border-white/40'
+                          ? 'border-sf-cyan shadow-[0_0_14px_rgba(0,212,255,0.55)]'
+                          : 'border-white/20 hover:border-white/60'
                   } ${!unlocked ? 'opacity-35 grayscale cursor-not-allowed' : ''}`}
                 >
-                  {(isP1 || isP2) && (
-                    <div className="absolute top-1 left-1 right-1 flex justify-between pointer-events-none z-10 font-mono-num">
-                      {isP1 && (
-                        <span className="px-1.5 py-0.5 bg-sf-gold text-black text-[9px] font-black leading-none">
-                          P1
-                        </span>
-                      )}
-                      {isP2 && (
-                        <span className="ml-auto px-1.5 py-0.5 bg-sf-cyan text-black text-[9px] font-black leading-none">
-                          P2
-                        </span>
-                      )}
-                    </div>
-                  )}
                   {meta.showPortraitPhoto && def.portraitUrl ? (
                     <img
                       src={def.portraitUrl}
-                      alt={meta.name}
+                      alt=""
                       referrerPolicy="no-referrer"
-                      className="w-full h-18 object-cover object-top group-hover:scale-105 transition-transform duration-200"
+                      className="w-full h-full object-cover object-top"
                     />
                   ) : (
                     <div
-                      className="w-full h-18 flex items-center justify-center font-display italic text-2xl font-black text-white"
+                      className="w-full h-full flex items-center justify-center font-display italic text-lg sm:text-2xl font-black text-white"
                       style={{ backgroundColor: def.badgeColor }}
                     >
                       {meta.name.slice(0, 2)}
                     </div>
                   )}
-                  <div className="py-1.5 px-1 text-[11px] font-extrabold truncate bg-sf-ink text-white border-t border-white/10">
-                    {meta.name.replace(/^O /, '')}
-                  </div>
+                  {(isP1 || isP2) && (
+                    <div className="absolute top-0 inset-x-0 flex justify-between font-mono-num pointer-events-none">
+                      {isP1 && <span className="px-1 bg-sf-gold text-black text-[9px] font-black leading-tight">P1</span>}
+                      {isP2 && <span className="ml-auto px-1 bg-sf-cyan text-black text-[9px] font-black leading-tight">P2</span>}
+                    </div>
+                  )}
                 </button>
               );
             })}
-
-            {/* Random "?" Button */}
             <button
               type="button"
               onClick={handleRandomPick}
-              className="sf-chamfer-sm border-2 border-dashed border-sf-gold/55 bg-sf-surface hover:bg-[#181d2c] hover:border-sf-gold flex flex-col items-center justify-center p-2 gap-1.5 text-sf-gold transition-colors focus-visible:outline-2 focus-visible:outline-sf-gold active:scale-95"
+              aria-label="Escolha aleatória"
+              className="aspect-square sf-chamfer-sm border-2 border-dashed border-sf-gold/60 bg-sf-ink/80 text-sf-gold grid place-items-center active:scale-95 hover:border-sf-gold focus-visible:outline-2 focus-visible:outline-sf-gold"
             >
-              <Shuffle className="w-5 h-5" />
-              <span className="font-display italic text-sm font-black tracking-wide">
-                ALEATÓRIO ?
-              </span>
+              <Shuffle className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+          </div>
+
+          {/* Ações do lutador ativo */}
+          <div className="flex flex-wrap items-center justify-center gap-1.5">
+            <button type="button" onClick={cycleActiveSkin} className="min-h-9 px-2.5 text-[11px] font-black uppercase text-sf-gold bg-black/80 border border-sf-gold/50 sf-chamfer-sm active:scale-95">
+              Skin
+            </button>
+            <button type="button" onClick={cycleActivePower} className="min-h-9 px-2.5 flex items-center gap-1 text-[11px] font-black uppercase text-sf-cyan bg-black/80 border border-sf-cyan/50 sf-chamfer-sm active:scale-95">
+              <Sparkles className="w-3 h-3" /> {POWERS[activePower].shortName}
+            </button>
+            <button type="button" onClick={() => setShow3D(true)} className="min-h-9 px-2.5 flex items-center gap-1 text-[11px] font-black uppercase text-white bg-black/80 border border-white/30 sf-chamfer-sm active:scale-95">
+              <Box className="w-3 h-3" /> 3D
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                gameAudio.playClick();
+                onOpenInventory();
+              }}
+              className="min-h-9 px-2.5 flex items-center gap-1 text-[11px] font-black uppercase text-white bg-black/80 border border-white/30 sf-chamfer-sm active:scale-95"
+            >
+              <Package className="w-3 h-3 text-sf-gold" /> Inventário
+            </button>
+          </div>
+
+          {/* Atributos (só quando há altura) */}
+          <div className="hidden [@media(min-height:560px)]:block w-full max-w-[320px] space-y-1">
+            {STAT_LABELS.map(({ key, label }) => (
+              <StatGauge key={key} label={label} value={activeDef.stats[key]} tone={slotTab === 'p1' ? 'gold' : 'cyan'} />
+            ))}
+          </div>
+        </div>
+      </main>
+
+      {/* Barra inferior: dificuldade, arena, lutar */}
+      <footer className="relative z-20 flex items-center justify-center gap-2 sm:gap-3 px-3 sm:px-5 py-1.5 sm:py-3 bg-gradient-to-t from-black/90 to-transparent">
+        <SegmentedTabs
+          items={[
+            { id: 'easy', label: 'Fácil' },
+            { id: 'medium', label: 'Médio' },
+            { id: 'hard', label: 'Difícil' },
+          ]}
+          value={difficulty}
+          onChange={setDifficulty}
+          tone="gold"
+          className="hidden sm:flex"
+        />
+        <ActionButton
+          variant="steel"
+          onClick={() => {
+            gameAudio.playClick();
+            onOpenStageSelect();
+          }}
+        >
+          <MapPin className="w-4 h-4 text-sf-gold" />
+          {ARENAS[arenaId].shortName}
+        </ActionButton>
+        <ActionButton
+          variant="gold"
+          size="lg"
+          className="flex-1 max-w-sm"
+          onClick={() => {
+            gameAudio.playSelectSnap();
+            onStartFight('vs_ai', difficulty);
+          }}
+        >
+          <Swords className="w-5 h-5" /> LUTAR
+        </ActionButton>
+      </footer>
+
+      {/* Pré-visualização 3D */}
+      {show3D && (
+        <div className="absolute inset-0 z-40 bg-black/85 flex items-center justify-center p-4" onClick={() => setShow3D(false)}>
+          <div className="relative w-full max-w-md h-full max-h-[80%] sf-chamfer-lg border border-sf-gold/50 bg-sf-ink overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <FighterPreview3D fighterId={activeId} skinId={activeSkin} authorizationMode={authorizationMode} />
+            <div className="absolute bottom-3 left-4 font-display italic font-black text-2xl text-white drop-shadow-[0_2px_0_rgba(0,0,0,0.9)]">
+              {activeMeta.name}
+            </div>
+            <button
+              type="button"
+              onClick={() => setShow3D(false)}
+              aria-label="Fechar"
+              className="absolute top-2 right-2 grid place-items-center w-11 h-11 rounded-full bg-black/80 border border-white/30"
+            >
+              <X className="w-5 h-5" />
             </button>
           </div>
         </div>
-
-        {/* Stat Bars + Special Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <StreetPanel chamfer="md" className="p-4 space-y-2">
-            {STAT_LABELS.map(({ key, label }) => (
-              <StatGauge
-                key={key}
-                label={label}
-                value={activeDef.stats[key]}
-                tone={slotTab === 'p1' ? 'gold' : 'cyan'}
-              />
-            ))}
-          </StreetPanel>
-
-          <StreetPanel chamfer="md" className="p-4 flex flex-col justify-between gap-3">
-            <div className="flex items-center justify-between gap-2 text-xs">
-              <span className="font-display italic text-lg font-black text-sf-gold tracking-wide">
-                GOLPES ASSINATURA
-              </span>
-              <span className="text-slate-400 font-semibold truncate">{activeDef.style}</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2.5 text-xs">
-              <div className="p-3 sf-chamfer-sm bg-sf-ink border border-white/10">
-                <div className="font-black text-white truncate">
-                  {activeDef.specialMoves.special_1.name}
-                </div>
-                <div className="text-sf-cyan font-mono-num text-[11px] font-bold mt-1">
-                  {activeDef.specialMoves.special_1.command}
-                </div>
-              </div>
-              <div className="p-3 sf-chamfer-sm bg-sf-ink border border-sf-crimson/35">
-                <div className="font-black text-sf-crimson truncate">{activeDef.finisherName}</div>
-                <div className="text-slate-300 font-mono-num text-[11px] font-bold mt-1">
-                  100% Energia
-                </div>
-              </div>
-            </div>
-          </StreetPanel>
-        </div>
-
-        {/* Difficulty + Arena Picker + Start Fight CTA */}
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1.25fr] gap-3 items-center mt-auto pt-1">
-          <SegmentedTabs
-            items={[
-              { id: 'easy', label: 'Fácil' },
-              { id: 'medium', label: 'Médio' },
-              { id: 'hard', label: 'Difícil' },
-            ]}
-            value={difficulty}
-            onChange={setDifficulty}
-            tone="gold"
-          />
-
-          <ActionButton
-            variant="steel"
-            onClick={() => {
-              gameAudio.playClick();
-              onOpenStageSelect();
-            }}
-          >
-            <MapPin className="w-4 h-4 text-sf-gold" />
-            Arena: {ARENAS[arenaId].shortName}
-          </ActionButton>
-
-          <ActionButton
-            variant="gold"
-            size="lg"
-            className="w-full"
-            onClick={() => {
-              gameAudio.playSelectSnap();
-              onStartFight('vs_ai', difficulty);
-            }}
-          >
-            <Swords className="w-5 h-5" /> LUTAR EM {ARENAS[arenaId].shortName.toUpperCase()}
-          </ActionButton>
-        </div>
-      </main>
+      )}
     </div>
   );
 }
