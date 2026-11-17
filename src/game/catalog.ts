@@ -308,7 +308,7 @@ export interface ArcadeStageDef {
 
 export const ARCADE_LADDER: ArcadeStageDef[] = [
   { stage: 1, opponentId: 'maluco', arenaId: 'cajazeira', difficulty: 'easy', title: 'Abertura em Cajazeiras' },
-  { stage: 2, opponentId: 'roberto', arenaId: 'pelourinho', difficulty: 'medium', title: 'Pé na Porta no Pelô' },
+  { stage: 2, opponentId: 'roberto', arenaId: 'pelourinho', difficulty: 'medium', title: 'Roda do Coronel no Pelô' },
   { stage: 3, opponentId: 'torcedor_vitoria', arenaId: 'rio_vermelho', difficulty: 'medium', title: 'Noite no Rio Vermelho' },
   { stage: 4, opponentId: 'torcedor', arenaId: 'dique_tororo', difficulty: 'hard', title: 'Final no Dique do Tororó' },
 ];

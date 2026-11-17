@@ -115,7 +115,7 @@ function AppShell() {
   const [screen, setScreen] = useScreenRouter(profile.hasCompletedOnboarding);
   const [inventoryReturnScreen, setInventoryReturnScreen] = useState<ScreenId>('menu');
 
-  // Protagonista padrão P1: O Policial; rival padrão P2: O Maluco
+  // Protagonista padrão P1: Roberto Pé na Porta; rival padrão P2: O Maluco
   const [p1Fighter, setP1Fighter] = useState<FighterId>('policial');
   const [p2Fighter, setP2Fighter] = useState<FighterId>('maluco');
   const [arenaId, setArenaId] = useState<ArenaId>('pelourinho');

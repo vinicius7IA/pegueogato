@@ -14,23 +14,23 @@ export const FIGHTER_ROSTER_CAPACITY = 16;
 export const FIGHTERS: Record<FighterId, FighterDefinition> = {
   policial: {
     id: 'policial',
-    name: 'CORONEL STURARO',
-    fallbackAlias: 'CORONEL DA LADEIRA',
+    name: 'ROBERTO PÉ NA PORTA',
+    fallbackAlias: 'PÉ DE PORTÃO',
     requiresAuthorization: true,
     archetype: 'tecnico',
-    title: 'Comando da Ladeira',
+    title: 'Pé na Porta da Ladeira',
     tagline: 'Esquiva de boxe, tapão que deixa vermelho e enxame de gatos pretos.',
-    lore: 'Coronel linha-dura das ruas de Salvador: disciplina, esquiva perfeita de boxe e um tapão que ecoa pelo Centro Histórico. Quando perde a paciência, chama a tropa felina da madrugada.',
-    catchphrase: 'Ordem na rua, ou o tapão canta!',
+    lore: 'Policial linha-dura de Salvador que chega chutando a porta: esquiva perfeita de boxe, tapão que ecoa pela ladeira e, quando perde a paciência, uma tropa de gatos pretos da madrugada.',
+    catchphrase: 'Pé na porta, e o gato não escapa!',
     quotes: [
+      'Pé na porta, sem pedir licença!',
       'Na minha ladeira ninguém folga, meu rei!',
-      'Respeita a patente, rapaz!',
       'Esse tapão deixou tua cara da cor do dendê!',
       'Fique quieto que os gatos pretos tão chegando!',
       'Guarda baixa comigo é passagem pro chão!',
-      'Operação concluída na Baixa dos Sapateiros!',
+      'Abre que é a polícia... ou eu abro no pé!',
       'Esquivei no reflexo e já voltou o cruzado!',
-      'Coronel não corre: avança!',
+      'Operação concluída na Baixa dos Sapateiros!',
     ],
     personality: 'Sério, técnico na esquiva de boxe e implacável no contra-ataque.',
     style: 'Esquiva lateral de boxe + tapão estalado + enxame de 7 gatos pretos.',
@@ -190,29 +190,29 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
 
   roberto: {
     id: 'roberto',
-    name: 'ROBERTO PÉ NA PORTA',
-    fallbackAlias: 'PÉ DE PORTÃO',
+    name: 'CORONEL STURARO',
+    fallbackAlias: 'CORONEL DA RODA',
     requiresAuthorization: true,
     archetype: 'rapido',
-    title: 'Chute que Abre Portão',
-    tagline: 'Ginga rápida, voadora certeira e chute que abre qualquer porta!',
-    lore: 'Lutador de rua que construiu fama chutando portas e portões de Salvador. Chute alto, giro veloz e pressão aérea: se a guarda é uma porta, ele derruba.',
-    catchphrase: 'Bateu na porta? Foi o meu pé!',
+    title: 'Coronel da Ginga',
+    tagline: 'Ginga contínua, armada alta, meia-lua e rasteira ancestral da Bahia.',
+    lore: 'Coronel da roda do Mercado Modelo: patente na voz, ritmo nos pés e chutes giratórios de longo alcance. Transforma o berimbau em pressão aérea e rasteiras velozes.',
+    catchphrase: 'Na roda do Pelô, quem vacila cai no chão!',
     quotes: [
-      'Pé na porta, sem pedir licença!',
-      'Abre a guarda que o chute entra!',
-      'Voadora não avisa, meu rei!',
-      'Portão fechado? Resolvo no pé!',
-      'Ginga de rua não perde o ritmo!',
-      'Quem vacila, o pé encontra!',
-      'Toma essa meia-lua de Salvador!',
-      'Essa porta vai abrir de qualquer jeito!',
+      'Sente o toque do berimbau, meu irmão!',
+      'Coronel não corre: gira!',
+      'Meia-lua de compasso não pede licença!',
+      'Abaixa a guarda que a rasteira vem varrendo!',
+      'Na Bahia, até o vento sabe fazer aú!',
+      'Respeita a patente da roda!',
+      'Com dendê no sangue, ninguém segura esse giro!',
+      'Iê, volta do mundo! Hora de recomeçar!',
     ],
     personality: 'Disciplinado, rítmico, fluido e letal nos chutes de longo alcance.',
     style: 'Capoeira baiana pura com chutes giratórios, saltos e rasteiras rápidas.',
     signaturePowerId: 'combo_relampago',
-    signaturePowerName: 'Chute Arrombador',
-    finisherName: 'PORTA ARROMBADA',
+    signaturePowerName: 'Roda de Ijexá',
+    finisherName: 'MEIA-LUA DO PELOURINHO',
     badgeColor: '#16a34a',
     stats: {
       forca: 84,
@@ -760,7 +760,7 @@ export function getMasteryLevel(xp: number): { level: number; titleIdx: number; 
 
 // 4 skins per fighter (32 skins total across 8 fighters, color variants included)
 export const SKINS: FighterSkin[] = [
-  // POLICIAL
+  // ROBERTO PÉ NA PORTA (POLICIAL)
   {
     id: 'policial_tatico',
     fighterId: 'policial',
@@ -836,11 +836,11 @@ export const SKINS: FighterSkin[] = [
     palette: { skin: 0xc98c66, hair: 0x18181b, top: 0xc98c66, vestOrTrim: 0xf59e0b, pants: 0xf4f4f5, glovesOrWraps: 0xfbbf24, accent: 0xf59e0b },
   },
 
-  // ROBERTO PÉ NA PORTA
+  // CORONEL STURARO
   {
     id: 'roberto_branco',
     fighterId: 'roberto',
-    name: 'Camisa de Rua',
+    name: 'Coronel de Rua',
     description: 'Sem camisa, bermuda branca e faixa verde e amarela.',
     priceCoins: 0,
     priceDiamonds: 0,
@@ -849,7 +849,7 @@ export const SKINS: FighterSkin[] = [
   {
     id: 'roberto_ouro',
     fighterId: 'roberto',
-    name: 'Pé de Ouro',
+    name: 'Patente de Ouro',
     description: 'Bermuda creme e faixas douradas.',
     priceCoins: 360,
     priceDiamonds: 0,
@@ -858,7 +858,7 @@ export const SKINS: FighterSkin[] = [
   {
     id: 'roberto_noite',
     fighterId: 'roberto',
-    name: 'Portão Noturno',
+    name: 'Coronel Noturno',
     description: 'Calça preta de treino com faixa azul-turquesa.',
     priceCoins: 420,
     priceDiamonds: 0,
@@ -867,7 +867,7 @@ export const SKINS: FighterSkin[] = [
   {
     id: 'roberto_festa',
     fighterId: 'roberto',
-    name: 'Arrombador',
+    name: 'Gala Vermelha',
     description: 'Conjunto vermelho-terra e ataduras douradas.',
     priceCoins: 0,
     priceDiamonds: 22,
