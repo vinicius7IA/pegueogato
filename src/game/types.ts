@@ -15,8 +15,8 @@ export type ScreenId =
 export type FighterId =
   | 'policial'
   | 'maluco'
-  | 'capoeira'
-  | 'baiana'
+  | 'roberto'
+  | 'torcedor_vitoria'
   | 'torcedor'
   | 'jesse'
   | 'alo_juca'

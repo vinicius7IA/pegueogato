@@ -11,8 +11,8 @@ const __dirname = path.dirname(__filename);
 const ALLOWED_FIGHTERS = new Set([
   'policial',
   'maluco',
-  'capoeira',
-  'baiana',
+  'roberto',
+  'torcedor_vitoria',
   'torcedor',
   'jesse',
   'alo_juca',
@@ -83,7 +83,7 @@ const DB_FILE = path.join(DATA_DIR, 'db.json');
 
 const SEED_LEADERBOARD: LeaderboardRecord[] = [
   { nickname: 'SoldadoSSA', rankPoints: 1480, wins: 22, losses: 4, favoriteFighter: 'policial' },
-  { nickname: 'MestreDende', rankPoints: 1410, wins: 19, losses: 5, favoriteFighter: 'capoeira' },
+  { nickname: 'MestreDende', rankPoints: 1410, wins: 19, losses: 5, favoriteFighter: 'roberto' },
   { nickname: 'JesseDaBarra', rankPoints: 1390, wins: 17, losses: 5, favoriteFighter: 'jesse' },
   { nickname: 'PlantaoSSA', rankPoints: 1310, wins: 15, losses: 6, favoriteFighter: 'alo_juca' },
   { nickname: 'AoVivoDani', rankPoints: 1245, wins: 13, losses: 7, favoriteFighter: 'alo_dani' },
@@ -110,7 +110,7 @@ const SEED_MATCHES: MatchRecord[] = [
     playerName: 'MestreDende',
     opponentName: 'AoVivoDani',
     winner: 'p1',
-    p1FighterId: 'capoeira',
+    p1FighterId: 'roberto',
     p2FighterId: 'alo_dani',
     p1RoundsWon: 2,
     p2RoundsWon: 1,
@@ -557,7 +557,7 @@ async function startServer() {
 
   const PORT = Number(process.env.PORT) || 3000;
   server.listen(PORT, '0.0.0.0', () => {
-    console.log(`PEGUE O GATO server running on http://localhost:${PORT}`);
+    console.log(`BAHIA STREET server running on http://localhost:${PORT}`);
   });
 }
 

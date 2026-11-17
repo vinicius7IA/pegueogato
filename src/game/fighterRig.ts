@@ -54,9 +54,9 @@ export function buildFighterRig(
 
   const isPolice = fighterId === 'policial';
   const isMaluco = fighterId === 'maluco';
-  const isCapoeira = fighterId === 'capoeira';
-  const isBaiana = fighterId === 'baiana';
-  const isTorcedor = fighterId === 'torcedor';
+  const isCapoeira = fighterId === 'roberto';
+  const isBaiana = false; // legado: baiana removida do elenco
+  const isTorcedor = fighterId === 'torcedor' || fighterId === 'torcedor_vitoria';
   const isJesse = fighterId === 'jesse';
   const isJuca = fighterId === 'alo_juca';
   const isDani = fighterId === 'alo_dani';
@@ -1317,8 +1317,8 @@ export function animateFighterRig(
   const p = moveDuration > 0 ? Math.min(1, moveTime / moveDuration) : 0;
   const isPolicial = fighterId === 'policial';
   const isBoxerStance = isPolicial || fighterId === 'jesse';
-  const isCapoeira = fighterId === 'capoeira';
-  const isBrute = fighterId === 'torcedor' || fighterId === 'baiana';
+  const isCapoeira = fighterId === 'roberto';
+  const isBrute = fighterId === 'torcedor' || fighterId === 'torcedor_vitoria';
 
   let pelvisY = 0.94;
   let pelvisRotX = 0;
@@ -1875,7 +1875,7 @@ export function animateFighterRig(
         headRotY = -0.14;
       }
       browTilt = 0.34;
-    } else if (fighterId === 'maluco' || fighterId === 'jesse' || fighterId === 'torcedor') {
+    } else if (fighterId === 'maluco' || fighterId === 'jesse' || fighterId === 'torcedor' || fighterId === 'torcedor_vitoria') {
       pelvisY = 0.94 + Math.abs(Math.sin(globalTime * 7)) * 0.08;
       torsoRotY = Math.sin(globalTime * 5) * 0.3;
       lArmX = -2.5;

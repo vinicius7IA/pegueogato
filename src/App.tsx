@@ -559,10 +559,10 @@ function AppShell() {
               SALVADOR · BAHIA · LIGA DE RUA 3D
             </div>
             <h1 className="font-display italic text-6xl sm:text-8xl font-black tracking-wide text-white drop-shadow-[0_6px_0_#ff462e]">
-              PEGUE O GATO
+              BAHIA STREET
             </h1>
             <p className="text-xs sm:text-sm font-medium text-slate-200 max-w-md mx-auto">
-              Luta de rua baiana em tempo real com 8 lutadores originais e 10 arenas de Salvador.
+              Luta de rua baiana em tempo real com 8 lutadores e 10 arenas de Salvador.
             </p>
             <motion.div
               animate={{ opacity: [0.45, 1, 0.45] }}
@@ -599,7 +599,7 @@ function AppShell() {
                     Registro de Lutador
                   </div>
                   <h1 className="font-display italic text-5xl font-black text-white drop-shadow-[0_3px_0_#ff462e]">
-                    PEGUE O GATO
+                    BAHIA STREET
                   </h1>
                   <p className="text-xs text-slate-400">
                     Escolha seu apelido para o ranking de Salvador e salas online.
@@ -903,7 +903,7 @@ function AppShell() {
         <header className="relative z-10 flex items-center justify-between gap-4 px-4 sm:px-6 py-3 border-b border-white/12 bg-[#080a10]/92 shrink-0 sf-speed-lines">
           <div className="leading-none min-w-0">
             <span className="font-display italic text-2xl sm:text-3xl font-black tracking-wide text-white drop-shadow-[0_2px_0_#ff462e] whitespace-nowrap">
-              PEGUE O GATO
+              BAHIA STREET
             </span>
           </div>
 

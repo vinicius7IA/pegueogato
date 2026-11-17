@@ -230,7 +230,7 @@ export const POWERS: Record<PowerId, PowerDefinition> = {
   },
   golpe_especial: {
     id: 'golpe_especial',
-    name: 'Pegue o Gato Supremo',
+    name: 'Bahia Street Supremo',
     shortName: 'Supremo',
     description: 'Investida máxima com explosão dourada e impacto sísmico.',
     energyCost: 85,
@@ -308,8 +308,8 @@ export interface ArcadeStageDef {
 
 export const ARCADE_LADDER: ArcadeStageDef[] = [
   { stage: 1, opponentId: 'maluco', arenaId: 'cajazeira', difficulty: 'easy', title: 'Abertura em Cajazeiras' },
-  { stage: 2, opponentId: 'capoeira', arenaId: 'pelourinho', difficulty: 'medium', title: 'Roda do Pelourinho' },
-  { stage: 3, opponentId: 'baiana', arenaId: 'rio_vermelho', difficulty: 'medium', title: 'Noite no Rio Vermelho' },
+  { stage: 2, opponentId: 'roberto', arenaId: 'pelourinho', difficulty: 'medium', title: 'Pé na Porta no Pelô' },
+  { stage: 3, opponentId: 'torcedor_vitoria', arenaId: 'rio_vermelho', difficulty: 'medium', title: 'Noite no Rio Vermelho' },
   { stage: 4, opponentId: 'torcedor', arenaId: 'dique_tororo', difficulty: 'hard', title: 'Final no Dique do Tororó' },
 ];
 
@@ -388,8 +388,8 @@ export const DEFAULT_KEY_BINDINGS: KeyBindings = {
   taunt: 'KeyT',
 };
 
-const PROFILE_STORAGE_KEY = 'pegue_o_gato_profile_v5';
-const SETTINGS_STORAGE_KEY = 'pegue_o_gato_settings_v5';
+const PROFILE_STORAGE_KEY = 'bahia_street_profile_v1';
+const SETTINGS_STORAGE_KEY = 'bahia_street_settings_v1';
 
 const todayStamp = () => new Date().toISOString().slice(0, 10);
 
@@ -404,12 +404,12 @@ export const DEFAULT_PROFILE: PlayerProfile = {
   wins: 0,
   losses: 0,
   rankPoints: 1000,
-  unlockedFighters: ['policial', 'maluco', 'capoeira', 'baiana', 'torcedor', 'jesse', 'alo_juca', 'alo_dani'],
+  unlockedFighters: ['policial', 'maluco', 'roberto', 'torcedor_vitoria', 'torcedor', 'jesse', 'alo_juca', 'alo_dani'],
   unlockedSkins: [
     'policial_tatico',
     'maluco_classico',
-    'capoeira_branco',
-    'baiana_tradicional',
+    'roberto_branco',
+    'vitoria_leao',
     'torcedor_tricolor',
     'jesse_rua',
     'juca_plantao',
@@ -419,8 +419,8 @@ export const DEFAULT_PROFILE: PlayerProfile = {
   equippedSkins: {
     policial: 'policial_tatico',
     maluco: 'maluco_classico',
-    capoeira: 'capoeira_branco',
-    baiana: 'baiana_tradicional',
+    roberto: 'roberto_branco',
+    torcedor_vitoria: 'vitoria_leao',
     torcedor: 'torcedor_tricolor',
     jesse: 'jesse_rua',
     alo_juca: 'juca_plantao',
@@ -429,8 +429,8 @@ export const DEFAULT_PROFILE: PlayerProfile = {
   equippedPowers: {
     policial: 'gatos_pretos',
     maluco: 'tapa_explosivo',
-    capoeira: 'combo_relampago',
-    baiana: 'escudo',
+    roberto: 'combo_relampago',
+    torcedor_vitoria: 'escudo',
     torcedor: 'super_soco',
     jesse: 'super_soco',
     alo_juca: 'combo_relampago',
@@ -439,8 +439,8 @@ export const DEFAULT_PROFILE: PlayerProfile = {
   fighterMasteryXp: {
     policial: 0,
     maluco: 0,
-    capoeira: 0,
-    baiana: 0,
+    roberto: 0,
+    torcedor_vitoria: 0,
     torcedor: 0,
     jesse: 0,
     alo_juca: 0,

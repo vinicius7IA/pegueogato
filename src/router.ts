@@ -23,7 +23,7 @@ export const ROUTES: Record<ScreenId, string> = {
 };
 
 export const SCREEN_TITLES: Record<ScreenId, string> = {
-  splash: 'PEGUE O GATO — Luta 3D Arcade',
+  splash: 'BAHIA STREET — Luta 3D Arcade',
   login: 'Entrar',
   menu: 'Menu',
   select: 'Lutadores',
@@ -96,7 +96,7 @@ export function useScreenRouter(onboarded: boolean) {
     document.title =
       screen === 'splash'
         ? SCREEN_TITLES.splash
-        : `${SCREEN_TITLES[screen]} · PEGUE O GATO`;
+        : `${SCREEN_TITLES[screen]} · BAHIA STREET`;
   }, [screen]);
 
   const setScreen = useCallback((next: ScreenId) => {
