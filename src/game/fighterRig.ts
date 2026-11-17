@@ -289,7 +289,8 @@ export function buildFighterRig(
   root.add(pelvis);
 
   // Sculpted Anatomical Pelvis / Glutes + Hip Block
-  const hipWidth = (isPolice || isTorcedor ? 0.37 : isDani ? 0.32 : 0.335) * Math.min(1.12, sil.shoulderScale);
+  const girth = isPolice ? sil.girth ?? 1 : 1;
+  const hipWidth = (isPolice || isTorcedor ? 0.37 : isDani ? 0.32 : 0.335) * Math.min(1.12, sil.shoulderScale) * (1 + (girth - 1) * 0.6);
   const pelvisGeo = trackGeo(
     new THREE.LatheGeometry(
       [
@@ -391,15 +392,16 @@ export function buildFighterRig(
 
   // High-resolution anatomical torso profile (waist -> obliques -> lats -> chest -> trapezius)
   const shoulderScale = sil.shoulderScale;
+  const girthK = (w: number) => 1 + (girth - 1) * w;
   const waistProfile =
     isPolice || isTorcedor
       ? [
-          new THREE.Vector2(0.158, 0),
-          new THREE.Vector2(0.174, 0.09),
-          new THREE.Vector2(0.198, 0.2),
-          new THREE.Vector2(0.228, 0.31),
-          new THREE.Vector2(0.248 * Math.min(1.12, shoulderScale * 0.9), 0.39),
-          new THREE.Vector2(0.21, 0.46),
+          new THREE.Vector2(0.158 * girthK(1), 0),
+          new THREE.Vector2(0.174 * girthK(1), 0.09),
+          new THREE.Vector2(0.198 * girthK(1.05), 0.2),
+          new THREE.Vector2(0.228 * girthK(0.9), 0.31),
+          new THREE.Vector2(0.248 * Math.min(1.12, shoulderScale * 0.9) * girthK(0.55), 0.39),
+          new THREE.Vector2(0.21 * girthK(0.4), 0.46),
           new THREE.Vector2(0.14, 0.49),
         ]
       : isDani

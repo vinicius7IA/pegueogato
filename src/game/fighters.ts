@@ -17,7 +17,7 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
     name: 'BETO CHUTA-PORTA',
     archetype: 'tecnico',
     title: 'Segurança · Controle',
-    tagline: 'Defensivo e tático: controla a distância, esquiva de boxe e chama a tropa de gatos pretos.',
+    tagline: 'Grandalhão, defensivo e tático: controla a distância, esquiva de boxe e chama a tropa de gatos pretos.',
     lore: 'Segurança de colete e óculos que guarda a porta de Salvador. Frio, tático e no controle: lê o adversário, bloqueia o espaço e, quando precisa, abre no pé. Se a coisa piora, solta o enxame de gatos pretos.',
     catchphrase: 'Chuta a porta, e o gato não escapa!',
     quotes: [
@@ -53,10 +53,11 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
       recoveryScale: 0.96,
     },
     silhouette: {
-      heightScale: 1.06,
-      shoulderScale: 1.24,
+      heightScale: 1.0,
+      shoulderScale: 1.3,
       fistScale: 1.22,
       headScale: 1.0,
+      girth: 1.38,
     },
     masteryTitles: [
       'Recruta da Ladeira',
@@ -468,7 +469,6 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
     signaturePowerId: 'super_soco',
     signaturePowerName: 'Arrancada do Motolinke',
     finisherName: 'CORTE NO CORREDOR',
-    portraitUrl: '/assets/aistudio/images_ddf02ae4.jpg',
     badgeColor: '#2563eb',
     stats: {
       forca: 86,
@@ -555,7 +555,6 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
     signaturePowerId: 'combo_relampago',
     signaturePowerName: 'Plantão Relâmpago',
     finisherName: 'EDIÇÃO URGENTE',
-    portraitUrl: '/assets/aistudio/images_0eebc264.jpg',
     badgeColor: '#1d4ed8',
     stats: {
       forca: 88,
@@ -642,7 +641,6 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
     signaturePowerId: 'velocidade_extrema',
     signaturePowerName: 'Edição Extra Turbo',
     finisherName: 'FECHAMENTO AO VIVO',
-    portraitUrl: '/assets/aistudio/images_6c1566e4.jpg',
     badgeColor: '#38bdf8',
     stats: {
       forca: 82,

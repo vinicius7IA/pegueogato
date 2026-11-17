@@ -378,7 +378,7 @@ export function CharacterSelectScreen({
                     </div>
                   )}
                   <div className="py-1.5 px-1 text-[11px] font-extrabold truncate bg-sf-ink text-white border-t border-white/10">
-                    {meta.name.replace('O ', '')}
+                    {meta.name.replace(/^O /, '')}
                   </div>
                 </button>
               );

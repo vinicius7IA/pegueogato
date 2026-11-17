@@ -132,6 +132,8 @@ export interface SilhouetteExaggeration {
   shoulderScale: number;
   fistScale: number;
   headScale: number;
+  /** Corpulência do tronco (1 = padrão). */
+  girth?: number;
 }
 
 export interface FighterSkin {
