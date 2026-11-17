@@ -1,0 +1,50 @@
+name: APK Android (Expo)
+
+# Gera o APK do BAHIA STRETAT a cada push que mexe no jogo ou no app,
+# ou manualmente pela aba Actions ("Run workflow"). O APK fica em "Artifacts".
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'mobile/**'
+      - 'src/**'
+      - '.github/workflows/android-apk.yml'
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Gera o jogo em arquivo único (mobile/assets/game.html)
+        run: |
+          npm ci
+          npm run expo:bundle
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Instala o app Expo
+        working-directory: mobile
+        run: npm ci
+
+      - name: Gera o projeto Android nativo (Expo prebuild)
+        working-directory: mobile
+        run: npx expo prebuild --platform android --no-install --clean
+
+      - name: Compila o APK
+        working-directory: mobile/android
+        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,armeabi-v7a
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bahia-stretat-apk
+          path: mobile/android/app/build/outputs/apk/release/*.apk
+          if-no-files-found: error

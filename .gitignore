@@ -6,3 +6,9 @@ coverage/
 *.log
 .env*
 !.env.example
+dist-single/
+mobile/node_modules/
+mobile/.expo/
+mobile/android/
+mobile/ios/
+mobile/dist/

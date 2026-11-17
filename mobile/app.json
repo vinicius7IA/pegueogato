@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Bahia Stretat",
+    "slug": "bahia-stretat",
+    "version": "1.0.0",
+    "orientation": "landscape",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0a1f8f",
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0a1f8f"
+    },
+    "assetBundlePatterns": ["assets/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.bahiastretat.game",
+      "requireFullScreen": true
+    },
+    "android": {
+      "package": "com.bahiastretat.game",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#0a1f8f"
+      }
+    }
+  }
+}

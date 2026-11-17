@@ -55,6 +55,23 @@ function normalize(pathname: string): string {
   return p === '' ? '/' : p;
 }
 
+/** Em WebView com HTML embutido (app Expo) a History API pode ser bloqueada: navegação vira só memória. */
+function safeHistory(kind: 'pushState' | 'replaceState', path: string): void {
+  try {
+    window.history[kind]({}, '', path);
+  } catch {
+    /* sem URL navegável: segue só com o estado em memória */
+  }
+}
+
+function currentPath(): string {
+  try {
+    return window.location.protocol.startsWith('http') ? window.location.pathname : '/';
+  } catch {
+    return '/';
+  }
+}
+
 export function screenFromPath(pathname: string): ScreenId | null {
   return BY_PATH[normalize(pathname)] ?? null;
 }
@@ -71,7 +88,7 @@ export function useScreenRouter(onboarded: boolean) {
   onboardedRef.current = onboarded;
 
   const [screen, setScreenState] = useState<ScreenId>(() =>
-    resolveGuarded(screenFromPath(window.location.pathname), onboarded),
+    resolveGuarded(screenFromPath(currentPath()), onboarded),
   );
   const screenRef = useRef(screen);
   screenRef.current = screen;
@@ -79,17 +96,13 @@ export function useScreenRouter(onboarded: boolean) {
   // Normaliza a URL inicial (ex.: /luta recarregada -> /menu)
   useEffect(() => {
     const path = ROUTES[screenRef.current];
-    if (normalize(window.location.pathname) !== path) {
-      window.history.replaceState({}, '', path);
-    }
+    if (normalize(currentPath()) !== path) safeHistory('replaceState', path);
   }, []);
 
   useEffect(() => {
     const onPop = () => {
-      const next = resolveGuarded(screenFromPath(window.location.pathname), onboardedRef.current);
-      if (ROUTES[next] !== normalize(window.location.pathname)) {
-        window.history.replaceState({}, '', ROUTES[next]);
-      }
+      const next = resolveGuarded(screenFromPath(currentPath()), onboardedRef.current);
+      if (ROUTES[next] !== normalize(currentPath())) safeHistory('replaceState', ROUTES[next]);
       setScreenState(next);
     };
     window.addEventListener('popstate', onPop);
@@ -108,7 +121,7 @@ export function useScreenRouter(onboarded: boolean) {
     if (next === current) return;
     // splash e luta->resultado substituem a entrada: "voltar" não reabre splash nem luta encerrada
     const replace = current === 'splash' || (current === 'arena' && next === 'result');
-    window.history[replace ? 'replaceState' : 'pushState']({}, '', ROUTES[next]);
+    safeHistory(replace ? 'replaceState' : 'pushState', ROUTES[next]);
     screenRef.current = next;
     setScreenState(next);
   }, []);

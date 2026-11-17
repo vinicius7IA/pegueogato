@@ -2,10 +2,17 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig} from 'vite';
+import {viteSingleFile} from 'vite-plugin-singlefile';
 
-export default defineConfig(() => {
+export default defineConfig(({mode}) => {
+  // `--mode single`: um único index.html com JS, CSS, imagens e sons embutidos (usado pelo app Expo)
+  const single = mode === 'single';
   return {
-    plugins: [react(), tailwindcss()],
+    base: './',
+    plugins: [react(), tailwindcss(), ...(single ? [viteSingleFile()] : [])],
+    build: single
+      ? { outDir: 'dist-single', assetsInlineLimit: 100_000_000, chunkSizeWarningLimit: 20_000 }
+      : { chunkSizeWarningLimit: 2000 },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
