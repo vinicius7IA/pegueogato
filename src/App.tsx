@@ -419,6 +419,7 @@ function AppShell() {
       ) {
         return prev;
       }
+      gameAudio.ui('unlock');
       return {
         ...prev,
         coins: prev.coins - f.unlockCoins,

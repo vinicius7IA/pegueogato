@@ -39,7 +39,7 @@ export function StageSelectScreen({
   const step = (dir: -1 | 1) => pick(PLAYABLE_ARENAS[(idx + dir + PLAYABLE_ARENAS.length) % PLAYABLE_ARENAS.length]);
   const confirm = () => {
     if (selected !== selectedArenaId) onSelectArena(selected);
-    gameAudio.playSelectSnap();
+    gameAudio.ui('confirm');
     if (onlineVoteMode && onOnlineVote) onOnlineVote(selected);
     else onConfirmFight();
   };
@@ -78,7 +78,7 @@ export function StageSelectScreen({
         <button
           type="button"
           onClick={() => {
-            gameAudio.playClick();
+            gameAudio.ui('back');
             onBack();
           }}
           aria-label="Voltar"

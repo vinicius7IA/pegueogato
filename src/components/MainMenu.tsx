@@ -58,7 +58,8 @@ export function MainMenu({ onSelect, onOpenShop, onOpenProfile, onOpenOnline }: 
 
   const confirm = useCallback(
     (i: number) => {
-      gameAudio.playSelectSnap();
+      gameAudio.unlockAudio();
+      gameAudio.ui('confirm');
       onSelect(OPTIONS[i].id);
     },
     [onSelect],

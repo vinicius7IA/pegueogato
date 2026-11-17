@@ -93,7 +93,7 @@ export function CharacterSelectScreen({
   // Arcade e Torneio: só o P1 escolhe; a CPU segue a escada de adversários.
   const ladderMode = flow === 'arcade' || flow === 'torneio';
   const confirm = () => {
-    gameAudio.playSelectSnap();
+    gameAudio.ui('confirm');
     if (step === 'p1') {
       if (ladderMode) onStartLadder();
       else setStep('p2');
@@ -101,7 +101,7 @@ export function CharacterSelectScreen({
   };
 
   const back = () => {
-    gameAudio.playClick();
+    gameAudio.ui('back');
     if (step === 'p2') setStep('p1');
     else onBack();
   };
