@@ -289,7 +289,7 @@ export function buildFighterRig(
   root.add(pelvis);
 
   // Sculpted Anatomical Pelvis / Glutes + Hip Block
-  const girth = isPolice ? sil.girth ?? 1 : 1;
+  const girth = sil.girth ?? 1;
   const hipWidth = (isPolice || isTorcedor ? 0.37 : isDani ? 0.32 : 0.335) * Math.min(1.12, sil.shoulderScale) * (1 + (girth - 1) * 0.6);
   const pelvisGeo = trackGeo(
     new THREE.LatheGeometry(
@@ -389,6 +389,8 @@ export function buildFighterRig(
   const torso = new THREE.Group();
   torso.position.set(0, 0.1, 0);
   pelvis.add(torso);
+  // Policial usa o perfil de cintura; os demais escalam o tronco inteiro (magro < 1 < corpulento)
+  if (!isPolice && girth !== 1) torso.scale.set(girth, 1, girth);
 
   // High-resolution anatomical torso profile (waist -> obliques -> lats -> chest -> trapezius)
   const shoulderScale = sil.shoulderScale;

@@ -4,6 +4,7 @@ import { gameAudio } from '../game/audio';
 import {
   FIGHTERS,
   FIGHTERS_LIST,
+  isPlayableFighter,
   getDisplayFighterMeta,
   PAID_BUNDLES,
   POWERS,
@@ -122,7 +123,7 @@ export function ShopScreen({
 
         {tab === 'fighters' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-            {FIGHTERS_LIST.map((f) => {
+            {FIGHTERS_LIST.filter((f) => isPlayableFighter(f.id)).map((f) => {
               const id = f.id;
               const meta = getDisplayFighterMeta(id, authorizationMode);
               const owned = profile.unlockedFighters.includes(id);
@@ -348,7 +349,7 @@ export function InventoryScreen({
 
       <main className="flex-1 p-4 sm:p-5 max-w-5xl w-full mx-auto space-y-4">
         <div className="flex gap-2 overflow-x-auto pb-1">
-          {profile.unlockedFighters.map((fid) => {
+          {profile.unlockedFighters.filter(isPlayableFighter).map((fid) => {
             const active = activeFighter === fid;
             return (
               <ActionButton

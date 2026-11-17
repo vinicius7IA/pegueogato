@@ -1,4 +1,4 @@
-import portraitMaluco from '../assets/images/realistic_maluco_1794790671764.jpg';
+import portraitMaluco from '../assets/images/maluco_portrait.jpg';
 import portraitPolicial from '../assets/images/roberto_portrait.jpg';
 import portraitTorcedor from '../assets/images/realistic_torcedor_1794790674222.jpg';
 import {
@@ -104,9 +104,9 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
     id: 'maluco',
     name: 'O MALUCO DO GATO',
     archetype: 'trapaceiro',
-    title: 'O Maluco do Gato',
-    tagline: 'Personagem caricato de rua: cabelo cacheado gigante, bermuda preta e ginga solta.',
-    lore: 'Figura lendária de ficção das calçadas baianas, vive desafiando todo mundo no corrimão. Luta sem camisa, descalço e cheio de fintas imprevisíveis.',
+    title: 'Rua · Desencanação',
+    tagline: 'Magrelo, cabelo black gigante, bermuda preta e chinelo: ninguém sabe o que ele vai fazer.',
+    lore: 'Figura de rua de Salvador que vive desencanado de tudo. Leve como um gato, foge, volta, olha estranho e acerta quando ninguém espera.',
     catchphrase: 'Pega o gato, pai! Quero ver acompanhar!',
     quotes: [
       'Lá ele! Achou que ia acertar esse vento?',
@@ -118,17 +118,17 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
       'Toma essa rasteira de quem cresceu na rua!',
       'Barril dobrado quando eu entro no ritmo!',
     ],
-    personality: 'Caricato, provocador, ágil e imprevisível nas esquivas.',
-    style: 'Capoeiragem de beco misturada com tapas rápidos e saltos soltos.',
+    personality: 'Desencanado, imprevisível e defensivo; escapa de tudo e provoca.',
+    style: 'Estilo de rua: fugas rápidas, saltos de gato e golpes de surpresa.',
     signaturePowerId: 'tapa_explosivo',
     signaturePowerName: 'Tapa Explosivo',
-    finisherName: 'RODOPIO DA CALÇADA',
+    finisherName: 'DESENCANAR',
     portraitUrl: portraitMaluco,
     badgeColor: '#f59e0b',
     stats: {
-      forca: 78,
-      velocidade: 93,
-      resistencia: 76,
+      forca: 70,
+      velocidade: 96,
+      resistencia: 68,
       energia: 86,
       habilidadeEspecial: 88,
     },
@@ -142,9 +142,10 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
     },
     silhouette: {
       heightScale: 0.98,
-      shoulderScale: 0.94,
-      fistScale: 1.15,
+      shoulderScale: 0.86,
+      fistScale: 1.0,
       headScale: 1.16,
+      girth: 0.78,
     },
     masteryTitles: [
       'Zueiro do Beco',
@@ -154,15 +155,15 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
     ],
     specialMoves: {
       special_1: {
-        name: 'Tapa Voador',
-        command: '↓ ↘ → + Soco',
+        name: 'Olhar Estranho',
+        command: '→ → + Soco',
         damageScale: 1.1,
         vfxColor: 0xf59e0b,
-        description: 'Avança girando com tapa duplo na cara.',
+        description: 'Encara o rival de um jeito estranho e avança com tapa duplo.',
       },
       special_2: {
-        name: 'Salto do Muro',
-        command: '← → + Chute',
+        name: 'Pulo do Gato',
+        command: '↓ ↓ + Chute',
         damageScale: 1.05,
         vfxColor: 0x22c55e,
         description: 'Chute acrobático surpresa que passa por cima da guarda baixa.',
@@ -175,7 +176,7 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
         description: 'Onda sônica de tapa que arremessa o rival na parede.',
       },
       finisher_move: {
-        name: 'RODOPIO DA CALÇADA',
+        name: 'DESENCANAR',
         command: 'Finalizador (100% Energia)',
         damageScale: 1.55,
         vfxColor: 0xfacc15,
@@ -794,7 +795,7 @@ export const SKINS: FighterSkin[] = [
     description: 'Sem camisa, cabelo cacheado volumoso, bermuda preta e descalço.',
     priceCoins: 0,
     priceDiamonds: 0,
-    palette: { skin: 0xc98c66, hair: 0x131316, top: 0xc98c66, vestOrTrim: 0xffffff, pants: 0x141518, glovesOrWraps: 0xc98c66, accent: 0xffffff },
+    palette: { skin: 0xa8714c, hair: 0x131316, top: 0xa8714c, vestOrTrim: 0xffffff, pants: 0x141518, glovesOrWraps: 0xa8714c, accent: 0xffffff },
   },
   {
     id: 'maluco_selecao',

@@ -34,6 +34,7 @@ import { gameAudio } from './game/audio';
 import {
   ACHIEVEMENTS,
   ARCADE_LADDER,
+  isPlayableFighter,
   ARENAS,
   FIGHTERS,
   getDisplayFighterMeta,
@@ -396,6 +397,7 @@ function AppShell() {
     const f = FIGHTERS[id];
     updateProfile((prev) => {
       if (
+        !isPlayableFighter(id) ||
         prev.unlockedFighters.includes(id) ||
         prev.coins < f.unlockCoins ||
         prev.diamonds < f.unlockDiamonds
@@ -509,7 +511,7 @@ function AppShell() {
   const cycleFighter = (slot: 'p1' | 'p2', dir: -1 | 1) => {
     const allIds = Object.keys(FIGHTERS) as FighterId[];
     const pool =
-      slot === 'p1' ? allIds.filter((id) => profile.unlockedFighters.includes(id)) : allIds;
+      allIds.filter((id) => isPlayableFighter(id) && (slot === 'p2' || profile.unlockedFighters.includes(id)));
     const current = slot === 'p1' ? p1Fighter : p2Fighter;
     const idx = pool.indexOf(current);
     const next = pool[(idx + dir + pool.length) % pool.length];

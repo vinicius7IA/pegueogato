@@ -1,7 +1,7 @@
 import { Copy, Globe, History, MapPin, Plus, Search, Swords, Trophy, Users } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { gameAudio } from '../game/audio';
-import { ARENAS, ARENAS_LIST, FIGHTERS, getDisplayFighterMeta } from '../game/catalog';
+import { ARENAS, ARENAS_LIST, FIGHTERS, getDisplayFighterMeta, isPlayableFighter } from '../game/catalog';
 import {
   ArenaId,
   FighterId,
@@ -239,7 +239,7 @@ export function MultiplayerScreen({
                 </span>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {profile.unlockedFighters.map((fid) => (
+                {profile.unlockedFighters.filter(isPlayableFighter).map((fid) => (
                   <ActionButton
                     key={fid}
                     variant={selectedFighter === fid ? 'gold' : 'steel'}

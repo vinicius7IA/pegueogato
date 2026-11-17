@@ -306,11 +306,15 @@ export interface ArcadeStageDef {
   title: string;
 }
 
+/** Lutadores jogáveis nesta versão; os demais aparecem bloqueados (cinza) na seleção. */
+export const PLAYABLE_FIGHTERS: FighterId[] = ['policial', 'maluco'];
+export const isPlayableFighter = (id: FighterId): boolean => PLAYABLE_FIGHTERS.includes(id);
+
 export const ARCADE_LADDER: ArcadeStageDef[] = [
   { stage: 1, opponentId: 'maluco', arenaId: 'cajazeira', difficulty: 'easy', title: 'Abertura em Cajazeiras' },
-  { stage: 2, opponentId: 'roberto', arenaId: 'pelourinho', difficulty: 'medium', title: 'Roda do Coronel no Pelô' },
-  { stage: 3, opponentId: 'torcedor_vitoria', arenaId: 'rio_vermelho', difficulty: 'medium', title: 'Noite no Rio Vermelho' },
-  { stage: 4, opponentId: 'torcedor', arenaId: 'dique_tororo', difficulty: 'hard', title: 'Final no Dique do Tororó' },
+  { stage: 2, opponentId: 'policial', arenaId: 'pelourinho', difficulty: 'medium', title: 'Chuta-Porta no Pelô' },
+  { stage: 3, opponentId: 'maluco', arenaId: 'rio_vermelho', difficulty: 'medium', title: 'Noite no Rio Vermelho' },
+  { stage: 4, opponentId: 'policial', arenaId: 'dique_tororo', difficulty: 'hard', title: 'Final no Dique do Tororó' },
 ];
 
 export function generateDailyChallenges(): DailyChallenge[] {

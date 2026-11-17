@@ -1,21 +1,10 @@
-import { ArrowLeft, Box, MapPin, Package, Shirt, Shuffle, Sparkles, Swords, X } from 'lucide-react';
+import { ArrowLeft, Lock, Shuffle } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import salvadorBackdrop from '../assets/images/salvador_arena_cinematic_1794790674658.jpg';
 import { gameAudio } from '../game/audio';
-import {
-  ARENAS,
-  FIGHTER_ROSTER_CAPACITY,
-  FIGHTERS,
-  FIGHTERS_LIST,
-  getDisplayFighterMeta,
-  getMasteryLevel,
-  POWERS,
-  SKINS,
-} from '../game/catalog';
+import { FIGHTER_ROSTER_CAPACITY, FIGHTERS, FIGHTERS_LIST, getDisplayFighterMeta, isPlayableFighter } from '../game/catalog';
 import { AiDifficulty, ArenaId, FighterId, MatchMode, PlayerProfile, PowerId } from '../game/types';
-import { FighterPreview3D } from './FighterPreview3D';
-import { SegmentedTabs } from './ui/FightingUI';
 
 interface CharacterSelectScreenProps {
   profile: PlayerProfile;
@@ -34,327 +23,218 @@ interface CharacterSelectScreenProps {
   onBack: () => void;
 }
 
-const STAT_LABELS: Array<{ key: keyof typeof FIGHTERS.policial.stats; label: string }> = [
-  { key: 'forca', label: 'Força' },
-  { key: 'velocidade', label: 'Velocidade' },
-  { key: 'resistencia', label: 'Resistência' },
-  { key: 'energia', label: 'Energia' },
-  { key: 'habilidadeEspecial', label: 'Especial' },
-];
+type Step = 'p1' | 'p2';
 
-const ARCHETYPE_NAMES: Record<string, string> = {
-  rapido: 'Veloz',
-  bruto: 'Bruto',
-  tecnico: 'Técnico',
-  trapaceiro: 'Trapaceiro',
-  zoneador: 'Zoneador',
-};
+const SIDE = {
+  p1: { label: '1P', color: 'var(--color-sf-p1)', text: 'text-sf-p1', border: 'border-sf-p1', bg: 'bg-sf-p1' },
+  p2: { label: '2P', color: 'var(--color-sf-p2)', text: 'text-sf-p2', border: 'border-sf-p2', bg: 'bg-sf-p2' },
+} as const;
+
+/** Silhueta usada quando o lutador ainda não tem arte 2D. */
+function Silhouette({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 100 120" className={className} aria-hidden="true">
+      <circle cx="50" cy="34" r="20" fill="currentColor" />
+      <path d="M10 120 C10 82 28 64 50 64 C72 64 90 82 90 120 Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function FighterArt({ id, side, authorizationMode }: { id: FighterId; side: Step; authorizationMode: boolean }) {
+  const def = FIGHTERS[id];
+  const meta = getDisplayFighterMeta(id, authorizationMode);
+  const left = side === 'p1';
+  if (meta.showPortraitPhoto && def.portraitUrl) {
+    return (
+      <img
+        src={def.portraitUrl}
+        alt={meta.name}
+        referrerPolicy="no-referrer"
+        className={`absolute bottom-0 ${left ? 'left-0 object-left-bottom' : 'right-0 object-right-bottom'} h-full w-full object-contain`}
+      />
+    );
+  }
+  return <Silhouette className={`absolute bottom-0 ${left ? 'left-[8%]' : 'right-[8%]'} h-[85%] text-black/55`} />;
+}
 
 export function CharacterSelectScreen({
   profile,
-  initialDifficulty,
   authorizationMode,
-  arenaId,
   p1Fighter,
   p2Fighter,
   onSelectP1,
   onSelectP2,
-  onEquipSkin,
-  onEquipPower,
   onOpenStageSelect,
-  onStartFight,
-  onOpenInventory,
   onBack,
 }: CharacterSelectScreenProps) {
-  const [slotTab, setSlotTab] = useState<'p1' | 'p2'>('p1');
-  const [difficulty, setDifficulty] = useState<AiDifficulty>(initialDifficulty);
-  const [countdown, setCountdown] = useState(45);
-  const [show3D, setShow3D] = useState(false);
+  const [step, setStep] = useState<Step>('p1');
+  const current = step === 'p1' ? p1Fighter : p2Fighter;
+  const ui = SIDE[step];
 
-  useEffect(() => {
-    const t = window.setInterval(() => {
-      setCountdown((c) => (c > 0 ? c - 1 : 0));
-    }, 1000);
-    return () => clearInterval(t);
-  }, []);
-
-  const activeId = slotTab === 'p1' ? p1Fighter : p2Fighter;
-  const activeDef = FIGHTERS[activeId];
-  const activeMeta = getDisplayFighterMeta(activeId, authorizationMode);
-  const p1Meta = getDisplayFighterMeta(p1Fighter, authorizationMode);
-  const p2Meta = getDisplayFighterMeta(p2Fighter, authorizationMode);
-
-  const activeSkin = profile.equippedSkins[activeId] || activeDef.defaultSkinId;
-  const activePower = profile.equippedPowers[activeId] || activeDef.signaturePowerId;
-  const unlockedSkinsForActive = SKINS.filter(
-    (s) => s.fighterId === activeId && profile.unlockedSkins.includes(s.id),
-  );
-  const mastery = getMasteryLevel(profile.fighterMasteryXp[activeId] || 0);
-
-  const handleRandomPick = () => {
-    const pool =
-      slotTab === 'p1'
-        ? FIGHTERS_LIST.filter((f) => profile.unlockedFighters.includes(f.id))
-        : FIGHTERS_LIST;
-    const choice = pool[Math.floor(Math.random() * pool.length)];
-    if (!choice) return;
+  const choose = (id: FighterId) => {
     gameAudio.playSelectSnap();
-    if (slotTab === 'p1') onSelectP1(choice.id);
-    else onSelectP2(choice.id);
+    if (step === 'p1') onSelectP1(id);
+    else onSelectP2(id);
   };
 
-  const cycleActiveSkin = () => {
-    if (unlockedSkinsForActive.length <= 1) return;
-    const idx = unlockedSkinsForActive.findIndex((s) => s.id === activeSkin);
-    const next = unlockedSkinsForActive[(idx + 1) % unlockedSkinsForActive.length];
+  const confirm = () => {
+    gameAudio.playSelectSnap();
+    if (step === 'p1') setStep('p2');
+    else onOpenStageSelect();
+  };
+
+  const back = () => {
     gameAudio.playClick();
-    onEquipSkin(activeId, next.id);
+    if (step === 'p2') setStep('p1');
+    else onBack();
   };
 
-  const cycleActivePower = () => {
-    if (profile.unlockedPowers.length <= 1) return;
-    const idx = profile.unlockedPowers.indexOf(activePower);
-    const next = profile.unlockedPowers[(idx + 1) % profile.unlockedPowers.length];
-    gameAudio.playClick();
-    onEquipPower(activeId, next);
+  const random = () => {
+    const pool = FIGHTERS_LIST.filter((f) => isPlayableFighter(f.id));
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    if (pick) choose(pick.id);
   };
 
-  const sides = [
-    { slot: 'p1' as const, id: p1Fighter, meta: p1Meta, tone: 'gold' as const },
-    { slot: 'p2' as const, id: p2Fighter, meta: p2Meta, tone: 'cyan' as const },
+  const sides: Array<{ side: Step; id: FighterId; shown: boolean }> = [
+    { side: 'p1', id: p1Fighter, shown: true },
+    { side: 'p2', id: p2Fighter, shown: step === 'p2' },
   ];
   const emptySlots = Math.max(0, FIGHTER_ROSTER_CAPACITY - FIGHTERS_LIST.length - 1);
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-sf-bg text-slate-100 flex flex-col">
-      <img src={salvadorBackdrop} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover opacity-35 pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(7,8,13,0.2),rgba(7,8,13,0.92))] pointer-events-none" />
+    <div className="relative w-full h-full overflow-hidden bg-sf-navy text-white flex flex-col select-none">
+      <img src={salvadorBackdrop} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-luminosity pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(47,107,255,0.25),rgba(7,11,30,0.95)_70%)] pointer-events-none" />
+      <div className="absolute inset-0 pointer-events-none opacity-30 bg-[repeating-linear-gradient(0deg,rgba(0,0,0,0.35)_0px,rgba(0,0,0,0.35)_1px,transparent_1px,transparent_3px)]" />
 
-      {/* Topo */}
-      <header className="absolute inset-x-0 top-0 z-30 flex items-center justify-between gap-2 px-3 sm:px-5 pt-1.5 pointer-events-none [&>*]:pointer-events-auto">
-        <button
-          type="button"
-          onClick={() => {
-            gameAudio.playClick();
-            onBack();
-          }}
-          aria-label="Voltar"
-          className="grid place-items-center w-11 h-11 sf-chamfer-sm bg-black/60 border border-white/25 hover:border-sf-gold focus-visible:outline-2 focus-visible:outline-sf-gold"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <SegmentedTabs
-          items={[
-            { id: 'p1', label: 'P1' },
-            { id: 'p2', label: 'P2' },
-          ]}
-          value={slotTab}
-          onChange={setSlotTab}
-          tone={slotTab === 'p2' ? 'cyan' : 'gold'}
-          className="min-w-[110px]"
-        />
-      </header>
-
-      {/* Palco: arte 2D dos dois lutadores, virados para o centro */}
-      <main className="relative z-10 flex-1 min-h-0">
-        {sides.map(({ slot, id, meta, tone }, idx) => {
+      {/* Palco */}
+      <main className="relative flex-1 min-h-0">
+        {sides.map(({ side, id, shown }) => {
           const def = FIGHTERS[id];
-          const left = idx === 0;
-          const active = slotTab === slot;
-          const accent = tone === 'gold' ? 'text-sf-gold' : 'text-sf-cyan';
-          const fade = left
-            ? 'linear-gradient(to right, black 62%, transparent 100%)'
-            : 'linear-gradient(to left, black 62%, transparent 100%)';
+          const meta = getDisplayFighterMeta(id, authorizationMode);
+          const left = side === 'p1';
+          const s = SIDE[side];
+          const fade = `linear-gradient(to ${left ? 'right' : 'left'}, black 55%, transparent 98%)`;
           return (
-            <motion.div
-              key={`${slot}_${id}`}
-              initial={{ x: left ? -40 : 40, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.25 }}
-              className={`absolute inset-y-0 w-[56%] ${left ? 'left-0' : 'right-0'}`}
-            >
-              <button
-                type="button"
-                aria-label={`Editar ${slot === 'p1' ? 'jogador 1' : 'jogador 2'}`}
-                onClick={() => setSlotTab(slot)}
-                className={`absolute inset-0 ${active ? '' : 'saturate-50 brightness-75'} transition`}
-                style={{ WebkitMaskImage: fade, maskImage: fade }}
+            <div key={side} className={`absolute inset-y-0 w-1/2 ${left ? 'left-0' : 'right-0'}`}>
+              <motion.div
+                key={`${side}_${id}_${shown}`}
+                initial={{ x: left ? -50 : 50, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.22, ease: 'easeOut' }}
+                className="absolute inset-0"
+                style={{
+                  WebkitMaskImage: `${fade}, linear-gradient(to top, transparent 0%, black 30%)`,
+                  maskImage: `${fade}, linear-gradient(to top, transparent 0%, black 30%)`,
+                  WebkitMaskComposite: 'source-in',
+                  maskComposite: 'intersect',
+                }}
               >
                 <div
                   className="absolute inset-0"
-                  style={{
-                    background: `linear-gradient(${left ? '100deg' : '260deg'}, ${def.badgeColor}cc, transparent 80%)`,
-                  }}
+                  style={{ background: `radial-gradient(ellipse at ${left ? '25%' : '75%'} 70%, ${s.color}66, transparent 65%)` }}
                 />
-                {meta.showPortraitPhoto && def.portraitUrl ? (
-                  <img
-                    src={def.portraitUrl}
-                    alt={meta.name}
-                    referrerPolicy="no-referrer"
-                    className={`absolute bottom-0 ${left ? 'left-0' : 'right-0'} h-[94%] w-auto max-w-full object-contain ${left ? 'object-left-bottom' : 'object-right-bottom'}`}
-                  />
+                {shown ? (
+                  <FighterArt id={id} side={side} authorizationMode={authorizationMode} />
                 ) : (
-                  <span
-                    aria-hidden="true"
-                    className={`absolute bottom-[12%] ${left ? 'left-[6%]' : 'right-[6%]'} font-display italic font-black text-white/30 text-[min(46vh,24vw)] leading-none select-none`}
-                  >
-                    {meta.name.slice(0, 2)}
-                  </span>
+                  <Silhouette className={`absolute bottom-0 right-[8%] h-[85%] text-black/60`} />
                 )}
-              </button>
+              </motion.div>
 
-              <div className={`absolute bottom-1.5 sm:bottom-3 ${left ? 'left-3 sm:left-6' : 'right-3 sm:right-6 text-right'} max-w-[85%] pointer-events-none`}>
-                <div className={`text-[11px] font-black tracking-[0.25em] ${accent} drop-shadow-[0_2px_0_rgba(0,0,0,0.9)]`}>
-                  {slot === 'p1' ? 'JOGADOR 1' : 'DESAFIANTE'}
+              <div className={`absolute bottom-2 ${left ? 'left-4 sm:left-8' : 'right-4 sm:right-8 text-right'} max-w-[90%]`}>
+                <span className={`inline-block px-1.5 font-mono-num text-xs font-black text-white ${s.bg}`}>{s.label}</span>
+                <div className="font-display italic font-black uppercase leading-[0.88] text-[clamp(2rem,11vh,5rem)] drop-shadow-[0_4px_0_rgba(0,0,0,0.9)]">
+                  {shown ? meta.name.replace(/^O /, '') : '???'}
                 </div>
-                <div className="font-display italic font-black text-white uppercase leading-[0.9] text-[clamp(1.8rem,9vh,4.6rem)] drop-shadow-[0_4px_0_rgba(0,0,0,0.95)] break-words">
-                  {meta.name.replace(/^O /, '')}
-                </div>
-                <div className="text-[11px] sm:text-xs text-slate-300 font-semibold mt-0.5 truncate">
-                  {ARCHETYPE_NAMES[def.archetype]} · {def.title}
-                </div>
+                {shown && <div className="text-xs text-white/70 font-semibold truncate">{def.title}</div>}
               </div>
-            </motion.div>
+            </div>
           );
         })}
 
-        {/* Centro: título, VS e ações */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-1 z-20 flex flex-col items-center gap-1.5 w-[min(34vw,260px)]">
-          <div className="flex items-center gap-1.5 font-display italic font-black text-sm sm:text-base tracking-[0.2em] text-white drop-shadow-[0_2px_0_rgba(0,0,0,0.9)]">
+        {/* Topo: voltar + título + instrução */}
+        <button
+          type="button"
+          onClick={back}
+          aria-label="Voltar"
+          className="absolute top-2 left-2 z-20 grid place-items-center w-11 h-11 rounded-full bg-black/50 border border-white/25 active:scale-95 focus-visible:outline-2 focus-visible:outline-white"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <div className="absolute top-2 inset-x-0 z-10 flex flex-col items-center pointer-events-none">
+          <div className="font-display italic font-black tracking-[0.25em] text-base sm:text-lg drop-shadow-[0_2px_0_rgba(0,0,0,0.9)]">
             SELEÇÃO DE PERSONAGEM
           </div>
-          <div className="font-display italic font-black text-5xl sm:text-6xl leading-none text-transparent bg-clip-text bg-gradient-to-b from-sf-gold to-sf-crimson drop-shadow-[0_3px_0_rgba(0,0,0,0.9)]">
-            VS
+          <div className={`text-[11px] sm:text-xs font-black tracking-widest ${ui.text}`}>
+            {step === 'p1' ? 'JOGADOR 1 · ESCOLHA SEU LUTADOR' : 'ESCOLHA O RIVAL'}
           </div>
-          <div className="font-mono-num text-xs font-black text-sf-gold">{String(countdown).padStart(2, '0')}</div>
-          <button
-            type="button"
-            onClick={() => {
-              gameAudio.playSelectSnap();
-              onStartFight('vs_ai', difficulty);
-            }}
-            className="w-full min-h-11 sf-chamfer-sm bg-gradient-to-r from-sf-gold to-sf-amber text-black font-display italic font-black text-xl tracking-wide flex items-center justify-center gap-2 active:scale-95 focus-visible:outline-2 focus-visible:outline-white sf-cta-glow"
-          >
-            <Swords className="w-5 h-5" /> LUTAR
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              gameAudio.playClick();
-              onOpenStageSelect();
-            }}
-            className="w-full min-h-10 sf-chamfer-sm bg-black/70 border border-white/30 text-xs font-black uppercase flex items-center justify-center gap-1.5 active:scale-95 focus-visible:outline-2 focus-visible:outline-sf-gold"
-          >
-            <MapPin className="w-4 h-4 text-sf-gold" /> {ARENAS[arenaId].shortName}
-          </button>
-          <div className="flex gap-1">
-            {(['easy', 'medium', 'hard'] as const).map((d) => (
-              <button
-                key={d}
-                type="button"
-                onClick={() => setDifficulty(d)}
-                className={`min-h-9 px-2 text-[10px] font-black uppercase border active:scale-95 ${
-                  difficulty === d ? 'bg-sf-gold text-black border-white' : 'bg-black/70 text-slate-300 border-white/25'
-                }`}
-              >
-                {d === 'easy' ? 'Fácil' : d === 'medium' ? 'Médio' : 'Difícil'}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Ações do lutador ativo: coluna na lateral */}
-        <div className={`absolute z-20 top-14 flex gap-1.5 ${slotTab === 'p1' ? 'left-2 sm:left-4' : 'right-2 sm:right-4'}`}>
-          <button type="button" aria-label="Trocar skin" onClick={cycleActiveSkin} className="min-h-10 min-w-10 px-2 flex items-center gap-1.5 text-[11px] font-black uppercase text-sf-gold bg-black/80 border border-sf-gold/50 sf-chamfer-sm active:scale-95">
-            <Shirt className="w-4 h-4" /><span className="hidden xl:inline">Skin</span>
-          </button>
-          <button type="button" aria-label="Trocar poder" onClick={cycleActivePower} className="min-h-10 min-w-10 px-2 flex items-center gap-1.5 text-[11px] font-black uppercase text-sf-cyan bg-black/80 border border-sf-cyan/50 sf-chamfer-sm active:scale-95">
-            <Sparkles className="w-4 h-4" /><span className="hidden xl:inline">{POWERS[activePower].shortName}</span>
-          </button>
-          <button type="button" aria-label="Ver em 3D" onClick={() => setShow3D(true)} className="min-h-10 min-w-10 px-2 flex items-center gap-1.5 text-[11px] font-black uppercase text-white bg-black/80 border border-white/30 sf-chamfer-sm active:scale-95">
-            <Box className="w-4 h-4" /><span className="hidden xl:inline">3D</span>
-          </button>
-          <button type="button" aria-label="Inventário" onClick={() => { gameAudio.playClick(); onOpenInventory(); }} className="min-h-10 min-w-10 px-2 flex items-center gap-1.5 text-[11px] font-black uppercase text-white bg-black/80 border border-white/30 sf-chamfer-sm active:scale-95">
-            <Package className="w-4 h-4 text-sf-gold" /><span className="hidden xl:inline">Inventário</span>
-          </button>
         </div>
       </main>
 
-      {/* Grade de personagens: 2 fileiras x 8 vagas, como no jogo de referência */}
-      <section className="relative z-30 px-2 sm:px-4 pb-1.5 pt-1 bg-gradient-to-t from-black via-black/80 to-transparent">
-        <div className="mx-auto grid grid-cols-8 gap-1 w-[min(100%,calc(8*clamp(40px,11vh,72px)+7*4px))]">
+      {/* Grade 2 x 8 + confirmar */}
+      <section className="relative z-20 flex flex-col items-center gap-1.5 px-2 pb-2 pt-1 bg-gradient-to-t from-black/85 to-transparent">
+        <div className="grid grid-cols-8 gap-[3px] p-[3px] bg-white/15 w-[min(100%,calc(8*clamp(38px,10vh,68px)+30px))]">
           {FIGHTERS_LIST.map((def) => {
             const id = def.id;
             const meta = getDisplayFighterMeta(id, authorizationMode);
-            const unlocked = slotTab === 'p2' || profile.unlockedFighters.includes(id);
-            const isP1 = p1Fighter === id;
-            const isP2 = p2Fighter === id;
+            const locked = !isPlayableFighter(id);
+            const isCursor = current === id;
+            const isOther = step === 'p2' && p1Fighter === id;
             return (
               <button
                 key={id}
                 type="button"
-                disabled={!unlocked}
+                disabled={locked}
                 aria-label={meta.name}
-                title={meta.name}
-                onClick={() => {
-                  gameAudio.playSelectSnap();
-                  if (slotTab === 'p1') onSelectP1(id);
-                  else onSelectP2(id);
-                }}
-                className={`relative aspect-square border-2 overflow-hidden transition active:scale-95 focus-visible:outline-2 focus-visible:outline-sf-gold ${
-                  isP1 && isP2
-                    ? 'border-sf-crimson'
-                    : isP1
-                      ? 'border-sf-gold shadow-[0_0_12px_rgba(255,200,21,0.7)] z-10'
-                      : isP2
-                        ? 'border-sf-cyan shadow-[0_0_12px_rgba(0,212,255,0.7)] z-10'
-                        : 'border-white/25 hover:border-white/60'
-                } ${!unlocked ? 'opacity-35 grayscale cursor-not-allowed' : ''}`}
+                aria-pressed={isCursor}
+                onClick={() => choose(id)}
+                onDoubleClick={confirm}
+                title={locked ? 'Bloqueado' : meta.name}
+                className={`relative aspect-square overflow-hidden bg-gradient-to-b from-[#1b2550] to-[#0b1030] focus-visible:outline-2 focus-visible:outline-white ${
+                  locked ? 'grayscale opacity-40 cursor-not-allowed' : ''
+                }`}
               >
                 {meta.showPortraitPhoto && def.portraitUrl ? (
                   <img src={def.portraitUrl} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover object-top" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center font-display italic text-base sm:text-xl font-black text-white" style={{ backgroundColor: def.badgeColor }}>
-                    {meta.name.slice(0, 2)}
-                  </div>
+                  <Silhouette className="w-full h-full p-1.5 text-white/25" />
                 )}
-                {(isP1 || isP2) && (
-                  <div className="absolute top-0 inset-x-0 flex justify-between font-mono-num pointer-events-none">
-                    {isP1 && <span className="px-0.5 bg-sf-gold text-black text-[8px] font-black leading-tight">1P</span>}
-                    {isP2 && <span className="ml-auto px-0.5 bg-sf-cyan text-black text-[8px] font-black leading-tight">2P</span>}
+                {locked && (
+                  <span className="absolute inset-0 grid place-items-center bg-black/40">
+                    <Lock className="w-4 h-4 text-white/80" />
+                  </span>
+                )}
+                {isOther && <div className={`absolute inset-0 border-[3px] ${SIDE.p1.border}`} />}
+                {isCursor && (
+                  <div className={`absolute inset-0 border-[3px] ${ui.border} shadow-[inset_0_0_12px_rgba(255,255,255,0.35)]`}>
+                    <span className={`absolute top-0 left-0 px-0.5 text-[9px] font-black leading-tight ${ui.bg}`}>{ui.label}</span>
                   </div>
                 )}
               </button>
             );
           })}
           {Array.from({ length: emptySlots }).map((_, i) => (
-            <div key={`empty_${i}`} aria-hidden="true" className="aspect-square border-2 border-white/10 bg-black/60 grid place-items-center text-white/20 font-display italic font-black text-xl">
-              ?
-            </div>
+            <div key={i} aria-hidden="true" className="aspect-square bg-[#0b1030]" />
           ))}
           <button
             type="button"
-            onClick={handleRandomPick}
-            aria-label="Escolha aleatória"
-            className="aspect-square border-2 border-dashed border-sf-gold/60 bg-black/70 text-sf-gold grid place-items-center active:scale-95 hover:border-sf-gold focus-visible:outline-2 focus-visible:outline-sf-gold"
+            onClick={random}
+            aria-label="Aleatório"
+            className="aspect-square bg-[#0b1030] grid place-items-center text-white/70 active:scale-95 focus-visible:outline-2 focus-visible:outline-white"
           >
             <Shuffle className="w-5 h-5" />
           </button>
         </div>
-      </section>
 
-      {/* Pré-visualização 3D */}
-      {show3D && (
-        <div className="absolute inset-0 z-40 bg-black/85 flex items-center justify-center p-4" onClick={() => setShow3D(false)}>
-          <div className="relative w-full max-w-md h-full max-h-[80%] sf-chamfer-lg border border-sf-gold/50 bg-sf-ink overflow-hidden" onClick={(e) => e.stopPropagation()}>
-            <FighterPreview3D fighterId={activeId} skinId={activeSkin} authorizationMode={authorizationMode} />
-            <div className="absolute bottom-3 left-4 font-display italic font-black text-2xl text-white drop-shadow-[0_2px_0_rgba(0,0,0,0.9)]">{activeMeta.name}</div>
-            <button type="button" onClick={() => setShow3D(false)} aria-label="Fechar" className="absolute top-2 right-2 grid place-items-center w-11 h-11 rounded-full bg-black/80 border border-white/30">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      )}
+        <button
+          type="button"
+          onClick={confirm}
+          className={`min-h-11 w-[min(100%,320px)] font-display italic font-black text-xl tracking-wider text-white ${ui.bg} active:scale-95 focus-visible:outline-2 focus-visible:outline-white shadow-[0_4px_0_rgba(0,0,0,0.6)]`}
+          style={{ clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)' }}
+        >
+          {step === 'p1' ? 'CONFIRMAR' : 'CONFIRMAR E ESCOLHER ARENA'}
+        </button>
+      </section>
     </div>
   );
 }
