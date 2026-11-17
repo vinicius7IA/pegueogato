@@ -1,0 +1,6 @@
+{
+  "name": "PEGUE O GATO",
+  "description": "Jogo de luta 3D arcade brasileiro com O Maluco e O Policial, sistema de combate em tempo real, combos, poderes desbloqueáveis, controles mobile/Xbox e multiplayer online.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

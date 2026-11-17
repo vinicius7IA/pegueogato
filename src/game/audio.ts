@@ -1,0 +1,586 @@
+type MusicStyle = 'samba_reggae' | 'pagode_rua' | 'ijexa' | 'percussao_baiana';
+
+class ArcadeAudioEngine {
+  private ctx: AudioContext | null = null;
+  private noiseCache: AudioBuffer | null = null;
+  private masterVolume = 0.85;
+  private musicVolume = 0.55;
+  private sfxVolume = 0.9;
+  private voiceVolume = 0.9;
+  private enabled = true;
+  private unlocked = false;
+
+  private musicTimer: number | null = null;
+  private musicStep = 0;
+  private currentStyle: MusicStyle | null = null;
+
+  public configure(volume: number, enabled: boolean): void {
+    this.masterVolume = Math.max(0, Math.min(1, volume));
+    this.enabled = enabled;
+    if (!enabled) this.stopStageMusic();
+  }
+
+  public configureMix(mix: {
+    masterVolume: number;
+    musicVolume: number;
+    sfxVolume: number;
+    voiceVolume: number;
+    sfxEnabled: boolean;
+  }): void {
+    this.masterVolume = Math.max(0, Math.min(1, mix.masterVolume));
+    this.musicVolume = Math.max(0, Math.min(1, mix.musicVolume));
+    this.sfxVolume = Math.max(0, Math.min(1, mix.sfxVolume));
+    this.voiceVolume = Math.max(0, Math.min(1, mix.voiceVolume));
+    this.enabled = mix.sfxEnabled;
+    if (!this.enabled || this.musicVolume <= 0.01) {
+      this.stopStageMusic();
+    }
+  }
+
+  public unlockAudio(): void {
+    this.unlocked = true;
+    const ctx = this.ensureContext();
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+  }
+
+  private get sfxGain(): number {
+    return this.masterVolume * this.sfxVolume;
+  }
+
+  private get musGain(): number {
+    return this.masterVolume * this.musicVolume;
+  }
+
+  private ensureContext(): AudioContext | null {
+    if (!this.enabled || this.masterVolume <= 0.01) return null;
+    if (!this.ctx) {
+      try {
+        const AudioCtx =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        if (!AudioCtx) return null;
+        this.ctx = new AudioCtx();
+      } catch {
+        return null;
+      }
+    }
+    if (this.ctx.state === 'suspended' && this.unlocked) {
+      this.ctx.resume().catch(() => {});
+    }
+    return this.ctx;
+  }
+
+  private getNoiseBuffer(ctx: AudioContext): AudioBuffer {
+    if (this.noiseCache && this.noiseCache.sampleRate === ctx.sampleRate) {
+      return this.noiseCache;
+    }
+    const sampleRate = ctx.sampleRate;
+    const frameCount = Math.floor(sampleRate * 0.65);
+    const buffer = ctx.createBuffer(1, frameCount, sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < frameCount; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    this.noiseCache = buffer;
+    return buffer;
+  }
+
+  private createPunchDistortion(ctx: AudioContext): WaveShaperNode {
+    const shaper = ctx.createWaveShaper();
+    const n = 256;
+    const curve = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      const x = (i * 2) / n - 1;
+      curve[i] = Math.tanh(x * 2.8);
+    }
+    shaper.curve = curve;
+    return shaper;
+  }
+
+  public announce(text: string): void {
+    if (!this.enabled || this.voiceVolume <= 0.05 || this.masterVolume <= 0.05) return;
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'pt-BR';
+      utter.rate = 1.12;
+      utter.pitch = 0.92;
+      utter.volume = Math.max(0, Math.min(1, this.masterVolume * this.voiceVolume));
+      const voices = window.speechSynthesis.getVoices();
+      const pt = voices.find((v) => v.lang.toLowerCase().startsWith('pt'));
+      if (pt) utter.voice = pt;
+      window.speechSynthesis.speak(utter);
+    } catch {
+      // ignore SpeechSynthesis restriction
+    }
+  }
+
+  public startStageMusic(style: MusicStyle): void {
+    if (!this.enabled || this.musGain <= 0.02) return;
+    if (this.currentStyle === style && this.musicTimer !== null) return;
+    this.stopStageMusic();
+    this.currentStyle = style;
+    this.musicStep = 0;
+
+    const stepMs =
+      style === 'pagode_rua'
+        ? 145
+        : style === 'samba_reggae'
+          ? 160
+          : style === 'percussao_baiana'
+            ? 150
+            : 178;
+
+    this.musicTimer = window.setInterval(() => {
+      if (!this.enabled || this.musGain <= 0.02 || !this.unlocked) return;
+      const ctx = this.ensureContext();
+      if (!ctx || ctx.state !== 'running') return;
+      this.triggerMusicStep(ctx, style, this.musicStep);
+      this.musicStep = (this.musicStep + 1) % 16;
+    }, stepMs);
+  }
+
+  public stopStageMusic(): void {
+    if (this.musicTimer !== null) {
+      clearInterval(this.musicTimer);
+      this.musicTimer = null;
+    }
+    this.currentStyle = null;
+  }
+
+  private triggerMusicStep(ctx: AudioContext, style: MusicStyle, step: number): void {
+    const now = ctx.currentTime;
+    const vol = this.musGain * 0.28;
+
+    // Surdo / bass drum Bahian pulse
+    const surdoPattern =
+      style === 'samba_reggae'
+        ? [1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0]
+        : style === 'ijexa'
+          ? [1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0]
+          : [1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0];
+
+    if (surdoPattern[step]) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      const pitch = step % 8 === 0 ? 96 : 118;
+      osc.frequency.setValueAtTime(pitch, now);
+      osc.frequency.exponentialRampToValueAtTime(42, now + 0.14);
+      gain.gain.setValueAtTime(vol * 0.85, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.17);
+    }
+
+    // Timbal / caixa accent
+    if (step % 4 === 2 || (style === 'pagode_rua' && (step === 7 || step === 15))) {
+      const noise = ctx.createBufferSource();
+      noise.buffer = this.getNoiseBuffer(ctx);
+      const bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.setValueAtTime(1600, now);
+      bp.Q.value = 1.8;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(vol * 0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.055);
+      noise.connect(bp).connect(gain).connect(ctx.destination);
+      noise.start(now);
+      noise.stop(now + 0.06);
+    }
+
+    // Agogô / Berimbau melodic bell line
+    const agogoSteps =
+      style === 'ijexa'
+        ? { 0: 523.25, 3: 659.25, 6: 523.25, 8: 659.25, 11: 783.99, 14: 659.25 }
+        : { 0: 440, 2: 523.25, 6: 659.25, 8: 440, 10: 587.33, 14: 523.25 };
+    const freq = (agogoSteps as Record<number, number | undefined>)[step];
+    if (freq) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = style === 'ijexa' ? 'triangle' : 'sine';
+      osc.frequency.setValueAtTime(freq, now);
+      gain.gain.setValueAtTime(vol * 0.22, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.12);
+    }
+  }
+
+  public playClick(): void {
+    const ctx = this.ensureContext();
+    if (!ctx || this.sfxGain <= 0.01) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(560, now);
+    osc.frequency.exponentialRampToValueAtTime(920, now + 0.045);
+    gain.gain.setValueAtTime(0.11 * this.sfxGain, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.055);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.06);
+  }
+
+  public playSelectSnap(): void {
+    const ctx = this.ensureContext();
+    if (!ctx || this.sfxGain <= 0.01) return;
+    const now = ctx.currentTime;
+    [440, 659.25].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now + i * 0.04);
+      gain.gain.setValueAtTime(0.16 * this.sfxGain, now + i * 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.04 + 0.12);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now + i * 0.04);
+      osc.stop(now + i * 0.04 + 0.13);
+    });
+  }
+
+  public playWhoosh(): void {
+    const ctx = this.ensureContext();
+    if (!ctx || this.sfxGain <= 0.01) return;
+    const now = ctx.currentTime;
+    const src = ctx.createBufferSource();
+    src.buffer = this.getNoiseBuffer(ctx);
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(1150, now);
+    filter.frequency.exponentialRampToValueAtTime(280, now + 0.14);
+    filter.Q.value = 1.6;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.16 * this.sfxGain, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+    src.connect(filter).connect(gain).connect(ctx.destination);
+    src.start(now);
+    src.stop(now + 0.15);
+  }
+
+  public playDodge(): void {
+    const ctx = this.ensureContext();
+    if (!ctx || this.sfxGain <= 0.01) return;
+    const now = ctx.currentTime;
+    const src = ctx.createBufferSource();
+    src.buffer = this.getNoiseBuffer(ctx);
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(1900, now);
+    filter.frequency.exponentialRampToValueAtTime(550, now + 0.12);
+    filter.Q.value = 2.4;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.22 * this.sfxGain, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
+    src.connect(filter).connect(gain).connect(ctx.destination);
+    src.start(now);
+    src.stop(now + 0.14);
+  }
+
+  public playParry(): void {
+    const ctx = this.ensureContext();
+    if (!ctx || this.sfxGain <= 0.01) return;
+    const now = ctx.currentTime;
+    [987.77, 1480, 1975.53].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = i === 0 ? 'triangle' : 'sine';
+      osc.frequency.setValueAtTime(freq, now);
+      gain.gain.setValueAtTime((0.22 - i * 0.05) * this.sfxGain, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.3);
+    });
+  }
+
+  public playGrabBreak(): void {
+    const ctx = this.ensureContext();
+    if (!ctx || this.sfxGain <= 0.01) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(320, now);
+    osc.frequency.exponentialRampToValueAtTime(640, now + 0.12);
+    gain.gain.setValueAtTime(0.2 * this.sfxGain, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.16);
+  }
+
+  public playStun(): void {
+    const ctx = this.ensureContext();
+    if (!ctx || this.sfxGain <= 0.01) return;
+    const now = ctx.currentTime;
+    [523.25, 659.25, 783.99, 659.25].forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+      gain.gain.setValueAtTime(0.14 * this.sfxGain, now + idx * 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.12);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now + idx * 0.08);
+      osc.stop(now + idx * 0.08 + 0.13);
+    });
+  }
+
+  public playPunch(heavy = false): void {
+    const ctx = this.ensureContext();
+    if (!ctx || this.sfxGain <= 0.01) return;
+    const now = ctx.currentTime;
+    const sat = this.createPunchDistortion(ctx);
+
+    const sub = ctx.createOscillator();
+    const subGain = ctx.createGain();
+    sub.type = 'sine';
+    sub.frequency.setValueAtTime(heavy ? 185 : 230, now);
+    sub.frequency.exponentialRampToValueAtTime(heavy ? 36 : 52, now + (heavy ? 0.21 : 0.12));
+    subGain.gain.setValueAtTime((heavy ? 0.52 : 0.36) * this.sfxGain, now);
+    subGain.gain.exponentialRampToValueAtTime(0.001, now + (heavy ? 0.23 : 0.13));
+    sub.connect(sat).connect(subGain).connect(ctx.destination);
+    sub.start(now);
+    sub.stop(now + 0.24);
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = this.getNoiseBuffer(ctx);
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.setValueAtTime(heavy ? 1450 : 2100, now);
+    bp.frequency.exponentialRampToValueAtTime(480, now + 0.09);
+    bp.Q.value = 0.9;
+    const nGain = ctx.createGain();
+    nGain.gain.setValueAtTime((heavy ? 0.48 : 0.32) * this.sfxGain, now);
+    nGain.gain.exponentialRampToValueAtTime(0.001, now + (heavy ? 0.16 : 0.09));
+    noise.connect(bp).connect(nGain).connect(ctx.destination);
+    noise.start(now);
+    noise.stop(now + 0.17);
+  }
+
+  public playSlap(): void {
+    const ctx = this.ensureContext();
+    if (!ctx || this.sfxGain <= 0.01) return;
+    const now = ctx.currentTime;
+
+    const crack = ctx.createBufferSource();
+    crack.buffer = this.getNoiseBuffer(ctx);
+    const hp = ctx.createBiquadFilter();
+    hp.type = 'bandpass';
+    hp.frequency.setValueAtTime(3400, now);
+    hp.frequency.exponentialRampToValueAtTime(950, now + 0.09);
+    hp.Q.value = 0.85;
+    const cGain = ctx.createGain();
+    cGain.gain.setValueAtTime(0.62 * this.sfxGain, now);
+    cGain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+    crack.connect(hp).connect(cGain).connect(ctx.destination);
+    crack.start(now);
+    crack.stop(now + 0.12);
+
+    const echo = ctx.createBufferSource();
+    echo.buffer = this.getNoiseBuffer(ctx);
+    const eFilter = ctx.createBiquadFilter();
+    eFilter.type = 'bandpass';
+    eFilter.frequency.setValueAtTime(1900, now + 0.028);
+    eFilter.Q.value = 1.1;
+    const eGain = ctx.createGain();
+    eGain.gain.setValueAtTime(0.001, now);
+    eGain.gain.setValueAtTime(0.24 * this.sfxGain, now + 0.028);
+    eGain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+    echo.connect(eFilter).connect(eGain).connect(ctx.destination);
+    echo.start(now + 0.025);
+    echo.stop(now + 0.2);
+
+    const body = ctx.createOscillator();
+    const bGain = ctx.createGain();
+    body.type = 'triangle';
+    body.frequency.setValueAtTime(420, now);
+    body.frequency.exponentialRampToValueAtTime(95, now + 0.075);
+    bGain.gain.setValueAtTime(0.32 * this.sfxGain, now);
+    bGain.gain.exponentialRampToValueAtTime(0.001, now + 0.085);
+    body.connect(bGain).connect(ctx.destination);
+    body.start(now);
+    body.stop(now + 0.09);
+  }
+
+  public playKick(): void {
+    const ctx = this.ensureContext();
+    if (!ctx || this.sfxGain <= 0.01) return;
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(215, now);
+    osc.frequency.exponentialRampToValueAtTime(38, now + 0.18);
+    gain.gain.setValueAtTime(0.45 * this.sfxGain, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.19);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.2);
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = this.getNoiseBuffer(ctx);
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.setValueAtTime(1800, now);
+    const nGain = ctx.createGain();
+    nGain.gain.setValueAtTime(0.3 * this.sfxGain, now);
+    nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+    noise.connect(lp).connect(nGain).connect(ctx.destination);
+    noise.start(now);
+    noise.stop(now + 0.12);
+  }
+
+  public playBlock(): void {
+    const ctx = this.ensureContext();
+    if (!ctx || this.sfxGain <= 0.01) return;
+    const now = ctx.currentTime;
+    [360, 540].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = i === 0 ? 'square' : 'triangle';
+      osc.frequency.setValueAtTime(freq, now);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.45, now + 0.08);
+      gain.gain.setValueAtTime(0.14 * this.sfxGain, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.1);
+    });
+  }
+
+  public playSpecial(): void {
+    const ctx = this.ensureContext();
+    if (!ctx || this.sfxGain <= 0.01) return;
+    const now = ctx.currentTime;
+    [293.66, 440, 587.33, 880].forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = idx % 2 === 0 ? 'sawtooth' : 'triangle';
+      osc.frequency.setValueAtTime(freq, now + idx * 0.035);
+      osc.frequency.exponentialRampToValueAtTime(freq * 1.45, now + idx * 0.035 + 0.2);
+      gain.gain.setValueAtTime(0.15 * this.sfxGain, now + idx * 0.035);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.035 + 0.28);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now + idx * 0.035);
+      osc.stop(now + idx * 0.035 + 0.29);
+    });
+  }
+
+  public playFinisher(): void {
+    const ctx = this.ensureContext();
+    if (!ctx || this.sfxGain <= 0.01) return;
+    const now = ctx.currentTime;
+    [146.83, 220, 440, 880, 1174.66].forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = idx < 2 ? 'sawtooth' : 'triangle';
+      osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+      osc.frequency.exponentialRampToValueAtTime(freq * 1.6, now + idx * 0.05 + 0.35);
+      gain.gain.setValueAtTime(0.18 * this.sfxGain, now + idx * 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.05 + 0.42);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now + idx * 0.05);
+      osc.stop(now + idx * 0.05 + 0.44);
+    });
+  }
+
+  public playCatSwarm(): void {
+    const ctx = this.ensureContext();
+    if (!ctx || this.sfxGain <= 0.01) return;
+    const now = ctx.currentTime;
+    [0, 0.09, 0.19, 0.31, 0.43].forEach((offset, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = i % 2 === 0 ? 'sawtooth' : 'triangle';
+      const base = 580 + (i % 3) * 110;
+      osc.frequency.setValueAtTime(base, now + offset);
+      osc.frequency.exponentialRampToValueAtTime(base * 1.48, now + offset + 0.07);
+      osc.frequency.exponentialRampToValueAtTime(base * 0.72, now + offset + 0.22);
+      gain.gain.setValueAtTime(0.12 * this.sfxGain, now + offset);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.24);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now + offset);
+      osc.stop(now + offset + 0.25);
+    });
+  }
+
+  public playKO(): void {
+    const ctx = this.ensureContext();
+    if (!ctx || this.sfxGain <= 0.01) return;
+    const now = ctx.currentTime;
+    [0, 0.18, 0.36].forEach((offset, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(150 - idx * 20, now + offset);
+      osc.frequency.exponentialRampToValueAtTime(28, now + offset + 0.45);
+      gain.gain.setValueAtTime((0.38 / (idx + 1)) * this.sfxGain, now + offset);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.5);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now + offset);
+      osc.stop(now + offset + 0.52);
+    });
+  }
+
+  public playRoundBell(): void {
+    const ctx = this.ensureContext();
+    if (!ctx || this.sfxGain <= 0.01) return;
+    const now = ctx.currentTime;
+    [587.33, 880, 1174.66].forEach((freq) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now);
+      gain.gain.setValueAtTime(0.14 * this.sfxGain, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.58);
+    });
+  }
+
+  public playCoin(): void {
+    const ctx = this.ensureContext();
+    if (!ctx || this.sfxGain <= 0.01) return;
+    const now = ctx.currentTime;
+    [987.77, 1318.51].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + i * 0.07);
+      gain.gain.setValueAtTime(0.16 * this.sfxGain, now + i * 0.07);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.16);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now + i * 0.07);
+      osc.stop(now + i * 0.07 + 0.18);
+    });
+  }
+
+  public playMeow(): void {
+    const ctx = this.ensureContext();
+    if (!ctx || this.sfxGain <= 0.01) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(640, now);
+    osc.frequency.exponentialRampToValueAtTime(950, now + 0.11);
+    osc.frequency.exponentialRampToValueAtTime(490, now + 0.32);
+    gain.gain.setValueAtTime(0.14 * this.sfxGain, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.34);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.36);
+  }
+}
+
+export const gameAudio = new ArcadeAudioEngine();
