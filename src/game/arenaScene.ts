@@ -134,6 +134,8 @@ interface FighterRuntime {
   regenIdleTimer: number;
   bufferedMove: MoveId | null;
   bufferTimer: number;
+  /** Tempo segurando para a frente: acima de ~0,35s o lutador corre. */
+  runHold: number;
   prevInput: FighterInputState;
   aiThinkTimer: number;
   aiDesiredMove: FighterInputState;
@@ -1657,6 +1659,7 @@ export class ArenaCombatEngine {
         regenIdleTimer: 0,
         bufferedMove: null,
         bufferTimer: 0,
+        runHold: 0,
         prevInput: createEmptyInput(),
         aiThinkTimer: 0,
         aiDesiredMove: createEmptyInput(),
@@ -2203,6 +2206,7 @@ export class ArenaCombatEngine {
       f.state === 'idle' ||
       f.state === 'walk_fwd' ||
       f.state === 'walk_back' ||
+      f.state === 'run' ||
       f.state === 'crouch' ||
       f.state === 'block' ||
       f.state === 'crouch_block' ||
@@ -2256,9 +2260,12 @@ export class ArenaCombatEngine {
         f.vx = 0;
       } else if (Math.abs(input.moveX) > 0.15) {
         const movingFwd = Math.sign(input.moveX) === f.facing;
-        f.state = movingFwd ? 'walk_fwd' : 'walk_back';
-        f.vx = input.moveX * moveSpeed * (movingFwd ? 1 : 0.82);
+        f.runHold = movingFwd && Math.abs(input.moveX) > 0.7 ? f.runHold + dt : 0;
+        const running = f.runHold > 0.35;
+        f.state = movingFwd ? (running ? 'run' : 'walk_fwd') : 'walk_back';
+        f.vx = input.moveX * moveSpeed * (movingFwd ? (running ? 1.75 : 1) : 0.82);
       } else {
+        f.runHold = 0;
         f.state = 'idle';
         f.vx = 0;
       }

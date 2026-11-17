@@ -196,7 +196,7 @@ export function buildFighterRig(
       color: denimTex ? 0xffffff : pal.pants,
       map: denimTex || undefined,
       normalMap: denimTex ? denimNormalTex : isPolice ? ripstopNormalTex : weaveNormalTex,
-      normalScale: new THREE.Vector2(0.5, 0.5),
+      normalScale: new THREE.Vector2(isPolice ? 0.22 : 0.5, isPolice ? 0.22 : 0.5),
       roughness: 0.88,
       metalness: 0.02,
     }),
@@ -859,6 +859,24 @@ export function buildFighterRig(
     buzzCap.scale.set(0.92, 1.11, 0.99);
     buzzCap.position.set(0, 0.205, -0.008);
     headGroup.add(buzzCap);
+
+    // Óculos (marca registrada do Beto): lentes escuras, aro e hastes
+    const frameMat = trackMat(new THREE.MeshStandardMaterial({ color: 0x0b0b0d, roughness: 0.35, metalness: 0.5 }));
+    const lensMat = trackMat(new THREE.MeshStandardMaterial({ color: 0x22303d, roughness: 0.12, metalness: 0.7, transparent: true, opacity: 0.85 }));
+    [-0.045, 0.045].forEach((lx) => {
+      const lens = new THREE.Mesh(trackGeo(new THREE.BoxGeometry(0.058, 0.034, 0.008)), lensMat);
+      lens.position.set(lx, 0.198, 0.128);
+      headGroup.add(lens);
+      const rim = new THREE.Mesh(trackGeo(new THREE.BoxGeometry(0.062, 0.008, 0.012)), frameMat);
+      rim.position.set(lx, 0.217, 0.128);
+      headGroup.add(rim);
+      const temple = new THREE.Mesh(trackGeo(new THREE.BoxGeometry(0.008, 0.008, 0.12)), frameMat);
+      temple.position.set(lx > 0 ? 0.106 : -0.106, 0.21, 0.07);
+      headGroup.add(temple);
+    });
+    const bridge = new THREE.Mesh(trackGeo(new THREE.BoxGeometry(0.03, 0.008, 0.01)), frameMat);
+    bridge.position.set(0, 0.208, 0.13);
+    headGroup.add(bridge);
   } else if (isCapoeira) {
     const band = new THREE.Mesh(trackGeo(new THREE.TorusGeometry(0.129, 0.02, 10, 24)), accentMat);
     band.rotation.x = Math.PI / 2;
@@ -1210,6 +1228,24 @@ export function buildFighterRig(
       toeCap.scale.set(1.02, 0.62, 1.0);
       toeCap.position.set(0, -0.026, 0.125);
       footGroup.add(toeCap);
+
+      if (isMaluco) {
+        // Chinelo: sola branca com tira azul
+        const soleMat = trackMat(new THREE.MeshStandardMaterial({ color: 0xf1f3f6, roughness: 0.7 }));
+        const strapMat = trackMat(new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.6 }));
+        const sole = new THREE.Mesh(trackGeo(new THREE.BoxGeometry(0.1, 0.016, 0.215)), soleMat);
+        sole.position.set(0, -0.052, 0.05);
+        sole.castShadow = true;
+        footGroup.add(sole);
+        const strapL = new THREE.Mesh(trackGeo(new THREE.BoxGeometry(0.008, 0.012, 0.09)), strapMat);
+        strapL.position.set(-0.03, -0.035, 0.085);
+        strapL.rotation.y = 0.45;
+        footGroup.add(strapL);
+        const strapR = strapL.clone();
+        strapR.position.x = 0.03;
+        strapR.rotation.y = -0.45;
+        footGroup.add(strapR);
+      }
     } else {
       const shoeMat = isDani ? vestMat : bootMat;
       const bootCollar = new THREE.Mesh(
@@ -1404,6 +1440,21 @@ export function animateFighterRig(
         headRotY = Math.sin(globalTime * 4) * 0.15;
       }
     }
+  } else if (move === 'run') {
+    // Corrida: passada longa, tronco inclinado e braços bombeando
+    const cycle = globalTime * 17;
+    pelvisY = 0.88 + Math.abs(Math.sin(cycle)) * 0.06;
+    lLegX = Math.sin(cycle) * 0.95;
+    rLegX = -Math.sin(cycle) * 0.95;
+    lShinX = Math.max(0.15, -Math.cos(cycle) * 1.2);
+    rShinX = Math.max(0.15, Math.cos(cycle) * 1.2);
+    torsoRotX = 0.38;
+    torsoRotY = 0.08;
+    headRotX = -0.18;
+    lArmX = -0.6 - Math.sin(cycle) * 0.9;
+    rArmX = -0.6 + Math.sin(cycle) * 0.9;
+    lForeX = -1.5;
+    rForeX = -1.5;
   } else if (move === 'walk_fwd' || move === 'walk_back') {
     const dir = move === 'walk_fwd' ? 1 : -1;
     const cycle = globalTime * (isPolicial ? 12.2 : 11.5) * dir;
@@ -1935,7 +1986,7 @@ export function animateFighterRig(
   rig.mouth.scale.set(mouthScaleX, mouthScaleY, 1);
 
   // Secondary motion on cape, skirt, and hair locks!
-  const speedActivity = move === 'walk_fwd' || move === 'walk_back' || move === 'jump' || move === 'special_1' || move === 'special_2' ? 1 : 0.3;
+  const speedActivity = move === 'run' || move === 'walk_fwd' || move === 'walk_back' || move === 'jump' || move === 'special_1' || move === 'special_2' ? 1 : 0.3;
   if (rig.capeGroup) {
     rig.capeGroup.rotation.x = dampAngle(
       rig.capeGroup.rotation.x,

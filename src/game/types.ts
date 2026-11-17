@@ -52,6 +52,7 @@ export type MoveId =
   | 'idle'
   | 'walk_fwd'
   | 'walk_back'
+  | 'run'
   | 'crouch'
   | 'jump'
   | 'block'

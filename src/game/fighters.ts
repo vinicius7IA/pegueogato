@@ -33,8 +33,8 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
     personality: 'Calmo, observador e defensivo; só ataca quando já está no controle.',
     style: 'Estilo segurança: guarda tática, esquiva lateral de boxe e contra-ataque + enxame de gatos pretos.',
     signaturePowerId: 'gatos_pretos',
-    signaturePowerName: 'Enxame dos Gatos Pretos',
-    finisherName: 'VIGIA TOTAL',
+    signaturePowerName: 'Chute Tático',
+    finisherName: 'IMPACTO CHUTA-PORTA',
     portraitUrl: portraitPolicial,
     badgeColor: '#1d4ed8',
     stats: {
@@ -67,28 +67,28 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
     ],
     specialMoves: {
       special_1: {
-        name: 'Golpe Tático',
+        name: 'Soco Pesado',
         command: '↓ ↘ → + Soco',
         damageScale: 1.15,
         vfxColor: 0xef4444,
         description: 'Tapão estalado que deixa o rosto do rival em brasa.',
       },
       special_2: {
-        name: 'Defesa Avançada',
-        command: '← ← + Chute',
+        name: 'Contra-ataque',
+        command: '← → + Chute',
         damageScale: 1.05,
         vfxColor: 0x38bdf8,
         description: 'Esquiva baixa seguida de gancho no queixo.',
       },
       super_move: {
-        name: 'Enxame dos Gatos Pretos',
+        name: 'Chute Tático',
         command: 'Poder (45+ Energia)',
         damageScale: 1.25,
         vfxColor: 0xa855f7,
         description: 'Convoca 7 gatos pretos em onda devastadora.',
       },
       finisher_move: {
-        name: 'VIGIA TOTAL',
+        name: 'IMPACTO CHUTA-PORTA',
         command: 'Finalizador (100% Energia)',
         damageScale: 1.6,
         vfxColor: 0xfacc15,
@@ -104,7 +104,7 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
     id: 'maluco',
     name: 'O MALUCO DO GATO',
     archetype: 'trapaceiro',
-    title: 'Rua · Desencanação',
+    title: 'Ágil · Imprevisível',
     tagline: 'Magrelo, cabelo black gigante, bermuda preta e chinelo: ninguém sabe o que ele vai fazer.',
     lore: 'Figura de rua de Salvador que vive desencanado de tudo. Leve como um gato, foge, volta, olha estranho e acerta quando ninguém espera.',
     catchphrase: 'Pega o gato, pai! Quero ver acompanhar!',
@@ -121,8 +121,8 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
     personality: 'Desencanado, imprevisível e defensivo; escapa de tudo e provoca.',
     style: 'Estilo de rua: fugas rápidas, saltos de gato e golpes de surpresa.',
     signaturePowerId: 'tapa_explosivo',
-    signaturePowerName: 'Tapa Explosivo',
-    finisherName: 'DESENCANAR',
+    signaturePowerName: 'Correria do Gato',
+    finisherName: 'SUMIDO RELÂMPAGO',
     portraitUrl: portraitMaluco,
     badgeColor: '#f59e0b',
     stats: {
@@ -155,7 +155,7 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
     ],
     specialMoves: {
       special_1: {
-        name: 'Olhar Estranho',
+        name: 'Ataque Surpresa',
         command: '→ → + Soco',
         damageScale: 1.1,
         vfxColor: 0xf59e0b,
@@ -169,14 +169,14 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
         description: 'Chute acrobático surpresa que passa por cima da guarda baixa.',
       },
       super_move: {
-        name: 'Tapa Explosivo',
+        name: 'Correria do Gato',
         command: 'Poder (45+ Energia)',
         damageScale: 1.2,
         vfxColor: 0xf97316,
         description: 'Onda sônica de tapa que arremessa o rival na parede.',
       },
       finisher_move: {
-        name: 'DESENCANAR',
+        name: 'SUMIDO RELÂMPAGO',
         command: 'Finalizador (100% Energia)',
         damageScale: 1.55,
         vfxColor: 0xfacc15,
@@ -1056,6 +1056,7 @@ export const SKINS: FighterSkin[] = [
 
 export const MOVES: Record<MoveId, MoveSpec> = {
   idle: { id: 'idle', label: 'Guarda', startup: 0, active: 0, recovery: 0, damage: 0, chipDamage: 0, range: 0, knockback: 0, hitstun: 0, stunDamage: 0, energyGain: 0, energyCost: 0, hitHeight: 'mid', vfxColor: 0xffffff },
+  run: { id: 'run', label: 'Correr', startup: 0, active: 0, recovery: 0, damage: 0, chipDamage: 0, range: 0, knockback: 0, hitstun: 0, stunDamage: 0, energyGain: 0, energyCost: 0, hitHeight: 'mid', vfxColor: 0xffffff },
   walk_fwd: { id: 'walk_fwd', label: 'Avançar', startup: 0, active: 0, recovery: 0, damage: 0, chipDamage: 0, range: 0, knockback: 0, hitstun: 0, stunDamage: 0, energyGain: 0, energyCost: 0, hitHeight: 'mid', vfxColor: 0xffffff },
   walk_back: { id: 'walk_back', label: 'Recuar', startup: 0, active: 0, recovery: 0, damage: 0, chipDamage: 0, range: 0, knockback: 0, hitstun: 0, stunDamage: 0, energyGain: 0, energyCost: 0, hitHeight: 'mid', vfxColor: 0xffffff },
   crouch: { id: 'crouch', label: 'Agachar', startup: 0, active: 0, recovery: 0, damage: 0, chipDamage: 0, range: 0, knockback: 0, hitstun: 0, stunDamage: 0, energyGain: 0, energyCost: 0, hitHeight: 'low', vfxColor: 0xffffff },

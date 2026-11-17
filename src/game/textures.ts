@@ -83,6 +83,10 @@ function createDataTextureFromBuffer(
   tex.wrapT = THREE.RepeatWrapping;
   tex.repeat.set(repeatX, repeatY);
   tex.anisotropy = maxAnisotropy;
+  // Suavização + mipmaps: sem isso o tecido vira "manchas" e serrilhado de longe
+  tex.magFilter = THREE.LinearFilter;
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.generateMipmaps = true;
   tex.needsUpdate = true;
   return tex;
 }
