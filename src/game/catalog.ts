@@ -461,7 +461,7 @@ export const DEFAULT_SETTINGS: GameSettings = {
   cameraShake: true,
   showHitEffects: true,
   controlScheme: 'auto',
-  mobileOrientation: null,
+  mobileOrientation: 'landscape',
   commandAssist: true,
   hapticsEnabled: true,
   touchLayoutScale: 1.0,

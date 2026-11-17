@@ -318,7 +318,7 @@ export class ArenaCombatEngine {
     this.scene.fog = new THREE.FogExp2(arenaDef.skyBottomHex, 0.008);
 
     this.camera = new THREE.PerspectiveCamera(aspect < 0.85 ? 52 : 42, aspect, 0.1, 145);
-    this.camera.position.set(0, 2.45, aspect < 0.85 ? 10.2 : 8.1);
+    this.camera.position.set(0, aspect < 0.85 ? 2.45 : 1.75, aspect < 0.85 ? 10.2 : 5.8);
     this.camera.lookAt(0, 1.05, 0);
 
     this.setupLighting(arenaDef.timeOfDay);
@@ -2941,8 +2941,15 @@ export class ArenaCombatEngine {
     }
 
     const portraitScale = isPortrait ? 1.45 / Math.max(0.55, this.camera.aspect + 0.15) : 1.0;
-    const targetZ = THREE.MathUtils.clamp((5.7 + separation * 0.78) * portraitScale, 6.0, 13.5);
-    const targetY = THREE.MathUtils.clamp((isPortrait ? 2.5 : 2.1) + separation * 0.08, 2.0, 3.2);
+    // Paisagem: câmera baixa e próxima (estilo jogo de luta), enquadrando só o necessário
+    const halfFovTan = Math.tan(THREE.MathUtils.degToRad(this.camera.fov) / 2);
+    const fitZ = (separation + 3.4) / (2 * halfFovTan * this.camera.aspect);
+    const targetZ = isPortrait
+      ? THREE.MathUtils.clamp((5.7 + separation * 0.78) * portraitScale, 6.0, 13.5)
+      : THREE.MathUtils.clamp(Math.max(5.6, fitZ), 5.6, 11);
+    const targetY = isPortrait
+      ? THREE.MathUtils.clamp(2.5 + separation * 0.08, 2.0, 3.2)
+      : THREE.MathUtils.clamp(1.75 + separation * 0.05, 1.75, 2.4);
 
     this.camera.position.x = THREE.MathUtils.damp(this.camera.position.x, midX * 0.85, 7, dt);
     this.camera.position.y = THREE.MathUtils.damp(this.camera.position.y, targetY, 6, dt);
@@ -2954,7 +2961,7 @@ export class ArenaCombatEngine {
       this.shakeAmount = THREE.MathUtils.damp(this.shakeAmount, 0, 14, dt);
     }
 
-    this.camera.lookAt(midX * 0.85, isPortrait ? 0.95 : 1.15, 0);
+    this.camera.lookAt(midX * 0.85, isPortrait ? 0.95 : 1.2, 0);
   }
 
   private updateMascotCat(dt: number, elapsed: number): void {

@@ -81,6 +81,24 @@ export function ArenaView({
   }, []);
 
   const isNarrowViewport = viewport.w < viewport.h;
+  const isTouchDevice = typeof window !== 'undefined' && (navigator.maxTouchPoints ?? 0) > 0;
+  const askToRotate = isTouchDevice && isNarrowViewport && settings.mobileOrientation !== 'portrait';
+
+  // Celular: tela cheia + trava em paisagem (best-effort; exige gesto do usuário e suporte do navegador)
+  useEffect(() => {
+    if (!isTouchDevice || settings.mobileOrientation === 'portrait') return;
+    const el = document.documentElement;
+    const lock = async () => {
+      try {
+        if (!document.fullscreenElement && el.requestFullscreen) await el.requestFullscreen();
+        const o = screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> };
+        await o.lock?.('landscape');
+      } catch {
+        /* navegador não permite: segue sem travar */
+      }
+    };
+    void lock();
+  }, [isTouchDevice, settings.mobileOrientation]);
   const isPortraitLayout =
     settings.mobileOrientation === 'portrait' ||
     (settings.mobileOrientation === null && isNarrowViewport && viewport.w < 768);
@@ -340,6 +358,16 @@ export function ArenaView({
           </div>
         ))}
       </div>
+
+      {askToRotate && (
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-sf-bg/95 text-center p-6">
+          <div className="text-6xl animate-pulse">📱↻</div>
+          <div className="font-display italic font-black text-3xl text-sf-gold">GIRE O CELULAR</div>
+          <p className="text-sm text-slate-300 max-w-xs">
+            O Bahia Street é jogado com o celular deitado (horizontal).
+          </p>
+        </div>
+      )}
 
       {/* Top AAA Street Fighting Combat HUD */}
       <div className="pointer-events-none absolute top-0 inset-x-0 z-20 px-2.5 sm:px-5 pt-2.5 max-w-6xl mx-auto">
