@@ -285,9 +285,11 @@ export class ArenaCombatEngine {
     const height = Math.max(240, cfg.container.clientHeight);
     const aspect = width / height;
 
+    const backdropUrl = (ARENAS[cfg.arenaId] || ARENAS.pelourinho).backdropUrl;
     this.renderer = new THREE.WebGLRenderer({
       antialias: !this.isSoftwareGl && this.resolvedQuality === 'high',
       powerPreference: 'high-performance',
+      alpha: Boolean(backdropUrl),
     });
     const gl = this.renderer.getContext();
     if (!gl || gl.isContextLost()) {
@@ -311,11 +313,25 @@ export class ArenaCombatEngine {
 
     cfg.container.innerHTML = '';
     cfg.container.appendChild(this.renderer.domElement);
+    if (backdropUrl) {
+      // Cenário 2D: a arte fica atrás do canvas transparente; só os lutadores são 3D
+      this.renderer.setClearColor(0x000000, 0);
+      Object.assign(cfg.container.style, {
+        backgroundImage: `url(${backdropUrl})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center 72%',
+        backgroundRepeat: 'no-repeat',
+      });
+    }
 
     const arenaDef = ARENAS[cfg.arenaId] || ARENAS.pelourinho;
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(arenaDef.skyTopHex);
-    this.scene.fog = new THREE.FogExp2(arenaDef.skyBottomHex, 0.008);
+    if (arenaDef.backdropUrl) {
+      this.scene.background = null;
+    } else {
+      this.scene.background = new THREE.Color(arenaDef.skyTopHex);
+      this.scene.fog = new THREE.FogExp2(arenaDef.skyBottomHex, 0.008);
+    }
 
     this.camera = new THREE.PerspectiveCamera(aspect < 0.85 ? 52 : 42, aspect, 0.1, 145);
     this.camera.position.set(0, aspect < 0.85 ? 2.45 : 1.75, aspect < 0.85 ? 10.2 : 5.8);
@@ -455,6 +471,17 @@ export class ArenaCombatEngine {
   }
 
   private buildSelectedSalvadorArena(arenaId: ArenaId): void {
+    if (ARENAS[arenaId]?.backdropUrl) {
+      // Só um plano invisível que recebe a sombra dos lutadores sobre a arte 2D
+      const geo = new THREE.PlaneGeometry(58, 36);
+      const mat = new THREE.ShadowMaterial({ opacity: 0.35 });
+      this.disposables.push(geo, mat);
+      const catcher = new THREE.Mesh(geo, mat);
+      catcher.rotation.x = -Math.PI / 2;
+      catcher.receiveShadow = true;
+      this.scene.add(catcher);
+      return;
+    }
     const maxAniso = this.renderer.capabilities.getMaxAnisotropy();
     this.buildSkyDome(arenaId);
 

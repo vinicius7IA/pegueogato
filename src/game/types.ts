@@ -108,6 +108,10 @@ export interface ArenaDefinition {
   accentHex: string;
   skyTopHex: number;
   skyBottomHex: number;
+  /** Fundo 2D (arte) usado no lugar do cenário 3D. */
+  backdropUrl?: string;
+  /** Miniatura usada no carrossel da seleção de arena. */
+  thumbUrl?: string;
 }
 
 export interface FighterStats {

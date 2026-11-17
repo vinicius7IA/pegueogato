@@ -1,7 +1,7 @@
 import { Copy, Globe, History, MapPin, Plus, Search, Swords, Trophy, Users } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { gameAudio } from '../game/audio';
-import { ARENAS, ARENAS_LIST, FIGHTERS, getDisplayFighterMeta, isPlayableFighter } from '../game/catalog';
+import { ARENAS, ARENAS_LIST, FIGHTERS, getDisplayFighterMeta, isPlayableArena, isPlayableFighter } from '../game/catalog';
 import {
   ArenaId,
   FighterId,
@@ -271,7 +271,7 @@ export function MultiplayerScreen({
                   <MapPin className="w-3.5 h-3.5 text-sf-gold" /> Voto de Arena da Sala
                 </div>
                 <div className="flex gap-1.5 overflow-x-auto pb-1">
-                  {ARENAS_LIST.map((a) => (
+                  {ARENAS_LIST.filter((a) => isPlayableArena(a.id)).map((a) => (
                     <ActionButton
                       key={a.id}
                       variant={stageVote === a.id ? 'gold' : 'steel'}

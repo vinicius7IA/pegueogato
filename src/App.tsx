@@ -119,7 +119,7 @@ function AppShell() {
   // Protagonista padrão P1: Beto Chuta-Porta; rival padrão P2: O Maluco
   const [p1Fighter, setP1Fighter] = useState<FighterId>('policial');
   const [p2Fighter, setP2Fighter] = useState<FighterId>('maluco');
-  const [arenaId, setArenaId] = useState<ArenaId>('pelourinho');
+  const [arenaId, setArenaId] = useState<ArenaId>('farol_barra');
   const [matchMode, setMatchMode] = useState<MatchMode>('vs_ai');
   const [aiDifficulty, setAiDifficulty] = useState<AiDifficulty>(settings.aiDifficulty);
   const [arcadeStage, setArcadeStage] = useState<number>(1);

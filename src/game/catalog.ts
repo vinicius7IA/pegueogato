@@ -1,3 +1,6 @@
+import thumbFarol from '../assets/images/stages/thumb_farol.jpg';
+import thumbFavela from '../assets/images/stages/thumb_favela.jpg';
+import thumbShopping from '../assets/images/stages/thumb_shopping.jpg';
 import {
   FIGHTER_ROSTER_CAPACITY,
   FIGHTERS,
@@ -45,8 +48,8 @@ export const ARENAS: Record<ArenaId, ArenaDefinition> = {
   },
   favela_salvador: {
     id: 'favela_salvador',
-    name: 'Ladeira da Comunidade',
-    shortName: 'Favela BA',
+    name: 'Favela',
+    shortName: 'Favela',
     district: 'Encosta de Salvador',
     timeOfDay: 'tarde',
     musicStyle: 'pagode_rua',
@@ -54,6 +57,7 @@ export const ARENAS: Record<ArenaId, ArenaDefinition> = {
     accentHex: '#ef4444',
     skyTopHex: 0x3b82f6,
     skyBottomHex: 0xfde68a,
+    thumbUrl: thumbFavela,
   },
   cajazeira: {
     id: 'cajazeira',
@@ -81,15 +85,16 @@ export const ARENAS: Record<ArenaId, ArenaDefinition> = {
   },
   pituba: {
     id: 'pituba',
-    name: 'Calçadão da Pituba',
-    shortName: 'Pituba',
-    district: 'Orla da Pituba · Salvador',
+    name: 'Shopping da Bahia',
+    shortName: 'Shopping',
+    district: 'Iguatemi · Salvador',
     timeOfDay: 'meio_dia',
     musicStyle: 'samba_reggae',
-    interactiveFeature: 'Ciclistas e carros passam ao fundo entre coqueiros ao vento',
+    interactiveFeature: 'Estacionamento lotado e movimento de compras na porta do shopping',
     accentHex: '#22c55e',
     skyTopHex: 0x1d4ed8,
     skyBottomHex: 0xe0f2fe,
+    thumbUrl: thumbShopping,
   },
   elevador_lacerda: {
     id: 'elevador_lacerda',
@@ -114,6 +119,7 @@ export const ARENAS: Record<ArenaId, ArenaDefinition> = {
     accentHex: '#f97316',
     skyTopHex: 0x1e3a8a,
     skyBottomHex: 0xfb923c,
+    thumbUrl: thumbFarol,
   },
   orla: {
     id: 'orla',
@@ -306,15 +312,19 @@ export interface ArcadeStageDef {
   title: string;
 }
 
+/** Arenas liberadas nesta versão; as demais aparecem bloqueadas no mapa. */
+export const PLAYABLE_ARENAS: ArenaId[] = ['farol_barra', 'favela_salvador', 'pituba'];
+export const isPlayableArena = (id: ArenaId): boolean => PLAYABLE_ARENAS.includes(id);
+
 /** Lutadores jogáveis nesta versão; os demais aparecem bloqueados (cinza) na seleção. */
 export const PLAYABLE_FIGHTERS: FighterId[] = ['policial', 'maluco'];
 export const isPlayableFighter = (id: FighterId): boolean => PLAYABLE_FIGHTERS.includes(id);
 
 export const ARCADE_LADDER: ArcadeStageDef[] = [
-  { stage: 1, opponentId: 'maluco', arenaId: 'cajazeira', difficulty: 'easy', title: 'Abertura em Cajazeiras' },
-  { stage: 2, opponentId: 'policial', arenaId: 'pelourinho', difficulty: 'medium', title: 'Chuta-Porta no Pelô' },
-  { stage: 3, opponentId: 'maluco', arenaId: 'rio_vermelho', difficulty: 'medium', title: 'Noite no Rio Vermelho' },
-  { stage: 4, opponentId: 'policial', arenaId: 'dique_tororo', difficulty: 'hard', title: 'Final no Dique do Tororó' },
+  { stage: 1, opponentId: 'maluco', arenaId: 'favela_salvador', difficulty: 'easy', title: 'Abertura na Favela' },
+  { stage: 2, opponentId: 'policial', arenaId: 'farol_barra', difficulty: 'medium', title: 'Chuta-Porta no Farol' },
+  { stage: 3, opponentId: 'maluco', arenaId: 'pituba', difficulty: 'medium', title: 'Confusão no Shopping' },
+  { stage: 4, opponentId: 'policial', arenaId: 'farol_barra', difficulty: 'hard', title: 'Final no Farol da Barra' },
 ];
 
 export function generateDailyChallenges(): DailyChallenge[] {
