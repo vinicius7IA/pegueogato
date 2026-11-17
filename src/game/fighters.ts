@@ -1,5 +1,5 @@
 import portraitMaluco from '../assets/images/realistic_maluco_1794790671764.jpg';
-import portraitPolicial from '../assets/images/realistic_policial_1794790671624.jpg';
+import portraitPolicial from '../assets/images/roberto_portrait.jpg';
 import portraitTorcedor from '../assets/images/realistic_torcedor_1794790674222.jpg';
 import {
   FighterDefinition,
@@ -18,9 +18,9 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
     fallbackAlias: 'PÉ DE PORTÃO',
     requiresAuthorization: true,
     archetype: 'tecnico',
-    title: 'Pé na Porta da Ladeira',
-    tagline: 'Esquiva de boxe, tapão que deixa vermelho e enxame de gatos pretos.',
-    lore: 'Policial linha-dura de Salvador que chega chutando a porta: esquiva perfeita de boxe, tapão que ecoa pela ladeira e, quando perde a paciência, uma tropa de gatos pretos da madrugada.',
+    title: 'Segurança · Controle',
+    tagline: 'Defensivo e tático: controla a distância, esquiva de boxe e chama a tropa de gatos pretos.',
+    lore: 'Segurança de colete e óculos que guarda a porta de Salvador. Frio, tático e no controle: lê o adversário, bloqueia o espaço e, quando precisa, abre no pé. Se a coisa piora, solta o enxame de gatos pretos.',
     catchphrase: 'Pé na porta, e o gato não escapa!',
     quotes: [
       'Pé na porta, sem pedir licença!',
@@ -32,11 +32,11 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
       'Esquivei no reflexo e já voltou o cruzado!',
       'Operação concluída na Baixa dos Sapateiros!',
     ],
-    personality: 'Sério, técnico na esquiva de boxe e implacável no contra-ataque.',
-    style: 'Esquiva lateral de boxe + tapão estalado + enxame de 7 gatos pretos.',
+    personality: 'Calmo, observador e defensivo; só ataca quando já está no controle.',
+    style: 'Estilo segurança: guarda tática, esquiva lateral de boxe e contra-ataque + enxame de gatos pretos.',
     signaturePowerId: 'gatos_pretos',
     signaturePowerName: 'Enxame dos Gatos Pretos',
-    finisherName: 'OPERAÇÃO GATO PRETO',
+    finisherName: 'VIGIA TOTAL',
     portraitUrl: portraitPolicial,
     badgeColor: '#1d4ed8',
     stats: {
@@ -68,15 +68,15 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
     ],
     specialMoves: {
       special_1: {
-        name: 'Tapão da Ordem',
+        name: 'Golpe Tático',
         command: '↓ ↘ → + Soco',
         damageScale: 1.15,
         vfxColor: 0xef4444,
         description: 'Tapão estalado que deixa o rosto do rival em brasa.',
       },
       special_2: {
-        name: 'Avanço de Boxe',
-        command: '← → + Chute',
+        name: 'Defesa Avançada',
+        command: '← ← + Chute',
         damageScale: 1.05,
         vfxColor: 0x38bdf8,
         description: 'Esquiva baixa seguida de gancho no queixo.',
@@ -89,7 +89,7 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
         description: 'Convoca 7 gatos pretos em onda devastadora.',
       },
       finisher_move: {
-        name: 'OPERAÇÃO GATO PRETO',
+        name: 'VIGIA TOTAL',
         command: 'Finalizador (100% Energia)',
         damageScale: 1.6,
         vfxColor: 0xfacc15,

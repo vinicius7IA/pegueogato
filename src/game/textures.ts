@@ -986,15 +986,17 @@ export function createPoliceVestTexture(): THREE.CanvasTexture {
   }
 
   ctx.fillStyle = '#07080b';
-  ctx.fillRect(46, 54, 164, 42);
+  ctx.fillRect(36, 46, 184, 58);
   ctx.strokeStyle = '#64748b';
   ctx.lineWidth = 2;
-  ctx.strokeRect(46, 54, 164, 42);
+  ctx.strokeRect(36, 46, 184, 58);
   ctx.fillStyle = '#f8fafc';
-  ctx.font = '900 22px sans-serif';
+  ctx.font = '900 24px sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('TÁTICO BA', 128, 76);
+  ctx.fillText('ROBERTO', 128, 63);
+  ctx.font = '900 15px sans-serif';
+  ctx.fillText('P.P. NA PORTA', 128, 87);
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
