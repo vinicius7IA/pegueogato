@@ -577,7 +577,7 @@ function AppShell() {
 
     if (screen === 'login') {
       return (
-        <div className="relative w-full h-full flex items-center justify-center bg-[#07080d] p-4 overflow-y-auto sf-halftone-bg">
+        <div className="relative w-full h-full flex bg-[#07080d] p-4 overflow-y-auto sf-halftone-bg">
           <img
             src={salvadorBackdrop}
             alt="Pelourinho Salvador"
@@ -589,9 +589,9 @@ function AppShell() {
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative z-10 w-full max-w-md"
+            className="relative z-10 w-full max-w-md m-auto"
           >
-            <StreetPanel tone="gold" chamfer="lg" textured className="p-6 space-y-5">
+            <StreetPanel tone="gold" chamfer="lg" textured className="p-4 sm:p-6 space-y-3 sm:space-y-5">
               <form onSubmit={handleLoginSubmit} className="space-y-5">
                 <div className="text-center space-y-1 border-b border-white/10 pb-4">
                   <div className="text-[11px] font-black tracking-[0.28em] text-[#00d4ff] uppercase">

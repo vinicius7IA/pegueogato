@@ -210,3 +210,11 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 200, 21, 0.75);
 }
+
+/* Mobile: respeita notch / barra de gestos (viewport-fit=cover) */
+#root {
+  box-sizing: border-box;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+}

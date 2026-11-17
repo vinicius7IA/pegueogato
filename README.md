@@ -1,20 +1,22 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# PEGUE O GATO
 
-# Run and deploy your AI Studio app
+Jogo de luta 3D arcade (React + Vite + Three.js) com servidor Express/WebSocket para multiplayer e ranking.
 
-This contains everything you need to run your app locally.
+## Rodar
 
-View your app in AI Studio: https://ai.studio/apps/3daa806a-597c-4d60-bf3d-54eb028daadd
+```bash
+npm install
+npm run dev          # http://localhost:3000 (PORT=xxxx para trocar)
+```
 
-## Run Locally
+Para jogar no celular na mesma rede Wi-Fi, abra `http://IP-DO-PC:3000`.
 
-**Prerequisites:**  Node.js
+## Produção
 
+```bash
+npm run build
+NODE_ENV=production npm start
+```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+O app é um PWA: ao abrir em HTTPS no celular, use "Adicionar à tela inicial" para jogar em tela cheia.
+Hospede em qualquer serviço que rode Node com WebSocket (Render, Railway, Fly.io).

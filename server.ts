@@ -550,7 +550,7 @@ async function startServer() {
     });
   });
 
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT) || 3000;
   server.listen(PORT, '0.0.0.0', () => {
     console.log(`PEGUE O GATO server running on http://localhost:${PORT}`);
   });
