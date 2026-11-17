@@ -14,21 +14,19 @@ export const FIGHTER_ROSTER_CAPACITY = 16;
 export const FIGHTERS: Record<FighterId, FighterDefinition> = {
   policial: {
     id: 'policial',
-    name: 'ROBERTO PÉ NA PORTA',
-    fallbackAlias: 'PÉ DE PORTÃO',
-    requiresAuthorization: true,
+    name: 'BETO CHUTA-PORTA',
     archetype: 'tecnico',
     title: 'Segurança · Controle',
     tagline: 'Defensivo e tático: controla a distância, esquiva de boxe e chama a tropa de gatos pretos.',
     lore: 'Segurança de colete e óculos que guarda a porta de Salvador. Frio, tático e no controle: lê o adversário, bloqueia o espaço e, quando precisa, abre no pé. Se a coisa piora, solta o enxame de gatos pretos.',
-    catchphrase: 'Pé na porta, e o gato não escapa!',
+    catchphrase: 'Chuta a porta, e o gato não escapa!',
     quotes: [
-      'Pé na porta, sem pedir licença!',
+      'Chuta a porta, sem pedir licença!',
       'Na minha ladeira ninguém folga, meu rei!',
       'Esse tapão deixou tua cara da cor do dendê!',
       'Fique quieto que os gatos pretos tão chegando!',
       'Guarda baixa comigo é passagem pro chão!',
-      'Abre que é a polícia... ou eu abro no pé!',
+      'Abre a porta... ou eu abro no pé!',
       'Esquivei no reflexo e já voltou o cruzado!',
       'Operação concluída na Baixa dos Sapateiros!',
     ],
@@ -190,9 +188,7 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
 
   roberto: {
     id: 'roberto',
-    name: 'CORONEL STURARO',
-    fallbackAlias: 'CORONEL DA RODA',
-    requiresAuthorization: true,
+    name: 'CORONEL BRABEZA',
     archetype: 'rapido',
     title: 'Coronel da Ginga',
     tagline: 'Ginga contínua, armada alta, meia-lua e rasteira ancestral da Bahia.',
@@ -278,21 +274,21 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
 
   torcedor: {
     id: 'torcedor',
-    name: 'TORCEDOR DO BAHIA',
+    name: 'TORCEDOR TRICOLOR',
     archetype: 'bruto',
     title: 'Tricolor de Aço',
     tagline: 'Bandeirão tricolor nas costas, cara pintada e pressão ensurdecedora da Fonte Nova!',
     lore: 'Não perde um jogo na Fonte Nova nem debaixo de chuva forte. Transforma charanga e cornetada em ataques que quebram qualquer guarda.',
-    catchphrase: 'Bora Bahêa! Aqui é tricolor até o K.O.!',
+    catchphrase: 'Bora Tricolor! Aqui é tricolor até o K.O.!',
     quotes: [
       'Aumenta o som da charanga tricolor!',
-      'Com a camisa do Bahêa eu não sinto nem arranhão!',
+      'Com a camisa tricolor eu não sinto nem arranhão!',
       'Fonte Nova tremendo no meu soco!',
       'Esquadrão de Aço não recua!',
       'Cantou o hino? Agora aguenta a pressão!',
       'Tricolor até o último round!',
       'Essa vai pra geral!',
-      'Respeita a torcida do Bahêa!',
+      'Respeita a torcida tricolor!',
     ],
     personality: 'Barulhento, sanguíneo, corajoso e especialista em quebrar retranca.',
     style: 'Lutador pesado de pressão com ombradas, grito sônico de corneta e super soco.',
@@ -365,7 +361,7 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
 
   torcedor_vitoria: {
     id: 'torcedor_vitoria',
-    name: 'TORCEDOR DO VITÓRIA',
+    name: 'TORCEDOR RUBRO-NEGRO',
     archetype: 'bruto',
     title: 'Rubro-Negro de Carteirinha',
     tagline: 'Bandeirão rubro-negro, cara pintada e a fúria do Barradão no peito!',
@@ -451,9 +447,7 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
 
   jesse: {
     id: 'jesse',
-    name: 'JESSE DE JUCA',
-    fallbackAlias: 'MOTOLINKE DO BECÃO',
-    requiresAuthorization: true,
+    name: 'ZÉ MOTOLINKE',
     archetype: 'rapido',
     title: 'Motolinke do Plantão',
     tagline: 'Capacete com câmera no alto, camisa preta de repórter e jeans na pista!',
@@ -540,9 +534,7 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
 
   alo_juca: {
     id: 'alo_juca',
-    name: 'ALÔ JUCA',
-    fallbackAlias: 'ÂNCORA DO PLANTÃO',
-    requiresAuthorization: true,
+    name: 'ALÔ ZUCA',
     archetype: 'tecnico',
     title: 'Plantão Urgente de Salvador',
     tagline: 'Polo azul-marinho, relógio no pulso e plantão pesado ao vivo!',
@@ -629,11 +621,9 @@ export const FIGHTERS: Record<FighterId, FighterDefinition> = {
 
   alo_dani: {
     id: 'alo_dani',
-    name: 'ALÔ DANI',
-    fallbackAlias: 'DANI DO ESTÚDIO',
-    requiresAuthorization: true,
+    name: 'ALÔ LENI',
     archetype: 'zoneador',
-    title: 'Fala Dani · Ao Vivo',
+    title: 'Fala Leni · Ao Vivo',
     tagline: 'Polo azul-claro, calça creme, cinto fino e velocidade extrema!',
     lore: 'Apresentadora de reflexos afiados que lê o movimento do adversário em frações de segundo. Especialista em chutes de alcance, esquiva limpa e aceleração relâmpago.',
     catchphrase: 'Fala, Salvador! Vamos resolver isso no ar!',
@@ -760,7 +750,7 @@ export function getMasteryLevel(xp: number): { level: number; titleIdx: number; 
 
 // 4 skins per fighter (32 skins total across 8 fighters, color variants included)
 export const SKINS: FighterSkin[] = [
-  // ROBERTO PÉ NA PORTA (POLICIAL)
+  // BETO CHUTA-PORTA (POLICIAL)
   {
     id: 'policial_tatico',
     fighterId: 'policial',
@@ -836,7 +826,7 @@ export const SKINS: FighterSkin[] = [
     palette: { skin: 0xc98c66, hair: 0x18181b, top: 0xc98c66, vestOrTrim: 0xf59e0b, pants: 0xf4f4f5, glovesOrWraps: 0xfbbf24, accent: 0xf59e0b },
   },
 
-  // CORONEL STURARO
+  // CORONEL BRABEZA
   {
     id: 'roberto_branco',
     fighterId: 'roberto',
@@ -874,7 +864,7 @@ export const SKINS: FighterSkin[] = [
     palette: { skin: 0x5c3621, hair: 0x111114, top: 0x5c3621, vestOrTrim: 0xdc2626, pants: 0x991b1b, glovesOrWraps: 0xfacc15, accent: 0xfacc15 },
   },
 
-  // TORCEDOR DO VITÓRIA
+  // TORCEDOR RUBRO-NEGRO
   {
     id: 'vitoria_leao',
     fighterId: 'torcedor_vitoria',
@@ -912,7 +902,7 @@ export const SKINS: FighterSkin[] = [
     palette: { skin: 0x8a5a3c, hair: 0x141417, top: 0x18181b, vestOrTrim: 0xdc2626, pants: 0x27272a, glovesOrWraps: 0xfacc15, accent: 0xfacc15 },
   },
 
-  // TORCEDOR DO BAHIA
+  // TORCEDOR TRICOLOR
   {
     id: 'torcedor_tricolor',
     fighterId: 'torcedor',
@@ -950,7 +940,7 @@ export const SKINS: FighterSkin[] = [
     palette: { skin: 0x9b6444, hair: 0x141417, top: 0x18181b, vestOrTrim: 0xfacc15, pants: 0x27272a, glovesOrWraps: 0xfacc15, accent: 0xfacc15 },
   },
 
-  // JESSE DE JUCA
+  // ZÉ MOTOLINKE
   {
     id: 'jesse_rua',
     fighterId: 'jesse',
@@ -988,7 +978,7 @@ export const SKINS: FighterSkin[] = [
     palette: { skin: 0x6f432b, hair: 0x111114, top: 0x18181b, vestOrTrim: 0xfacc15, pants: 0x1e293b, glovesOrWraps: 0xfacc15, accent: 0xfacc15 },
   },
 
-  // ALÔ JUCA
+  // ALÔ ZUCA
   {
     id: 'juca_plantao',
     fighterId: 'alo_juca',
@@ -1026,7 +1016,7 @@ export const SKINS: FighterSkin[] = [
     palette: { skin: 0xd6a484, hair: 0x1b1614, top: 0x1e293b, vestOrTrim: 0xfacc15, pants: 0x09090b, glovesOrWraps: 0xd6a484, accent: 0xfacc15 },
   },
 
-  // ALÔ DANI
+  // ALÔ LENI
   {
     id: 'dani_estudio',
     fighterId: 'alo_dani',

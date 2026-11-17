@@ -890,7 +890,7 @@ export function createAloJucaChestTexture(): THREE.CanvasTexture {
   ctx.fillRect(38, 114, 180, 44);
   ctx.fillStyle = '#1e3a8a';
   ctx.font = '900 34px sans-serif';
-  ctx.fillText('JUCA', 128, 138);
+  ctx.fillText('ZUCA', 128, 138);
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -994,9 +994,9 @@ export function createPoliceVestTexture(): THREE.CanvasTexture {
   ctx.font = '900 24px sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('ROBERTO', 128, 63);
+  ctx.fillText('BETO', 128, 63);
   ctx.font = '900 15px sans-serif';
-  ctx.fillText('P.P. NA PORTA', 128, 87);
+  ctx.fillText('CHUTA-PORTA', 128, 87);
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;

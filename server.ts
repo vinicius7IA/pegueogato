@@ -84,9 +84,9 @@ const DB_FILE = path.join(DATA_DIR, 'db.json');
 const SEED_LEADERBOARD: LeaderboardRecord[] = [
   { nickname: 'SoldadoSSA', rankPoints: 1480, wins: 22, losses: 4, favoriteFighter: 'policial' },
   { nickname: 'MestreDende', rankPoints: 1410, wins: 19, losses: 5, favoriteFighter: 'roberto' },
-  { nickname: 'JesseDaBarra', rankPoints: 1390, wins: 17, losses: 5, favoriteFighter: 'jesse' },
+  { nickname: 'ZeMotolinke', rankPoints: 1390, wins: 17, losses: 5, favoriteFighter: 'jesse' },
   { nickname: 'PlantaoSSA', rankPoints: 1310, wins: 15, losses: 6, favoriteFighter: 'alo_juca' },
-  { nickname: 'AoVivoDani', rankPoints: 1245, wins: 13, losses: 7, favoriteFighter: 'alo_dani' },
+  { nickname: 'AoVivoLeni', rankPoints: 1245, wins: 13, losses: 7, favoriteFighter: 'alo_dani' },
   { nickname: 'ZecaDoTapa', rankPoints: 1190, wins: 11, losses: 8, favoriteFighter: 'maluco' },
 ];
 
@@ -108,7 +108,7 @@ const SEED_MATCHES: MatchRecord[] = [
   {
     id: 'm_seed_2',
     playerName: 'MestreDende',
-    opponentName: 'AoVivoDani',
+    opponentName: 'AoVivoLeni',
     winner: 'p1',
     p1FighterId: 'roberto',
     p2FighterId: 'alo_dani',
