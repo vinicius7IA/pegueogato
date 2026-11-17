@@ -1,4 +1,4 @@
-import { ArrowLeft, Box, MapPin, Package, Shuffle, Sparkles, Swords, X } from 'lucide-react';
+import { ArrowLeft, Box, MapPin, Package, Shirt, Shuffle, Sparkles, Swords, X } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import salvadorBackdrop from '../assets/images/salvador_arena_cinematic_1794790674658.jpg';
@@ -15,7 +15,7 @@ import {
 } from '../game/catalog';
 import { AiDifficulty, ArenaId, FighterId, MatchMode, PlayerProfile, PowerId } from '../game/types';
 import { FighterPreview3D } from './FighterPreview3D';
-import { ActionButton, SegmentedTabs, StatGauge } from './ui/FightingUI';
+import { SegmentedTabs } from './ui/FightingUI';
 
 interface CharacterSelectScreenProps {
   profile: PlayerProfile;
@@ -123,20 +123,15 @@ export function CharacterSelectScreen({
     { slot: 'p1' as const, id: p1Fighter, meta: p1Meta, tone: 'gold' as const },
     { slot: 'p2' as const, id: p2Fighter, meta: p2Meta, tone: 'cyan' as const },
   ];
+  const emptySlots = Math.max(0, FIGHTER_ROSTER_CAPACITY - FIGHTERS_LIST.length - 1);
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-sf-bg text-slate-100 flex flex-col">
-      <img
-        src={salvadorBackdrop}
-        alt=""
-        aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none"
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-sf-bg/70 to-black pointer-events-none" />
-      <div className="absolute inset-0 sf-halftone-bg pointer-events-none" />
+      <img src={salvadorBackdrop} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover opacity-35 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(7,8,13,0.2),rgba(7,8,13,0.92))] pointer-events-none" />
 
-      {/* Barra superior */}
-      <header className="relative z-20 flex items-center justify-between gap-2 px-3 sm:px-5 py-1.5 sm:py-2.5">
+      {/* Topo */}
+      <header className="absolute inset-x-0 top-0 z-30 flex items-center justify-between gap-2 px-3 sm:px-5 pt-1.5 pointer-events-none [&>*]:pointer-events-auto">
         <button
           type="button"
           onClick={() => {
@@ -144,18 +139,10 @@ export function CharacterSelectScreen({
             onBack();
           }}
           aria-label="Voltar"
-          className="grid place-items-center w-11 h-11 sf-chamfer-sm bg-sf-ink/90 border border-white/20 hover:border-sf-gold focus-visible:outline-2 focus-visible:outline-sf-gold"
+          className="grid place-items-center w-11 h-11 sf-chamfer-sm bg-black/60 border border-white/25 hover:border-sf-gold focus-visible:outline-2 focus-visible:outline-sf-gold"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <div className="flex flex-col items-center leading-none">
-          <h1 className="font-display italic font-black text-xl sm:text-3xl tracking-wider text-white drop-shadow-[0_2px_0_rgba(0,0,0,0.9)]">
-            SELEÇÃO DE PERSONAGEM
-          </h1>
-          <span className="font-mono-num text-xs font-black text-sf-gold mt-0.5">
-            {String(countdown).padStart(2, '0')}
-          </span>
-        </div>
         <SegmentedTabs
           items={[
             { id: 'p1', label: 'P1' },
@@ -168,222 +155,201 @@ export function CharacterSelectScreen({
         />
       </header>
 
-      {/* Palco: lutador P1 | grade | lutador P2 */}
-      <main className="relative z-10 flex-1 min-h-0 grid grid-cols-[1fr_minmax(0,auto)_1fr] gap-0 items-stretch">
+      {/* Palco: arte 2D dos dois lutadores, virados para o centro */}
+      <main className="relative z-10 flex-1 min-h-0">
         {sides.map(({ slot, id, meta, tone }, idx) => {
           const def = FIGHTERS[id];
-          const isLeft = idx === 0;
+          const left = idx === 0;
           const active = slotTab === slot;
           const accent = tone === 'gold' ? 'text-sf-gold' : 'text-sf-cyan';
-          const glow = tone === 'gold' ? 'from-sf-gold/45' : 'from-sf-cyan/45';
+          const fade = left
+            ? 'linear-gradient(to right, black 62%, transparent 100%)'
+            : 'linear-gradient(to left, black 62%, transparent 100%)';
           return (
-            <motion.button
+            <motion.div
               key={`${slot}_${id}`}
-              type="button"
-              onClick={() => setSlotTab(slot)}
-              initial={{ x: isLeft ? -24 : 24, opacity: 0.4 }}
+              initial={{ x: left ? -40 : 40, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.22 }}
-              aria-label={`Editar ${slot === 'p1' ? 'jogador 1' : 'jogador 2'}`}
-              className={`relative overflow-hidden min-w-0 text-left ${isLeft ? '' : 'text-right'} focus-visible:outline-2 focus-visible:outline-sf-gold ${
-                active ? '' : 'saturate-50 brightness-75'
-              } transition`}
-              style={{
-                clipPath: isLeft
-                  ? 'polygon(0 0, 100% 0, calc(100% - 26px) 100%, 0 100%)'
-                  : 'polygon(26px 0, 100% 0, 100% 100%, 0 100%)',
-              }}
+              transition={{ duration: 0.25 }}
+              className={`absolute inset-y-0 w-[56%] ${left ? 'left-0' : 'right-0'}`}
             >
-              <div
-                className="absolute inset-0"
-                style={{
-                  background: `linear-gradient(${isLeft ? '120deg' : '240deg'}, ${def.badgeColor}, #07080d 75%)`,
-                }}
-              />
-              {meta.showPortraitPhoto && def.portraitUrl ? (
-                <img
-                  src={def.portraitUrl}
-                  alt={meta.name}
-                  referrerPolicy="no-referrer"
-                  className="absolute inset-0 w-full h-full object-cover object-top"
+              <button
+                type="button"
+                aria-label={`Editar ${slot === 'p1' ? 'jogador 1' : 'jogador 2'}`}
+                onClick={() => setSlotTab(slot)}
+                className={`absolute inset-0 ${active ? '' : 'saturate-50 brightness-75'} transition`}
+                style={{ WebkitMaskImage: fade, maskImage: fade }}
+              >
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: `linear-gradient(${left ? '100deg' : '260deg'}, ${def.badgeColor}cc, transparent 80%)`,
+                  }}
                 />
-              ) : (
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-0 flex items-center justify-center font-display italic font-black text-white/25 text-[28vh] leading-none select-none"
-                >
-                  {meta.name.slice(0, 2)}
-                </span>
-              )}
-              <div className={`absolute inset-0 bg-gradient-to-t ${glow} via-transparent to-black/40`} />
-              <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/90 to-transparent" />
+                {meta.showPortraitPhoto && def.portraitUrl ? (
+                  <img
+                    src={def.portraitUrl}
+                    alt={meta.name}
+                    referrerPolicy="no-referrer"
+                    className={`absolute bottom-0 ${left ? 'left-0' : 'right-0'} h-[94%] w-auto max-w-full object-contain ${left ? 'object-left-bottom' : 'object-right-bottom'}`}
+                  />
+                ) : (
+                  <span
+                    aria-hidden="true"
+                    className={`absolute bottom-[12%] ${left ? 'left-[6%]' : 'right-[6%]'} font-display italic font-black text-white/30 text-[min(46vh,24vw)] leading-none select-none`}
+                  >
+                    {meta.name.slice(0, 2)}
+                  </span>
+                )}
+              </button>
 
-              <div className={`absolute top-2 ${isLeft ? 'left-3' : 'right-3'} font-display italic font-black text-sm tracking-widest ${accent} drop-shadow-[0_2px_0_rgba(0,0,0,0.9)]`}>
-                {slot === 'p1' ? 'JOGADOR 1' : 'DESAFIANTE'}
-              </div>
-
-              <div className={`absolute bottom-2 sm:bottom-4 ${isLeft ? 'left-3 sm:left-5 pr-8' : 'right-3 sm:right-5 pl-8'}`}>
-                <div className="font-display italic font-black text-white uppercase leading-[0.9] text-[clamp(1.4rem,6.5vh,3.4rem)] drop-shadow-[0_3px_0_rgba(0,0,0,0.95)] break-words">
+              <div className={`absolute bottom-1.5 sm:bottom-3 ${left ? 'left-3 sm:left-6' : 'right-3 sm:right-6 text-right'} max-w-[85%] pointer-events-none`}>
+                <div className={`text-[11px] font-black tracking-[0.25em] ${accent} drop-shadow-[0_2px_0_rgba(0,0,0,0.9)]`}>
+                  {slot === 'p1' ? 'JOGADOR 1' : 'DESAFIANTE'}
+                </div>
+                <div className="font-display italic font-black text-white uppercase leading-[0.9] text-[clamp(1.8rem,9vh,4.6rem)] drop-shadow-[0_4px_0_rgba(0,0,0,0.95)] break-words">
                   {meta.name.replace(/^O /, '')}
                 </div>
-                <div className="text-[11px] sm:text-xs text-slate-300 font-semibold mt-1 truncate">
+                <div className="text-[11px] sm:text-xs text-slate-300 font-semibold mt-0.5 truncate">
                   {ARCHETYPE_NAMES[def.archetype]} · {def.title}
                 </div>
-                <div className="hidden md:block text-[11px] italic text-amber-100/85 mt-0.5 truncate">
-                  “{def.catchphrase}”
-                </div>
               </div>
-            </motion.button>
+            </motion.div>
           );
         })}
 
-        {/* Centro: grade de personagens (posicionada entre os dois painéis) */}
-        <div className="col-start-2 row-start-1 relative z-20 flex flex-col items-center justify-center gap-2 px-2 sm:px-4 w-[min(48vw,440px)]">
-          <div className="grid grid-cols-5 gap-1.5 sm:gap-2 w-full">
-            {FIGHTERS_LIST.map((def) => {
-              const id = def.id;
-              const meta = getDisplayFighterMeta(id, authorizationMode);
-              const unlocked = slotTab === 'p2' || profile.unlockedFighters.includes(id);
-              const isP1 = p1Fighter === id;
-              const isP2 = p2Fighter === id;
-              return (
-                <button
-                  key={id}
-                  type="button"
-                  disabled={!unlocked}
-                  aria-label={meta.name}
-                  title={meta.name}
-                  onClick={() => {
-                    gameAudio.playSelectSnap();
-                    if (slotTab === 'p1') onSelectP1(id);
-                    else onSelectP2(id);
-                  }}
-                  className={`relative aspect-square sf-chamfer-sm border-2 overflow-hidden transition active:scale-95 focus-visible:outline-2 focus-visible:outline-sf-gold ${
-                    isP1 && isP2
-                      ? 'border-sf-crimson'
-                      : isP1
-                        ? 'border-sf-gold shadow-[0_0_14px_rgba(255,200,21,0.55)]'
-                        : isP2
-                          ? 'border-sf-cyan shadow-[0_0_14px_rgba(0,212,255,0.55)]'
-                          : 'border-white/20 hover:border-white/60'
-                  } ${!unlocked ? 'opacity-35 grayscale cursor-not-allowed' : ''}`}
-                >
-                  {meta.showPortraitPhoto && def.portraitUrl ? (
-                    <img
-                      src={def.portraitUrl}
-                      alt=""
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover object-top"
-                    />
-                  ) : (
-                    <div
-                      className="w-full h-full flex items-center justify-center font-display italic text-lg sm:text-2xl font-black text-white"
-                      style={{ backgroundColor: def.badgeColor }}
-                    >
-                      {meta.name.slice(0, 2)}
-                    </div>
-                  )}
-                  {(isP1 || isP2) && (
-                    <div className="absolute top-0 inset-x-0 flex justify-between font-mono-num pointer-events-none">
-                      {isP1 && <span className="px-1 bg-sf-gold text-black text-[9px] font-black leading-tight">P1</span>}
-                      {isP2 && <span className="ml-auto px-1 bg-sf-cyan text-black text-[9px] font-black leading-tight">P2</span>}
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-            <button
-              type="button"
-              onClick={handleRandomPick}
-              aria-label="Escolha aleatória"
-              className="aspect-square sf-chamfer-sm border-2 border-dashed border-sf-gold/60 bg-sf-ink/80 text-sf-gold grid place-items-center active:scale-95 hover:border-sf-gold focus-visible:outline-2 focus-visible:outline-sf-gold"
-            >
-              <Shuffle className="w-5 h-5 sm:w-6 sm:h-6" />
-            </button>
+        {/* Centro: título, VS e ações */}
+        <div className="absolute left-1/2 -translate-x-1/2 top-1 z-20 flex flex-col items-center gap-1.5 w-[min(34vw,260px)]">
+          <div className="flex items-center gap-1.5 font-display italic font-black text-sm sm:text-base tracking-[0.2em] text-white drop-shadow-[0_2px_0_rgba(0,0,0,0.9)]">
+            SELEÇÃO DE PERSONAGEM
           </div>
-
-          {/* Ações do lutador ativo */}
-          <div className="flex flex-wrap items-center justify-center gap-1.5">
-            <button type="button" onClick={cycleActiveSkin} className="min-h-9 px-2.5 text-[11px] font-black uppercase text-sf-gold bg-black/80 border border-sf-gold/50 sf-chamfer-sm active:scale-95">
-              Skin
-            </button>
-            <button type="button" onClick={cycleActivePower} className="min-h-9 px-2.5 flex items-center gap-1 text-[11px] font-black uppercase text-sf-cyan bg-black/80 border border-sf-cyan/50 sf-chamfer-sm active:scale-95">
-              <Sparkles className="w-3 h-3" /> {POWERS[activePower].shortName}
-            </button>
-            <button type="button" onClick={() => setShow3D(true)} className="min-h-9 px-2.5 flex items-center gap-1 text-[11px] font-black uppercase text-white bg-black/80 border border-white/30 sf-chamfer-sm active:scale-95">
-              <Box className="w-3 h-3" /> 3D
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                gameAudio.playClick();
-                onOpenInventory();
-              }}
-              className="min-h-9 px-2.5 flex items-center gap-1 text-[11px] font-black uppercase text-white bg-black/80 border border-white/30 sf-chamfer-sm active:scale-95"
-            >
-              <Package className="w-3 h-3 text-sf-gold" /> Inventário
-            </button>
+          <div className="font-display italic font-black text-5xl sm:text-6xl leading-none text-transparent bg-clip-text bg-gradient-to-b from-sf-gold to-sf-crimson drop-shadow-[0_3px_0_rgba(0,0,0,0.9)]">
+            VS
           </div>
-
-          {/* Atributos (só quando há altura) */}
-          <div className="hidden [@media(min-height:560px)]:block w-full max-w-[320px] space-y-1">
-            {STAT_LABELS.map(({ key, label }) => (
-              <StatGauge key={key} label={label} value={activeDef.stats[key]} tone={slotTab === 'p1' ? 'gold' : 'cyan'} />
+          <div className="font-mono-num text-xs font-black text-sf-gold">{String(countdown).padStart(2, '0')}</div>
+          <button
+            type="button"
+            onClick={() => {
+              gameAudio.playSelectSnap();
+              onStartFight('vs_ai', difficulty);
+            }}
+            className="w-full min-h-11 sf-chamfer-sm bg-gradient-to-r from-sf-gold to-sf-amber text-black font-display italic font-black text-xl tracking-wide flex items-center justify-center gap-2 active:scale-95 focus-visible:outline-2 focus-visible:outline-white sf-cta-glow"
+          >
+            <Swords className="w-5 h-5" /> LUTAR
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              gameAudio.playClick();
+              onOpenStageSelect();
+            }}
+            className="w-full min-h-10 sf-chamfer-sm bg-black/70 border border-white/30 text-xs font-black uppercase flex items-center justify-center gap-1.5 active:scale-95 focus-visible:outline-2 focus-visible:outline-sf-gold"
+          >
+            <MapPin className="w-4 h-4 text-sf-gold" /> {ARENAS[arenaId].shortName}
+          </button>
+          <div className="flex gap-1">
+            {(['easy', 'medium', 'hard'] as const).map((d) => (
+              <button
+                key={d}
+                type="button"
+                onClick={() => setDifficulty(d)}
+                className={`min-h-9 px-2 text-[10px] font-black uppercase border active:scale-95 ${
+                  difficulty === d ? 'bg-sf-gold text-black border-white' : 'bg-black/70 text-slate-300 border-white/25'
+                }`}
+              >
+                {d === 'easy' ? 'Fácil' : d === 'medium' ? 'Médio' : 'Difícil'}
+              </button>
             ))}
           </div>
         </div>
+
+        {/* Ações do lutador ativo: coluna na lateral */}
+        <div className={`absolute z-20 top-14 flex gap-1.5 ${slotTab === 'p1' ? 'left-2 sm:left-4' : 'right-2 sm:right-4'}`}>
+          <button type="button" aria-label="Trocar skin" onClick={cycleActiveSkin} className="min-h-10 min-w-10 px-2 flex items-center gap-1.5 text-[11px] font-black uppercase text-sf-gold bg-black/80 border border-sf-gold/50 sf-chamfer-sm active:scale-95">
+            <Shirt className="w-4 h-4" /><span className="hidden xl:inline">Skin</span>
+          </button>
+          <button type="button" aria-label="Trocar poder" onClick={cycleActivePower} className="min-h-10 min-w-10 px-2 flex items-center gap-1.5 text-[11px] font-black uppercase text-sf-cyan bg-black/80 border border-sf-cyan/50 sf-chamfer-sm active:scale-95">
+            <Sparkles className="w-4 h-4" /><span className="hidden xl:inline">{POWERS[activePower].shortName}</span>
+          </button>
+          <button type="button" aria-label="Ver em 3D" onClick={() => setShow3D(true)} className="min-h-10 min-w-10 px-2 flex items-center gap-1.5 text-[11px] font-black uppercase text-white bg-black/80 border border-white/30 sf-chamfer-sm active:scale-95">
+            <Box className="w-4 h-4" /><span className="hidden xl:inline">3D</span>
+          </button>
+          <button type="button" aria-label="Inventário" onClick={() => { gameAudio.playClick(); onOpenInventory(); }} className="min-h-10 min-w-10 px-2 flex items-center gap-1.5 text-[11px] font-black uppercase text-white bg-black/80 border border-white/30 sf-chamfer-sm active:scale-95">
+            <Package className="w-4 h-4 text-sf-gold" /><span className="hidden xl:inline">Inventário</span>
+          </button>
+        </div>
       </main>
 
-      {/* Barra inferior: dificuldade, arena, lutar */}
-      <footer className="relative z-20 flex items-center justify-center gap-2 sm:gap-3 px-3 sm:px-5 py-1.5 sm:py-3 bg-gradient-to-t from-black/90 to-transparent">
-        <SegmentedTabs
-          items={[
-            { id: 'easy', label: 'Fácil' },
-            { id: 'medium', label: 'Médio' },
-            { id: 'hard', label: 'Difícil' },
-          ]}
-          value={difficulty}
-          onChange={setDifficulty}
-          tone="gold"
-          className="hidden sm:flex"
-        />
-        <ActionButton
-          variant="steel"
-          onClick={() => {
-            gameAudio.playClick();
-            onOpenStageSelect();
-          }}
-        >
-          <MapPin className="w-4 h-4 text-sf-gold" />
-          {ARENAS[arenaId].shortName}
-        </ActionButton>
-        <ActionButton
-          variant="gold"
-          size="lg"
-          className="flex-1 max-w-sm"
-          onClick={() => {
-            gameAudio.playSelectSnap();
-            onStartFight('vs_ai', difficulty);
-          }}
-        >
-          <Swords className="w-5 h-5" /> LUTAR
-        </ActionButton>
-      </footer>
+      {/* Grade de personagens: 2 fileiras x 8 vagas, como no jogo de referência */}
+      <section className="relative z-30 px-2 sm:px-4 pb-1.5 pt-1 bg-gradient-to-t from-black via-black/80 to-transparent">
+        <div className="mx-auto grid grid-cols-8 gap-1 w-[min(100%,calc(8*clamp(40px,11vh,72px)+7*4px))]">
+          {FIGHTERS_LIST.map((def) => {
+            const id = def.id;
+            const meta = getDisplayFighterMeta(id, authorizationMode);
+            const unlocked = slotTab === 'p2' || profile.unlockedFighters.includes(id);
+            const isP1 = p1Fighter === id;
+            const isP2 = p2Fighter === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                disabled={!unlocked}
+                aria-label={meta.name}
+                title={meta.name}
+                onClick={() => {
+                  gameAudio.playSelectSnap();
+                  if (slotTab === 'p1') onSelectP1(id);
+                  else onSelectP2(id);
+                }}
+                className={`relative aspect-square border-2 overflow-hidden transition active:scale-95 focus-visible:outline-2 focus-visible:outline-sf-gold ${
+                  isP1 && isP2
+                    ? 'border-sf-crimson'
+                    : isP1
+                      ? 'border-sf-gold shadow-[0_0_12px_rgba(255,200,21,0.7)] z-10'
+                      : isP2
+                        ? 'border-sf-cyan shadow-[0_0_12px_rgba(0,212,255,0.7)] z-10'
+                        : 'border-white/25 hover:border-white/60'
+                } ${!unlocked ? 'opacity-35 grayscale cursor-not-allowed' : ''}`}
+              >
+                {meta.showPortraitPhoto && def.portraitUrl ? (
+                  <img src={def.portraitUrl} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover object-top" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center font-display italic text-base sm:text-xl font-black text-white" style={{ backgroundColor: def.badgeColor }}>
+                    {meta.name.slice(0, 2)}
+                  </div>
+                )}
+                {(isP1 || isP2) && (
+                  <div className="absolute top-0 inset-x-0 flex justify-between font-mono-num pointer-events-none">
+                    {isP1 && <span className="px-0.5 bg-sf-gold text-black text-[8px] font-black leading-tight">1P</span>}
+                    {isP2 && <span className="ml-auto px-0.5 bg-sf-cyan text-black text-[8px] font-black leading-tight">2P</span>}
+                  </div>
+                )}
+              </button>
+            );
+          })}
+          {Array.from({ length: emptySlots }).map((_, i) => (
+            <div key={`empty_${i}`} aria-hidden="true" className="aspect-square border-2 border-white/10 bg-black/60 grid place-items-center text-white/20 font-display italic font-black text-xl">
+              ?
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={handleRandomPick}
+            aria-label="Escolha aleatória"
+            className="aspect-square border-2 border-dashed border-sf-gold/60 bg-black/70 text-sf-gold grid place-items-center active:scale-95 hover:border-sf-gold focus-visible:outline-2 focus-visible:outline-sf-gold"
+          >
+            <Shuffle className="w-5 h-5" />
+          </button>
+        </div>
+      </section>
 
       {/* Pré-visualização 3D */}
       {show3D && (
         <div className="absolute inset-0 z-40 bg-black/85 flex items-center justify-center p-4" onClick={() => setShow3D(false)}>
           <div className="relative w-full max-w-md h-full max-h-[80%] sf-chamfer-lg border border-sf-gold/50 bg-sf-ink overflow-hidden" onClick={(e) => e.stopPropagation()}>
             <FighterPreview3D fighterId={activeId} skinId={activeSkin} authorizationMode={authorizationMode} />
-            <div className="absolute bottom-3 left-4 font-display italic font-black text-2xl text-white drop-shadow-[0_2px_0_rgba(0,0,0,0.9)]">
-              {activeMeta.name}
-            </div>
-            <button
-              type="button"
-              onClick={() => setShow3D(false)}
-              aria-label="Fechar"
-              className="absolute top-2 right-2 grid place-items-center w-11 h-11 rounded-full bg-black/80 border border-white/30"
-            >
+            <div className="absolute bottom-3 left-4 font-display italic font-black text-2xl text-white drop-shadow-[0_2px_0_rgba(0,0,0,0.9)]">{activeMeta.name}</div>
+            <button type="button" onClick={() => setShow3D(false)} aria-label="Fechar" className="absolute top-2 right-2 grid place-items-center w-11 h-11 rounded-full bg-black/80 border border-white/30">
               <X className="w-5 h-5" />
             </button>
           </div>
