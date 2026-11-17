@@ -92,6 +92,8 @@ export function createEmptyInput(): FighterInputState {
   };
 }
 
+type NpcKind = 'tricolor' | 'rubronegro' | 'semcamisa' | 'bone' | 'ambulante' | 'seguranca' | 'pedestre';
+
 interface FighterRuntime {
   slot: 'p1' | 'p2';
   fighterId: FighterId;
@@ -537,76 +539,142 @@ export class ArenaCombatEngine {
     this.buildMascotCat();
   }
 
-  private addCheeringCrowd(xs: number[], z: number): void {
-    const shirtColors = [0xfacc15, 0x0284c7, 0xdc2626, 0x16a34a, 0xea580c, 0xe2e8f0];
-    const skinTones = [0x8d5524, 0xc68642, 0x5c361e, 0xd99e73];
-    const torsoGeo = new THREE.CylinderGeometry(0.155, 0.135, 0.48, 12);
+  /**
+   * Torcida/NPCs ao fundo (fora da área de luta). Tipos: torcedor tricolor e rubro-negro
+   * (camisas listradas, sem escudo), sem camisa, de boné, ambulante, segurança e pedestre.
+   * Comportamentos: conversando, comemorando, batendo palma; todos reagem aos golpes.
+   */
+  private addCheeringCrowd(xs: number[], z: number, kinds?: NpcKind[]): void {
+    const skinTones = [0x8d5524, 0xc68642, 0x5c361e, 0xd99e73, 0x6b3f22];
+    const torsoGeo = new THREE.CylinderGeometry(0.155, 0.135, 0.48, 14);
     const legGeo = new THREE.CylinderGeometry(0.055, 0.044, 0.46, 10);
     const armGeo = new THREE.CapsuleGeometry(0.038, 0.28, 4, 8);
-    const headGeo = new THREE.SphereGeometry(0.115, 12, 10);
+    const headGeo = new THREE.SphereGeometry(0.115, 14, 12);
     const hairGeo = new THREE.SphereGeometry(0.12, 10, 8, 0, Math.PI * 2, 0, Math.PI * 0.55);
+    const capGeo = new THREE.SphereGeometry(0.124, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.5);
+    const brimGeo = new THREE.BoxGeometry(0.14, 0.014, 0.12);
+    const shortsMat = new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.85 });
     const pantsMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.85 });
     const hairMat = new THREE.MeshStandardMaterial({ color: 0x111114, roughness: 0.8 });
-    this.disposables.push(torsoGeo, legGeo, armGeo, headGeo, hairGeo, pantsMat, hairMat);
+    this.disposables.push(torsoGeo, legGeo, armGeo, headGeo, hairGeo, capGeo, brimGeo, shortsMat, pantsMat, hairMat);
 
-    const crowdMeshes: Array<{
-      group: THREE.Group;
-      lArm: THREE.Mesh;
-      rArm: THREE.Mesh;
-      phase: number;
-      baseY: number;
-    }> = [];
+    const stripeTex = (colors: string[]) => {
+      const c = document.createElement('canvas');
+      c.width = 64;
+      c.height = 8;
+      const g = c.getContext('2d')!;
+      const w = c.width / (colors.length * 3);
+      for (let i = 0; i < colors.length * 3; i++) {
+        g.fillStyle = colors[i % colors.length];
+        g.fillRect(i * w, 0, w + 1, c.height);
+      }
+      const t = new THREE.CanvasTexture(c);
+      t.colorSpace = THREE.SRGBColorSpace;
+      this.disposables.push(t);
+      return t;
+    };
+    const tricolor = stripeTex(['#1d4ed8', '#dc2626', '#f8fafc']);
+    const rubronegro = stripeTex(['#dc2626', '#111114']);
+
+    const order: NpcKind[] = kinds ?? ['tricolor', 'rubronegro', 'semcamisa', 'bone', 'tricolor', 'rubronegro'];
+    const crowd: Array<{ group: THREE.Group; head: THREE.Mesh; lArm: THREE.Mesh; rArm: THREE.Mesh; phase: number; mode: 'cheer' | 'talk' | 'clap' | 'still' }> = [];
 
     xs.forEach((x, idx) => {
+      const kind = order[idx % order.length];
       const g = new THREE.Group();
-      const shirtMat = new THREE.MeshStandardMaterial({
-        color: shirtColors[idx % shirtColors.length],
-        roughness: 0.78,
-      });
-      const skinMat = new THREE.MeshStandardMaterial({
-        color: skinTones[idx % skinTones.length],
-        roughness: 0.58,
-      });
-      this.disposables.push(shirtMat, skinMat);
+      const skin = skinTones[(idx * 3) % skinTones.length];
+      const skinMat = new THREE.MeshStandardMaterial({ color: skin, roughness: 0.58 });
+      const shirtMat =
+        kind === 'tricolor'
+          ? new THREE.MeshStandardMaterial({ map: tricolor, roughness: 0.75 })
+          : kind === 'rubronegro'
+            ? new THREE.MeshStandardMaterial({ map: rubronegro, roughness: 0.75 })
+            : kind === 'semcamisa'
+              ? skinMat
+              : kind === 'seguranca'
+                ? new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.7 })
+                : kind === 'ambulante'
+                  ? new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.8 })
+                  : new THREE.MeshStandardMaterial({ color: [0xfacc15, 0x16a34a, 0xea580c, 0x0284c7][idx % 4], roughness: 0.78 });
+      this.disposables.push(skinMat, shirtMat);
 
       [-0.068, 0.068].forEach((lx) => {
-        const leg = new THREE.Mesh(legGeo, pantsMat);
+        const leg = new THREE.Mesh(legGeo, kind === 'seguranca' ? pantsMat : idx % 2 ? shortsMat : pantsMat);
         leg.position.set(lx, 0.23, 0);
         g.add(leg);
       });
-
       const torso = new THREE.Mesh(torsoGeo, shirtMat);
       torso.position.y = 0.68;
       torso.castShadow = true;
       g.add(torso);
-
-      const lArm = new THREE.Mesh(armGeo, skinMat);
+      const armMat = kind === 'seguranca' ? shirtMat : skinMat;
+      const lArm = new THREE.Mesh(armGeo, armMat);
       lArm.position.set(-0.2, 0.92, 0);
-      lArm.rotation.z = 0.45;
-      const rArm = new THREE.Mesh(armGeo, skinMat);
+      const rArm = new THREE.Mesh(armGeo, armMat);
       rArm.position.set(0.2, 0.92, 0);
-      rArm.rotation.z = -0.45;
       g.add(lArm, rArm);
-
-      const h = new THREE.Mesh(headGeo, skinMat);
-      h.position.y = 1.07;
-      const hr = new THREE.Mesh(hairGeo, hairMat);
-      hr.position.set(0, 1.09, -0.01);
-      g.add(h, hr);
+      const head = new THREE.Mesh(headGeo, skinMat);
+      head.position.y = 1.07;
+      g.add(head);
+      if (kind === 'bone' || kind === 'ambulante' || kind === 'seguranca') {
+        const capMat = new THREE.MeshStandardMaterial({ color: kind === 'seguranca' ? 0x0b0b0d : kind === 'ambulante' ? 0xdc2626 : [0x1d4ed8, 0xdc2626, 0xf8fafc][idx % 3], roughness: 0.7 });
+        this.disposables.push(capMat);
+        const cap = new THREE.Mesh(capGeo, capMat);
+        cap.position.set(0, 1.1, 0);
+        const brim = new THREE.Mesh(brimGeo, capMat);
+        brim.position.set(0, 1.12, 0.11);
+        head.add(cap, brim);
+        cap.position.sub(head.position);
+        brim.position.sub(head.position);
+      } else {
+        const hr = new THREE.Mesh(hairGeo, hairMat);
+        hr.position.set(0, 0.02, -0.01);
+        head.add(hr);
+      }
+      if (kind === 'ambulante') {
+        // isopor do ambulante
+        const boxMat = new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.6 });
+        this.disposables.push(boxMat);
+        const cooler = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.3, 0.3), boxMat);
+        this.disposables.push(cooler.geometry);
+        cooler.position.set(0.42, 0.15, 0.05);
+        g.add(cooler);
+      }
 
       const pz = z + (idx % 2) * 0.42;
       g.position.set(x, 0, pz);
+      g.rotation.y = x < 0 ? 0.35 : -0.35;
       this.scene.add(g);
-      crowdMeshes.push({ group: g, lArm, rArm, phase: idx * 0.9, baseY: 0 });
+      const mode = kind === 'seguranca' ? 'still' : (['cheer', 'talk', 'clap'] as const)[idx % 3];
+      crowd.push({ group: g, head, lArm, rArm, phase: idx * 0.9, mode });
     });
 
     this.stageAnimators.push((_dt, elapsed, hitPulse) => {
-      crowdMeshes.forEach((c) => {
-        const bounce = Math.abs(Math.sin(elapsed * 4.2 + c.phase)) * (0.08 + hitPulse * 0.36);
-        c.group.position.y = c.baseY + bounce;
-        const cheerWave = Math.sin(elapsed * 6.5 + c.phase) * (0.3 + hitPulse * 0.45);
-        c.lArm.rotation.z = 0.55 + cheerWave;
-        c.rArm.rotation.z = -0.55 - cheerWave;
+      crowd.forEach((c) => {
+        const excited = hitPulse > 0.25;
+        const mode = excited && c.mode !== 'still' ? 'cheer' : c.mode;
+        const t = elapsed + c.phase;
+        if (mode === 'cheer') {
+          c.group.position.y = Math.abs(Math.sin(t * 4.2)) * (0.08 + hitPulse * 0.36);
+          const wave = Math.sin(t * 6.5) * (0.3 + hitPulse * 0.45);
+          c.lArm.rotation.z = 2.6 + wave;
+          c.rArm.rotation.z = -2.6 - wave;
+        } else if (mode === 'clap') {
+          c.group.position.y = 0;
+          const clap = Math.abs(Math.sin(t * 7)) * 0.5;
+          c.lArm.rotation.set(-1.2, 0, 0.2 + clap);
+          c.rArm.rotation.set(-1.2, 0, -0.2 - clap);
+        } else if (mode === 'talk') {
+          c.group.position.y = 0;
+          c.head.rotation.y = Math.sin(t * 0.8) * 0.6;
+          c.head.rotation.x = Math.max(0, Math.sin(t * 5)) * 0.12;
+          c.lArm.rotation.z = 0.25 + Math.max(0, Math.sin(t * 2.3)) * 0.6;
+          c.rArm.rotation.z = -0.25;
+        } else {
+          c.lArm.rotation.z = 0.12;
+          c.rArm.rotation.z = -0.12;
+          c.head.rotation.y = Math.sin(t * 0.5) * 0.4;
+        }
       });
     });
   }
@@ -963,6 +1031,7 @@ export class ArenaCombatEngine {
   }
 
   private buildPitubaArena(maxAniso: number): void {
+    this.addCheeringCrowd([-5.0, -4.1, -3.2, 3.2, 4.1, 5.0], -3.9, ['pedestre', 'seguranca', 'bone', 'pedestre', 'tricolor', 'rubronegro']);
     const seaTex = createWaterWaveTexture(maxAniso, '#0ea5e9');
     const seaNorm = createWaterNormalTexture(maxAniso);
     this.disposables.push(seaTex, seaNorm);
@@ -1085,6 +1154,7 @@ export class ArenaCombatEngine {
   }
 
   private buildFarolBarraArena(maxAniso: number): void {
+    this.addCheeringCrowd([-5.2, -4.3, -3.4, 3.4, 4.3, 5.2], -3.9, ['ambulante', 'tricolor', 'semcamisa', 'rubronegro', 'bone', 'tricolor']);
     const seaTex = createWaterWaveTexture(maxAniso, '#0e7490');
     const seaNorm = createWaterNormalTexture(maxAniso);
     this.disposables.push(seaTex, seaNorm);
