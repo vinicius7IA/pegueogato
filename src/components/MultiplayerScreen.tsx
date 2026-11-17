@@ -192,7 +192,7 @@ export function MultiplayerScreen({
   };
 
   return (
-    <div className="w-full h-full overflow-y-auto bg-[#07080d] text-slate-100 flex flex-col sf-halftone-bg">
+    <div className="w-full h-full overflow-y-auto bg-sf-bg text-slate-100 flex flex-col sf-halftone-bg">
       <ScreenHeader
         title="ARENA ONLINE"
         subtitle="Partidas ranqueadas, salas privadas e histórico de combate"
@@ -234,7 +234,7 @@ export function MultiplayerScreen({
                 <span className="font-black tracking-wider text-slate-300 uppercase">
                   Seu Lutador
                 </span>
-                <span className="font-mono-num text-[#ffc815] font-black">
+                <span className="font-mono-num text-sf-gold font-black">
                   {profile.rankPoints} PTS
                 </span>
               </div>
@@ -268,7 +268,7 @@ export function MultiplayerScreen({
               {/* Online Arena Vote */}
               <div className="pt-3 border-t border-white/10">
                 <div className="flex items-center gap-1.5 text-[11px] font-black tracking-wider text-slate-400 uppercase mb-2">
-                  <MapPin className="w-3.5 h-3.5 text-[#ffc815]" /> Voto de Arena da Sala
+                  <MapPin className="w-3.5 h-3.5 text-sf-gold" /> Voto de Arena da Sala
                 </div>
                 <div className="flex gap-1.5 overflow-x-auto pb-1">
                   {ARENAS_LIST.map((a) => (
@@ -304,7 +304,7 @@ export function MultiplayerScreen({
                     <div className="text-[11px] font-bold text-slate-400 uppercase">
                       Sala ({myRole === 'host' ? 'Anfitrião' : 'Desafiante'})
                     </div>
-                    <div className="font-mono-num text-3xl font-black text-[#ffc815] flex items-center gap-2.5 mt-0.5">
+                    <div className="font-mono-num text-3xl font-black text-sf-gold flex items-center gap-2.5 mt-0.5">
                       {roomCode}
                       <ActionButton
                         variant="steel"
@@ -337,8 +337,8 @@ export function MultiplayerScreen({
                         key={slotIdx}
                         className={`p-3.5 sf-chamfer-sm border ${
                           member
-                            ? 'bg-[#171c29] border-white/18'
-                            : 'bg-[#090b11] border-dashed border-white/12'
+                            ? 'bg-sf-raised border-white/18'
+                            : 'bg-sf-ink border-dashed border-white/12'
                         }`}
                       >
                         {member ? (
@@ -347,7 +347,7 @@ export function MultiplayerScreen({
                               <div className="font-extrabold text-sm text-white">
                                 {member.nickname}{' '}
                                 {member.id === myClientId && (
-                                  <span className="text-xs text-[#ffc815]">(Você)</span>
+                                  <span className="text-xs text-sf-gold">(Você)</span>
                                 )}
                               </div>
                               <div className="text-xs text-slate-400 mt-0.5">
@@ -358,7 +358,7 @@ export function MultiplayerScreen({
                             </div>
                             <span
                               className={`text-xs font-black uppercase ${
-                                member.ready ? 'text-emerald-400' : 'text-[#ffc815]'
+                                member.ready ? 'text-emerald-400' : 'text-sf-gold'
                               }`}
                             >
                               {member.ready ? 'PRONTO' : 'Aguardando'}
@@ -435,7 +435,7 @@ export function MultiplayerScreen({
                       });
                     }}
                   >
-                    <Plus className="w-4 h-4 text-[#00d4ff]" /> Criar Sala Privada
+                    <Plus className="w-4 h-4 text-sf-cyan" /> Criar Sala Privada
                   </ActionButton>
 
                   <form
@@ -462,7 +462,7 @@ export function MultiplayerScreen({
                       value={joinInput}
                       onChange={(e) => setJoinInput(e.target.value.toUpperCase())}
                       placeholder="CÓDIGO DA SALA"
-                      className="flex-1 min-w-0 px-3.5 py-2.5 sf-chamfer-sm bg-[#090b11] border border-white/18 text-xs font-mono-num uppercase text-white focus:outline-none focus:border-[#ffc815]"
+                      className="flex-1 min-w-0 px-3.5 py-2.5 sf-chamfer-sm bg-sf-ink border border-white/18 text-xs font-mono-num uppercase text-white focus:outline-none focus:border-sf-gold"
                     />
                     <ActionButton type="submit" variant="cyan" size="md">
                       Entrar
@@ -483,7 +483,7 @@ export function MultiplayerScreen({
                       {openRooms.map((r) => (
                         <div
                           key={r.code}
-                          className="flex items-center justify-between p-3 sf-chamfer-sm bg-[#171c29] border border-white/12"
+                          className="flex items-center justify-between p-3 sf-chamfer-sm bg-sf-raised border border-white/12"
                         >
                           <div className="min-w-0">
                             <div className="font-bold text-xs text-white truncate font-mono-num">
@@ -530,7 +530,7 @@ export function MultiplayerScreen({
                 className="flex items-center justify-between gap-3 p-3.5 text-xs"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <span className="font-mono-num text-base font-black text-[#ffc815] w-7 text-center shrink-0">
+                  <span className="font-mono-num text-base font-black text-sf-gold w-7 text-center shrink-0">
                     #{idx + 1}
                   </span>
                   <div className="min-w-0">
@@ -567,7 +567,7 @@ export function MultiplayerScreen({
                   <div className="min-w-0">
                     <div className="font-extrabold text-sm text-white truncate">
                       {m.playerName} <span className="text-slate-500">vs</span>{' '}
-                      <span className="text-[#00d4ff]">{m.opponentName}</span>
+                      <span className="text-sf-cyan">{m.opponentName}</span>
                     </div>
                     <div className="text-[11px] text-slate-400 truncate mt-0.5">
                       {getDisplayFighterMeta(m.p1FighterId, authorizationMode).name} vs{' '}
@@ -576,7 +576,7 @@ export function MultiplayerScreen({
                     </div>
                   </div>
                   <div className="text-right font-mono-num shrink-0">
-                    <div className="text-[#ffc815] font-black text-sm">{m.score} PTS</div>
+                    <div className="text-sf-gold font-black text-sm">{m.score} PTS</div>
                     <div className="text-[11px] text-slate-400">{m.maxCombo} hits</div>
                   </div>
                 </StreetPanel>

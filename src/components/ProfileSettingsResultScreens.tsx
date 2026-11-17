@@ -61,7 +61,7 @@ export function ResultScreen({
     summary.mode === 'arcade' && isWin && summary.arcadeStage === ARCADE_LADDER.length;
 
   return (
-    <div className="w-full h-full overflow-y-auto bg-[#07080d] flex items-center justify-center p-4 sf-halftone-bg">
+    <div className="w-full h-full overflow-y-auto bg-sf-bg flex items-center justify-center p-4 sf-halftone-bg">
       <StreetPanel
         tone={isWin ? 'gold' : 'crimson'}
         chamfer="lg"
@@ -71,7 +71,7 @@ export function ResultScreen({
         <div className="text-center border-b border-white/12 pb-4 sf-speed-lines">
           <div
             className={`inline-flex items-center gap-1.5 text-xs font-black tracking-widest uppercase mb-1.5 ${
-              isWin ? 'text-[#ffc815]' : 'text-[#ff462e]'
+              isWin ? 'text-sf-gold' : 'text-sf-crimson'
             }`}
           >
             <Trophy className="w-4 h-4" />
@@ -90,42 +90,42 @@ export function ResultScreen({
             {p1Meta.name} ({summary.p1RoundsWon}) × ({summary.p2RoundsWon}) {p2Meta.name}
           </p>
           {summary.finisherUsed && (
-            <div className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 sf-chamfer-sm bg-[#ff462e]/20 border border-[#ff462e]/60 text-xs font-black text-red-200">
+            <div className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 sf-chamfer-sm bg-sf-crimson/20 border border-sf-crimson/60 text-xs font-black text-red-200">
               <Flame className="w-3.5 h-3.5" /> Golpe Final: {FIGHTERS[summary.p1FighterId].finisherName}
             </div>
           )}
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-center">
-          <div className="p-3 sf-chamfer-sm bg-[#090b11] border border-white/10">
+          <div className="p-3 sf-chamfer-sm bg-sf-ink border border-white/10">
             <div className="text-[11px] font-semibold text-slate-400">Pontuação</div>
             <div className="font-mono-num text-xl font-black text-white mt-0.5">{summary.score}</div>
           </div>
-          <div className="p-3 sf-chamfer-sm bg-[#090b11] border border-white/10">
+          <div className="p-3 sf-chamfer-sm bg-sf-ink border border-white/10">
             <div className="text-[11px] font-semibold text-slate-400">Combo Máx</div>
-            <div className="font-mono-num text-xl font-black text-[#ffc815] mt-0.5">
+            <div className="font-mono-num text-xl font-black text-sf-gold mt-0.5">
               {summary.maxCombo} HITS
             </div>
           </div>
-          <div className="p-3 sf-chamfer-sm bg-[#090b11] border border-white/10">
+          <div className="p-3 sf-chamfer-sm bg-sf-ink border border-white/10">
             <div className="text-[11px] font-semibold text-slate-400">Defesas Perfeitas</div>
             <div className="font-mono-num text-xl font-black text-yellow-300 mt-0.5">
               {summary.perfectParries}
             </div>
           </div>
-          <div className="p-3 sf-chamfer-sm bg-[#090b11] border border-white/10">
+          <div className="p-3 sf-chamfer-sm bg-sf-ink border border-white/10">
             <div className="text-[11px] font-semibold text-slate-400">XP Geral</div>
-            <div className="font-mono-num text-xl font-black text-[#00d4ff] mt-0.5">
+            <div className="font-mono-num text-xl font-black text-sf-cyan mt-0.5">
               +{summary.xpEarned}
             </div>
           </div>
-          <div className="p-3 sf-chamfer-sm bg-[#090b11] border border-white/10">
+          <div className="p-3 sf-chamfer-sm bg-sf-ink border border-white/10">
             <div className="text-[11px] font-semibold text-slate-400">Maestria</div>
-            <div className="font-mono-num text-xl font-black text-[#c084fc] mt-0.5">
+            <div className="font-mono-num text-xl font-black text-sf-violet mt-0.5">
               +{summary.masteryXpEarned}
             </div>
           </div>
-          <div className="p-3 sf-chamfer-sm bg-[#090b11] border border-white/10">
+          <div className="p-3 sf-chamfer-sm bg-sf-ink border border-white/10">
             <div className="text-[11px] font-semibold text-slate-400">Moedas</div>
             <div className="font-mono-num text-xl font-black text-emerald-400 flex items-center justify-center gap-1 mt-0.5">
               <Coins className="w-4 h-4" /> +{summary.coinsEarned}
@@ -133,10 +133,10 @@ export function ResultScreen({
           </div>
         </div>
 
-        <div className="p-3.5 sf-chamfer-sm bg-[#090b11] border border-white/10 space-y-2">
+        <div className="p-3.5 sf-chamfer-sm bg-sf-ink border border-white/10 space-y-2">
           <div className="flex items-center justify-between text-xs">
             <span className="font-extrabold text-white flex items-center gap-1.5">
-              <Award className="w-4 h-4 text-[#ffc815]" /> Nível {profile.level}
+              <Award className="w-4 h-4 text-sf-gold" /> Nível {profile.level}
               {leveledUp && (
                 <span className="text-[11px] font-black text-emerald-400">+NÍVEL!</span>
               )}
@@ -145,9 +145,9 @@ export function ResultScreen({
               {profile.xp} / {profile.xpToNext} XP
             </span>
           </div>
-          <div className="h-2.5 bg-[#050608] -skew-x-12 border border-white/10 overflow-hidden">
+          <div className="h-2.5 bg-sf-ink -skew-x-12 border border-white/10 overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-[#ff8800] to-[#ffc815] transition-all duration-500"
+              className="h-full bg-gradient-to-r from-sf-amber to-sf-gold transition-all duration-500"
               style={{ width: `${xpPct}%` }}
             />
           </div>
@@ -218,13 +218,13 @@ export function ProfileScreen({
   const [saved, setSaved] = useState(false);
 
   return (
-    <div className="w-full h-full overflow-y-auto bg-[#07080d] text-slate-100 flex flex-col sf-halftone-bg">
+    <div className="w-full h-full overflow-y-auto bg-sf-bg text-slate-100 flex flex-col sf-halftone-bg">
       <ScreenHeader
         title="PERFIL & MAESTRIA"
         subtitle="Progresso da conta, desafios diários e conquistas de Salvador"
         onBack={onBack}
         rightSlot={
-          <span className="text-xs font-mono-num font-black text-[#ffc815]">
+          <span className="text-xs font-mono-num font-black text-sf-gold">
             Nível {profile.level}
           </span>
         }
@@ -235,14 +235,14 @@ export function ProfileScreen({
           {/* Player Identity & Currencies */}
           <StreetPanel tone="gold" chamfer="md" className="p-4 sm:p-5 space-y-4">
             <div className="flex items-center gap-3.5">
-              <div className="w-14 h-14 sf-chamfer-sm bg-[#ffc815]/15 border border-[#ffc815]/50 flex items-center justify-center shrink-0">
-                <User className="w-7 h-7 text-[#ffc815]" />
+              <div className="w-14 h-14 sf-chamfer-sm bg-sf-gold/15 border border-sf-gold/50 flex items-center justify-center shrink-0">
+                <User className="w-7 h-7 text-sf-gold" />
               </div>
               <div className="min-w-0">
                 <h2 className="font-display italic text-3xl font-black text-white truncate leading-none">
                   {profile.nickname}
                 </h2>
-                <div className="text-xs text-[#00d4ff] font-mono-num font-bold mt-1">
+                <div className="text-xs text-sf-cyan font-mono-num font-bold mt-1">
                   {profile.rankPoints} PTS de Ranking
                 </div>
               </div>
@@ -270,7 +270,7 @@ export function ProfileScreen({
                   maxLength={18}
                   value={nameInput}
                   onChange={(e) => setNameInput(e.target.value)}
-                  className="flex-1 min-w-0 px-3 py-2 sf-chamfer-sm bg-[#090b11] border border-white/18 text-xs font-bold text-white focus:outline-none focus:border-[#ffc815]"
+                  className="flex-1 min-w-0 px-3 py-2 sf-chamfer-sm bg-sf-ink border border-white/18 text-xs font-bold text-white focus:outline-none focus:border-sf-gold"
                 />
                 <ActionButton type="submit" variant="gold" size="sm">
                   <Save className="w-3.5 h-3.5" /> {saved ? 'Salvo' : 'Salvar'}
@@ -288,27 +288,27 @@ export function ProfileScreen({
             />
 
             <div className="grid grid-cols-2 gap-2.5">
-              <div className="p-3 sf-chamfer-sm bg-[#090b11] border border-white/10">
+              <div className="p-3 sf-chamfer-sm bg-sf-ink border border-white/10">
                 <div className="text-[11px] font-semibold text-slate-400">Vitórias</div>
                 <div className="font-mono-num text-xl font-black text-emerald-400 mt-0.5">
                   {profile.wins}
                 </div>
               </div>
-              <div className="p-3 sf-chamfer-sm bg-[#090b11] border border-white/10">
+              <div className="p-3 sf-chamfer-sm bg-sf-ink border border-white/10">
                 <div className="text-[11px] font-semibold text-slate-400">Derrotas</div>
                 <div className="font-mono-num text-xl font-black text-red-400 mt-0.5">
                   {profile.losses}
                 </div>
               </div>
-              <div className="p-3 sf-chamfer-sm bg-[#090b11] border border-white/10">
+              <div className="p-3 sf-chamfer-sm bg-sf-ink border border-white/10">
                 <div className="text-[11px] font-semibold text-slate-400">Moedas</div>
-                <div className="font-mono-num text-xl font-black text-[#ffc815] mt-0.5">
+                <div className="font-mono-num text-xl font-black text-sf-gold mt-0.5">
                   {profile.coins.toLocaleString('pt-BR')}
                 </div>
               </div>
-              <div className="p-3 sf-chamfer-sm bg-[#090b11] border border-white/10">
+              <div className="p-3 sf-chamfer-sm bg-sf-ink border border-white/10">
                 <div className="text-[11px] font-semibold text-slate-400">Diamantes</div>
-                <div className="font-mono-num text-xl font-black text-[#00d4ff] mt-0.5">
+                <div className="font-mono-num text-xl font-black text-sf-cyan mt-0.5">
                   {profile.diamonds}
                 </div>
               </div>
@@ -322,13 +322,13 @@ export function ProfileScreen({
                 onOpenInventory();
               }}
             >
-              <Package className="w-4 h-4 text-[#ffc815]" /> Inventário (Skins & Poderes)
+              <Package className="w-4 h-4 text-sf-gold" /> Inventário (Skins & Poderes)
             </ActionButton>
           </StreetPanel>
 
           {/* Daily Challenges */}
           <StreetPanel tone="cyan" chamfer="md" className="p-4 sm:p-5 space-y-3">
-            <h3 className="font-display italic text-2xl font-black text-[#ffc815] flex items-center gap-2">
+            <h3 className="font-display italic text-2xl font-black text-sf-gold flex items-center gap-2">
               <Sparkles className="w-4 h-4" /> DESAFIOS DIÁRIOS
             </h3>
             <div className="space-y-2.5">
@@ -338,16 +338,16 @@ export function ProfileScreen({
                 return (
                   <div
                     key={dc.id}
-                    className="p-3.5 sf-chamfer-sm bg-[#090b11] border border-white/10 space-y-2"
+                    className="p-3.5 sf-chamfer-sm bg-sf-ink border border-white/10 space-y-2"
                   >
                     <div className="flex items-center justify-between gap-2 text-xs">
                       <span className="font-extrabold text-white">{dc.title}</span>
-                      <span className="font-mono-num font-black text-[#ffc815] shrink-0">
+                      <span className="font-mono-num font-black text-sf-gold shrink-0">
                         {Math.min(dc.progress, dc.target)}/{dc.target}
                       </span>
                     </div>
-                    <div className="h-2 bg-[#050608] -skew-x-12 border border-white/10 overflow-hidden">
-                      <div className="h-full bg-[#ffc815]" style={{ width: `${pct}%` }} />
+                    <div className="h-2 bg-sf-ink -skew-x-12 border border-white/10 overflow-hidden">
+                      <div className="h-full bg-sf-gold" style={{ width: `${pct}%` }} />
                     </div>
                     <div className="flex items-center justify-between text-[11px]">
                       <span className="text-slate-400 font-mono-num">
@@ -392,19 +392,19 @@ export function ProfileScreen({
               return (
                 <div
                   key={f.id}
-                  className="p-3.5 sf-chamfer-sm bg-[#090b11] border border-white/10 space-y-2"
+                  className="p-3.5 sf-chamfer-sm bg-sf-ink border border-white/10 space-y-2"
                 >
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-extrabold text-white truncate">{meta.name}</span>
-                    <span className="font-mono-num font-black text-[#ffc815] shrink-0">
+                    <span className="font-mono-num font-black text-sf-gold shrink-0">
                       Nv.{info.level}
                     </span>
                   </div>
-                  <div className="text-[11px] text-[#00d4ff] font-bold truncate">
+                  <div className="text-[11px] text-sf-cyan font-bold truncate">
                     {f.masteryTitles[info.titleIdx]}
                   </div>
-                  <div className="h-1.5 bg-[#050608] -skew-x-12 overflow-hidden">
-                    <div className="h-full bg-[#9d4edd]" style={{ width: `${info.pct}%` }} />
+                  <div className="h-1.5 bg-sf-ink -skew-x-12 overflow-hidden">
+                    <div className="h-full bg-sf-purple" style={{ width: `${info.pct}%` }} />
                   </div>
                 </div>
               );
@@ -424,15 +424,15 @@ export function ProfileScreen({
                     key={ach.id}
                     className={`p-3 sf-chamfer-sm border flex items-center justify-between gap-2 text-xs ${
                       unlocked
-                        ? 'bg-[#ffc815]/12 border-[#ffc815]/45'
-                        : 'bg-[#090b11] border-white/8 opacity-65'
+                        ? 'bg-sf-gold/12 border-sf-gold/45'
+                        : 'bg-sf-ink border-white/8 opacity-65'
                     }`}
                   >
                     <div>
                       <div className="font-extrabold text-white">{ach.title}</div>
                       <div className="text-[11px] text-slate-400">{ach.description}</div>
                     </div>
-                    <span className="font-mono-num text-[11px] font-black text-[#ffc815] shrink-0">
+                    <span className="font-mono-num text-[11px] font-black text-sf-gold shrink-0">
                       {unlocked ? 'LIBERADA' : `+${ach.rewardCoins}M`}
                     </span>
                   </div>
@@ -450,7 +450,7 @@ export function ProfileScreen({
                 {profile.matchHistory.slice(0, 6).map((m, i) => (
                   <div
                     key={i}
-                    className="flex items-center justify-between gap-2 p-3 sf-chamfer-sm bg-[#090b11] border border-white/10 text-xs"
+                    className="flex items-center justify-between gap-2 p-3 sf-chamfer-sm bg-sf-ink border border-white/10 text-xs"
                   >
                     <div className="min-w-0 truncate">
                       <span
@@ -464,7 +464,7 @@ export function ProfileScreen({
                       {getDisplayFighterMeta(m.p2FighterId, authorizationMode).name} (
                       {m.p1RoundsWon}–{m.p2RoundsWon})
                     </div>
-                    <div className="font-mono-num text-[11px] font-bold text-[#ffc815] shrink-0">
+                    <div className="font-mono-num text-[11px] font-bold text-sf-gold shrink-0">
                       {m.score} PTS
                     </div>
                   </div>
@@ -529,18 +529,18 @@ export function SettingsScreen({ settings, onUpdate, onBack }: SettingsScreenPro
   }, [listeningKey, onUpdate, settings]);
 
   return (
-    <div className="w-full h-full overflow-y-auto bg-[#07080d] text-slate-100 flex flex-col sf-halftone-bg">
+    <div className="w-full h-full overflow-y-auto bg-sf-bg text-slate-100 flex flex-col sf-halftone-bg">
       <ScreenHeader
         title="CONFIGURAÇÕES"
         subtitle="Mixagem de áudio, qualidade 3D, orientação mobile e controles"
         onBack={onBack}
-        rightSlot={<Sliders className="w-4 h-4 text-[#ffc815]" />}
+        rightSlot={<Sliders className="w-4 h-4 text-sf-gold" />}
       />
 
       <main className="flex-1 p-4 sm:p-5 max-w-4xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Audio & Display */}
         <StreetPanel tone="gold" chamfer="md" className="p-4 sm:p-5 space-y-4">
-          <h2 className="font-display italic text-2xl font-black text-[#ffc815]">
+          <h2 className="font-display italic text-2xl font-black text-sf-gold">
             ÁUDIO & QUALIDADE
           </h2>
 
@@ -555,7 +555,7 @@ export function SettingsScreen({ settings, onUpdate, onBack }: SettingsScreenPro
             <div key={vol.key}>
               <div className="flex justify-between text-xs font-bold mb-1">
                 <span>{vol.label}</span>
-                <span className="font-mono-num text-[#ffc815]">
+                <span className="font-mono-num text-sf-gold">
                   {Math.round(settings[vol.key] * 100)}%
                 </span>
               </div>
@@ -566,7 +566,7 @@ export function SettingsScreen({ settings, onUpdate, onBack }: SettingsScreenPro
                 step={0.05}
                 value={settings[vol.key]}
                 onChange={(e) => update({ [vol.key]: parseFloat(e.target.value) })}
-                className="w-full accent-[#ffc815]"
+                className="w-full accent-sf-gold"
               />
             </div>
           ))}
@@ -631,10 +631,10 @@ export function SettingsScreen({ settings, onUpdate, onBack }: SettingsScreenPro
           </div>
 
           {/* Authorization Mode Switch */}
-          <div className="p-3.5 sf-chamfer-sm bg-[#090b11] border border-white/12 space-y-2">
+          <div className="p-3.5 sf-chamfer-sm bg-sf-ink border border-white/12 space-y-2">
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs font-extrabold text-white flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-[#00d4ff]" /> Modo de Imagem & Nomes
+                <ShieldCheck className="w-4 h-4 text-sf-cyan" /> Modo de Imagem & Nomes
               </span>
               <ActionButton
                 variant={settings.authorizationMode ? 'gold' : 'cyan'}
@@ -652,7 +652,7 @@ export function SettingsScreen({ settings, onUpdate, onBack }: SettingsScreenPro
 
         {/* Orientation, Touch Layout & Keyboard Remapping */}
         <StreetPanel tone="cyan" chamfer="md" className="p-4 sm:p-5 space-y-4">
-          <h2 className="font-display italic text-2xl font-black text-[#00d4ff]">
+          <h2 className="font-display italic text-2xl font-black text-sf-cyan">
             CONTROLES & ORIENTAÇÃO
           </h2>
 
@@ -706,7 +706,7 @@ export function SettingsScreen({ settings, onUpdate, onBack }: SettingsScreenPro
             <div>
               <div className="flex justify-between text-[11px] font-bold mb-1">
                 <span>Tamanho Touch</span>
-                <span className="font-mono-num text-[#ffc815]">
+                <span className="font-mono-num text-sf-gold">
                   {Math.round(settings.touchLayoutScale * 100)}%
                 </span>
               </div>
@@ -717,13 +717,13 @@ export function SettingsScreen({ settings, onUpdate, onBack }: SettingsScreenPro
                 step={0.05}
                 value={settings.touchLayoutScale}
                 onChange={(e) => update({ touchLayoutScale: parseFloat(e.target.value) })}
-                className="w-full accent-[#ffc815]"
+                className="w-full accent-sf-gold"
               />
             </div>
             <div>
               <div className="flex justify-between text-[11px] font-bold mb-1">
                 <span>Altura Touch</span>
-                <span className="font-mono-num text-[#ffc815]">
+                <span className="font-mono-num text-sf-gold">
                   {settings.touchButtonsOffsetY}px
                 </span>
               </div>
@@ -734,7 +734,7 @@ export function SettingsScreen({ settings, onUpdate, onBack }: SettingsScreenPro
                 step={4}
                 value={settings.touchButtonsOffsetY}
                 onChange={(e) => update({ touchButtonsOffsetY: parseInt(e.target.value, 10) })}
-                className="w-full accent-[#ffc815]"
+                className="w-full accent-sf-gold"
               />
             </div>
           </div>
@@ -752,12 +752,12 @@ export function SettingsScreen({ settings, onUpdate, onBack }: SettingsScreenPro
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs font-bold text-white">
               <span className="flex items-center gap-1.5">
-                <Keyboard className="w-4 h-4 text-[#ffc815]" /> Teclas do PC (clique para mudar)
+                <Keyboard className="w-4 h-4 text-sf-gold" /> Teclas do PC (clique para mudar)
               </span>
               <button
                 type="button"
                 onClick={() => update({ keyBindings: DEFAULT_KEY_BINDINGS })}
-                className="text-[11px] text-[#00d4ff] hover:underline font-bold"
+                className="text-[11px] text-sf-cyan hover:underline font-bold"
               >
                 Restaurar Padrão
               </button>
@@ -772,12 +772,12 @@ export function SettingsScreen({ settings, onUpdate, onBack }: SettingsScreenPro
                     onClick={() => setListeningKey(item.key)}
                     className={`flex items-center justify-between px-2.5 py-1.5 sf-chamfer-sm border text-[11px] transition-colors ${
                       isWaiting
-                        ? 'bg-[#ffc815] text-black border-white font-black'
-                        : 'bg-[#090b11] border-white/12 text-slate-200 hover:border-[#ffc815]/50'
+                        ? 'bg-sf-gold text-black border-white font-black'
+                        : 'bg-sf-ink border-white/12 text-slate-200 hover:border-sf-gold/50'
                     }`}
                   >
                     <span className="truncate">{item.label}</span>
-                    <span className="font-mono-num text-[10px] font-bold text-[#ffc815]">
+                    <span className="font-mono-num text-[10px] font-bold text-sf-gold">
                       {isWaiting ? 'TECLE...' : settings.keyBindings[item.key].replace('Key', '')}
                     </span>
                   </button>

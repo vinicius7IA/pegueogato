@@ -1,3 +1,4 @@
+import { useScreenRouter } from './router';
 import {
   ChevronLeft,
   ChevronRight,
@@ -75,7 +76,7 @@ class AppErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryS
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="w-full h-full bg-[#07080d] flex items-center justify-center p-6 text-slate-100">
+        <div className="w-full h-full bg-sf-bg flex items-center justify-center p-6 text-slate-100">
           <StreetPanel tone="crimson" chamfer="lg" className="max-w-md w-full p-6 text-center space-y-4">
             <h2 className="font-display italic text-3xl font-black text-white">
               PAUSA INESPERADA NA ARENA
@@ -111,7 +112,7 @@ function AppShell() {
   const [profile, setProfile] = useState<PlayerProfile>(() => loadProfile());
   const [settings, setSettings] = useState<GameSettings>(() => loadSettings());
 
-  const [screen, setScreen] = useState<ScreenId>('splash');
+  const [screen, setScreen] = useScreenRouter(profile.hasCompletedOnboarding);
   const [inventoryReturnScreen, setInventoryReturnScreen] = useState<ScreenId>('menu');
 
   // Protagonista padrão P1: O Policial; rival padrão P2: O Maluco
@@ -538,7 +539,7 @@ function AppShell() {
             gameAudio.playSelectSnap();
             setScreen(profile.hasCompletedOnboarding ? 'menu' : 'login');
           }}
-          className="relative w-full h-full flex flex-col items-center justify-center bg-[#06070b] text-center p-6 overflow-hidden cursor-pointer focus-visible:outline-2 focus-visible:outline-[#ffc815]"
+          className="relative w-full h-full flex flex-col items-center justify-center bg-sf-ink text-center p-6 overflow-hidden cursor-pointer focus-visible:outline-2 focus-visible:outline-sf-gold"
         >
           <img
             src={salvadorBackdrop}
@@ -546,7 +547,7 @@ function AppShell() {
             referrerPolicy="no-referrer"
             className="absolute inset-0 w-full h-full object-cover opacity-45 pointer-events-none"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-[#07080d]/65 to-black pointer-events-none sf-speed-lines" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-sf-bg/65 to-black pointer-events-none sf-speed-lines" />
 
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 14 }}
@@ -554,7 +555,7 @@ function AppShell() {
             transition={{ duration: 0.4 }}
             className="relative z-10 space-y-3"
           >
-            <div className="text-xs font-black tracking-[0.35em] text-[#00d4ff]">
+            <div className="text-xs font-black tracking-[0.35em] text-sf-cyan">
               SALVADOR · BAHIA · LIGA DE RUA 3D
             </div>
             <h1 className="font-display italic text-6xl sm:text-8xl font-black tracking-wide text-white drop-shadow-[0_6px_0_#ff462e]">
@@ -566,7 +567,7 @@ function AppShell() {
             <motion.div
               animate={{ opacity: [0.45, 1, 0.45] }}
               transition={{ repeat: Infinity, duration: 1.4 }}
-              className="pt-5 text-xs font-black tracking-[0.25em] text-[#ffc815] uppercase"
+              className="pt-5 text-xs font-black tracking-[0.25em] text-sf-gold uppercase"
             >
               Toque ou pressione para entrar
             </motion.div>
@@ -577,14 +578,14 @@ function AppShell() {
 
     if (screen === 'login') {
       return (
-        <div className="relative w-full h-full flex bg-[#07080d] p-4 overflow-y-auto sf-halftone-bg">
+        <div className="relative w-full h-full flex bg-sf-bg p-4 overflow-y-auto sf-halftone-bg">
           <img
             src={salvadorBackdrop}
             alt="Pelourinho Salvador"
             referrerPolicy="no-referrer"
             className="absolute inset-0 w-full h-full object-cover opacity-38 pointer-events-none"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/72 via-[#07080d]/82 to-black pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/72 via-sf-bg/82 to-black pointer-events-none" />
 
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -594,7 +595,7 @@ function AppShell() {
             <StreetPanel tone="gold" chamfer="lg" textured className="p-4 sm:p-6 space-y-3 sm:space-y-5">
               <form onSubmit={handleLoginSubmit} className="space-y-5">
                 <div className="text-center space-y-1 border-b border-white/10 pb-4">
-                  <div className="text-[11px] font-black tracking-[0.28em] text-[#00d4ff] uppercase">
+                  <div className="text-[11px] font-black tracking-[0.28em] text-sf-cyan uppercase">
                     Registro de Lutador
                   </div>
                   <h1 className="font-display italic text-5xl font-black text-white drop-shadow-[0_3px_0_#ff462e]">
@@ -619,7 +620,7 @@ function AppShell() {
                       if (loginError) setLoginError(null);
                     }}
                     placeholder="Ex: SoldadoSSA"
-                    className="w-full px-3.5 py-3 sf-chamfer-sm bg-[#090b11] border border-white/18 text-sm font-bold text-white focus:outline-none focus:border-[#ffc815]"
+                    className="w-full px-3.5 py-3 sf-chamfer-sm bg-sf-ink border border-white/18 text-sm font-bold text-white focus:outline-none focus:border-sf-gold"
                   />
                   {loginError && <p className="text-xs text-red-400 font-bold">{loginError}</p>}
                 </div>
@@ -634,7 +635,7 @@ function AppShell() {
                         setLoginName(preset);
                         setLoginError(null);
                       }}
-                      className="py-2 px-2 sf-chamfer-sm bg-[#171c29] border border-white/14 text-[11px] font-bold text-slate-200 hover:border-[#ffc815]/60 truncate transition-colors"
+                      className="py-2 px-2 sf-chamfer-sm bg-sf-raised border border-white/14 text-[11px] font-bold text-slate-200 hover:border-sf-gold/60 truncate transition-colors"
                     >
                       {preset}
                     </button>
@@ -890,14 +891,14 @@ function AppShell() {
 
     // Tela 1 — Menu Principal (Street Fighter Fighting Ground Hub: Paisagem Widescreen ou Retrato Mobile)
     return (
-      <div className="relative w-full h-full flex flex-col bg-[#07080d] overflow-hidden sf-halftone-bg">
+      <div className="relative w-full h-full flex flex-col bg-sf-bg overflow-hidden sf-halftone-bg">
         <img
           src={salvadorBackdrop}
           alt="Fundo Pelourinho Salvador"
           referrerPolicy="no-referrer"
           className="absolute inset-0 w-full h-full object-cover opacity-38 pointer-events-none"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#07080d]/82 via-[#07080d]/52 to-[#07080d]/96 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-sf-bg/82 via-sf-bg/52 to-sf-bg/96 pointer-events-none" />
 
         <header className="relative z-10 flex items-center justify-between gap-4 px-4 sm:px-6 py-3 border-b border-white/12 bg-[#080a10]/92 shrink-0 sf-speed-lines">
           <div className="leading-none min-w-0">
@@ -918,7 +919,7 @@ function AppShell() {
                 setScreen('profile');
               }}
             >
-              <User className="w-3.5 h-3.5 text-[#ffc815]" />
+              <User className="w-3.5 h-3.5 text-sf-gold" />
               <span className="hidden sm:inline">{profile.nickname}</span>
               {readyDailyCount > 0 && (
                 <span className="text-[10px] font-mono-num font-black text-emerald-400">
@@ -968,14 +969,14 @@ function AppShell() {
                 authorizationMode={settings.authorizationMode}
                 autoRotate
               />
-              <span className="absolute top-3 left-3 text-[10px] font-black tracking-wider text-black bg-[#ffc815] px-2.5 py-0.5 sf-chamfer-sm pointer-events-none">
+              <span className="absolute top-3 left-3 text-[10px] font-black tracking-wider text-black bg-sf-gold px-2.5 py-0.5 sf-chamfer-sm pointer-events-none">
                 P1 · VOCÊ
               </span>
               <button
                 type="button"
                 aria-label="Lutador P1 anterior"
                 onClick={() => cycleFighter('p1', -1)}
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 p-2 sf-chamfer-sm bg-black/75 border border-white/20 text-white hover:border-[#ffc815] hover:text-[#ffc815] transition-colors"
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 p-2 sf-chamfer-sm bg-black/75 border border-white/20 text-white hover:border-sf-gold hover:text-sf-gold transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -983,12 +984,12 @@ function AppShell() {
                 type="button"
                 aria-label="Próximo lutador P1"
                 onClick={() => cycleFighter('p1', 1)}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 sf-chamfer-sm bg-black/75 border border-white/20 text-white hover:border-[#ffc815] hover:text-[#ffc815] transition-colors"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 sf-chamfer-sm bg-black/75 border border-white/20 text-white hover:border-sf-gold hover:text-sf-gold transition-colors"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
               <div className="absolute bottom-3 inset-x-3 text-center pointer-events-none">
-                <div className="font-display italic text-xl sm:text-3xl font-black text-[#ffc815] drop-shadow-[0_2px_0_rgba(0,0,0,0.95)] truncate">
+                <div className="font-display italic text-xl sm:text-3xl font-black text-sf-gold drop-shadow-[0_2px_0_rgba(0,0,0,0.95)] truncate">
                   {p1Meta.name}
                 </div>
                 <div className="text-[11px] font-semibold text-slate-300 truncate hidden sm:block">
@@ -1009,14 +1010,14 @@ function AppShell() {
                   authorizationMode={settings.authorizationMode}
                   autoRotate
                 />
-                <span className="absolute top-3 right-3 text-[10px] font-black tracking-wider text-black bg-[#00d4ff] px-2.5 py-0.5 sf-chamfer-sm pointer-events-none">
+                <span className="absolute top-3 right-3 text-[10px] font-black tracking-wider text-black bg-sf-cyan px-2.5 py-0.5 sf-chamfer-sm pointer-events-none">
                   RIVAL
                 </span>
                 <button
                   type="button"
                   aria-label="Rival anterior"
                   onClick={() => cycleFighter('p2', -1)}
-                  className="absolute left-2.5 top-1/2 -translate-y-1/2 p-2 sf-chamfer-sm bg-black/75 border border-white/20 text-white hover:border-[#00d4ff]"
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 p-2 sf-chamfer-sm bg-black/75 border border-white/20 text-white hover:border-sf-cyan"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -1024,12 +1025,12 @@ function AppShell() {
                   type="button"
                   aria-label="Próximo rival"
                   onClick={() => cycleFighter('p2', 1)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 sf-chamfer-sm bg-black/75 border border-white/20 text-white hover:border-[#00d4ff]"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 sf-chamfer-sm bg-black/75 border border-white/20 text-white hover:border-sf-cyan"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
                 <div className="absolute bottom-3 inset-x-3 text-center pointer-events-none">
-                  <div className="font-display italic text-xl font-black text-[#00d4ff] drop-shadow-[0_2px_0_rgba(0,0,0,0.95)] truncate">
+                  <div className="font-display italic text-xl font-black text-sf-cyan drop-shadow-[0_2px_0_rgba(0,0,0,0.95)] truncate">
                     {p2Meta.name}
                   </div>
                 </div>
@@ -1042,13 +1043,13 @@ function AppShell() {
             <button
               type="button"
               onClick={cycleArena}
-              className="w-full py-2.5 px-3.5 sf-chamfer-sm bg-[#10131c]/95 border border-white/16 hover:border-[#ffc815]/60 flex items-center justify-between text-xs transition-colors"
+              className="w-full py-2.5 px-3.5 sf-chamfer-sm bg-sf-surface/95 border border-white/16 hover:border-sf-gold/60 flex items-center justify-between text-xs transition-colors"
             >
               <span className="flex items-center gap-2 font-extrabold text-white truncate">
-                <MapPin className="w-4 h-4 text-[#ffc815] shrink-0" />
+                <MapPin className="w-4 h-4 text-sf-gold shrink-0" />
                 {ARENAS[arenaId].name}
               </span>
-              <span className="text-[11px] font-black text-[#ffc815] uppercase shrink-0 ml-2">
+              <span className="text-[11px] font-black text-sf-gold uppercase shrink-0 ml-2">
                 Trocar Arena
               </span>
             </button>
@@ -1074,7 +1075,7 @@ function AppShell() {
               <ActionButton
                 variant="steel"
                 size="md"
-                className="w-full border-[#00d4ff]/40 text-[#00d4ff]"
+                className="w-full border-sf-cyan/40 text-sf-cyan"
                 onClick={() => launchQuickFight('training')}
               >
                 <Dumbbell className="w-4 h-4" /> MODO TREINO
@@ -1091,7 +1092,7 @@ function AppShell() {
                   setScreen('select');
                 }}
               >
-                <Users className="w-4 h-4 text-[#ffc815]" /> LUTADORES
+                <Users className="w-4 h-4 text-sf-gold" /> LUTADORES
               </ActionButton>
               <ActionButton
                 variant="steel"
@@ -1107,9 +1108,9 @@ function AppShell() {
             </div>
 
             {!isPortraitLayout && (
-              <div className="hidden lg:flex items-center justify-between px-3.5 py-2.5 sf-chamfer-sm bg-[#090b11]/90 border border-white/12 text-xs text-slate-300">
+              <div className="hidden lg:flex items-center justify-between px-3.5 py-2.5 sf-chamfer-sm bg-sf-ink/90 border border-white/12 text-xs text-slate-300">
                 <span className="flex items-center gap-2 font-mono-num font-bold">
-                  <Trophy className="w-3.5 h-3.5 text-[#ffc815]" />
+                  <Trophy className="w-3.5 h-3.5 text-sf-gold" />
                   Nv.{profile.level} · {profile.wins}V/{profile.losses}D · {profile.rankPoints} PTS
                 </span>
                 <button
@@ -1118,7 +1119,7 @@ function AppShell() {
                     gameAudio.playClick();
                     setScreen('profile');
                   }}
-                  className="text-[#ffc815] font-extrabold hover:underline flex items-center gap-1"
+                  className="text-sf-gold font-extrabold hover:underline flex items-center gap-1"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   {readyDailyCount > 0 ? `${readyDailyCount} desafio pronto` : 'Desafios'}
@@ -1140,14 +1141,14 @@ function AppShell() {
                 authorizationMode={settings.authorizationMode}
                 autoRotate
               />
-              <span className="absolute top-3 right-3 text-[10px] font-black tracking-wider text-black bg-[#00d4ff] px-2.5 py-0.5 sf-chamfer-sm pointer-events-none">
+              <span className="absolute top-3 right-3 text-[10px] font-black tracking-wider text-black bg-sf-cyan px-2.5 py-0.5 sf-chamfer-sm pointer-events-none">
                 P2 · RIVAL
               </span>
               <button
                 type="button"
                 aria-label="Rival anterior"
                 onClick={() => cycleFighter('p2', -1)}
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 p-2 sf-chamfer-sm bg-black/75 border border-white/20 text-white hover:border-[#00d4ff] hover:text-[#00d4ff] transition-colors"
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 p-2 sf-chamfer-sm bg-black/75 border border-white/20 text-white hover:border-sf-cyan hover:text-sf-cyan transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -1155,12 +1156,12 @@ function AppShell() {
                 type="button"
                 aria-label="Próximo rival"
                 onClick={() => cycleFighter('p2', 1)}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 sf-chamfer-sm bg-black/75 border border-white/20 text-white hover:border-[#00d4ff] hover:text-[#00d4ff] transition-colors"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 sf-chamfer-sm bg-black/75 border border-white/20 text-white hover:border-sf-cyan hover:text-sf-cyan transition-colors"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
               <div className="absolute bottom-3 inset-x-3 text-center pointer-events-none">
-                <div className="font-display italic text-3xl font-black text-[#00d4ff] drop-shadow-[0_2px_0_rgba(0,0,0,0.95)] truncate">
+                <div className="font-display italic text-3xl font-black text-sf-cyan drop-shadow-[0_2px_0_rgba(0,0,0,0.95)] truncate">
                   {p2Meta.name}
                 </div>
                 <div className="text-[11px] font-semibold text-slate-300 truncate">
@@ -1171,7 +1172,7 @@ function AppShell() {
           )}
         </div>
 
-        <nav className="relative z-10 grid grid-cols-4 border-t border-white/12 bg-[#090b12]/96 shrink-0">
+        <nav className="relative z-10 grid grid-cols-4 border-t border-white/12 bg-sf-ink/96 shrink-0">
           {(
             [
               { id: 'select', label: 'Lutadores', icon: Users },
@@ -1189,7 +1190,7 @@ function AppShell() {
                   gameAudio.playClick();
                   setScreen(item.id);
                 }}
-                className="py-2.5 sm:py-3 flex flex-col items-center gap-1 text-xs font-extrabold text-slate-300 hover:text-[#ffc815] hover:bg-white/4 border-t-2 border-transparent hover:border-[#ffc815] transition-colors"
+                className="py-2.5 sm:py-3 flex flex-col items-center gap-1 text-xs font-extrabold text-slate-300 hover:text-sf-gold hover:bg-white/4 border-t-2 border-transparent hover:border-sf-gold transition-colors"
               >
                 <Icon className="w-4 h-4" />
                 <span>{item.label}</span>
@@ -1206,8 +1207,8 @@ function AppShell() {
       <div
         className={
           isPortraitLayout
-            ? 'w-full h-full max-w-[440px] relative bg-[#07080d] overflow-hidden md:border-x md:border-white/12 shadow-2xl'
-            : 'w-full h-full relative bg-[#07080d] overflow-hidden'
+            ? 'w-full h-full max-w-[440px] relative bg-sf-bg overflow-hidden md:border-x md:border-white/12 shadow-2xl'
+            : 'w-full h-full relative bg-sf-bg overflow-hidden'
         }
       >
         {renderScreen()}
@@ -1221,7 +1222,7 @@ function AppShell() {
         {showOrientationPrompt && screen === 'menu' && (
           <ModalFrame tone="gold" maxWidthClass="max-w-sm">
             <div className="text-center space-y-2">
-              <Smartphone className="w-8 h-8 text-[#ffc815] mx-auto" />
+              <Smartphone className="w-8 h-8 text-sf-gold mx-auto" />
               <h2 className="font-display italic text-3xl font-black text-white">
                 COMO VOCÊ QUER JOGAR?
               </h2>

@@ -41,12 +41,12 @@ export function StageSelectScreen({
   const activeArena = ARENAS[selectedArenaId];
 
   return (
-    <div className="w-full h-full overflow-y-auto bg-[#07080d] text-slate-100 flex flex-col sf-halftone-bg">
+    <div className="w-full h-full overflow-y-auto bg-sf-bg text-slate-100 flex flex-col sf-halftone-bg">
       <ScreenHeader
         title={onlineVoteMode ? 'VOTAR NA ARENA ONLINE' : 'ARENAS DE SALVADOR'}
         subtitle="10 cenários 3D com iluminação dinâmica e trilha percussiva própria"
         onBack={onBack}
-        rightSlot={<MapPin className="w-5 h-5 text-[#ffc815]" />}
+        rightSlot={<MapPin className="w-5 h-5 text-sf-gold" />}
       />
 
       <main className="flex-1 p-4 sm:p-5 max-w-6xl w-full mx-auto flex flex-col gap-5">
@@ -72,11 +72,11 @@ export function StageSelectScreen({
             <div className="relative z-10 space-y-2 min-w-0">
               {/* Unboxed typographic metadata strip */}
               <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-slate-300">
-                <span className="text-[#ffc815]">{activeArena.district}</span>
+                <span className="text-sf-gold">{activeArena.district}</span>
                 <span aria-hidden="true" className="text-white/25">
                   ·
                 </span>
-                <span className="text-[#00d4ff]">{TIME_LABELS[activeArena.timeOfDay]}</span>
+                <span className="text-sf-cyan">{TIME_LABELS[activeArena.timeOfDay]}</span>
                 <span aria-hidden="true" className="text-white/25">
                   ·
                 </span>
@@ -90,7 +90,7 @@ export function StageSelectScreen({
               </h2>
 
               <p className="text-xs sm:text-sm text-slate-300 flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-[#ffc815] shrink-0" />
+                <Sparkles className="w-4 h-4 text-sf-gold shrink-0" />
                 {activeArena.interactiveFeature}
               </p>
             </div>
@@ -135,10 +135,10 @@ export function StageSelectScreen({
                   gameAudio.playSelectSnap();
                   onSelectArena(arena.id);
                 }}
-                className={`relative sf-chamfer border p-3.5 text-left flex flex-col justify-between gap-2.5 transition-all duration-150 focus-visible:outline-2 focus-visible:outline-[#ffc815] ${
+                className={`relative sf-chamfer border p-3.5 text-left flex flex-col justify-between gap-2.5 transition-all duration-150 focus-visible:outline-2 focus-visible:outline-sf-gold ${
                   active
-                    ? 'bg-[#171d2c] border-[#ffc815] shadow-md'
-                    : 'bg-[#10131c] border-white/12 hover:border-white/35'
+                    ? 'bg-[#171d2c] border-sf-gold shadow-md'
+                    : 'bg-sf-surface border-white/12 hover:border-white/35'
                 }`}
               >
                 <div className="space-y-1.5">
@@ -156,7 +156,7 @@ export function StageSelectScreen({
                   </div>
                   <div className="text-[11px] text-slate-400 truncate mt-0.5">{arena.district}</div>
                 </div>
-                <div className="text-[11px] font-bold text-[#ffc815] truncate">
+                <div className="text-[11px] font-bold text-sf-gold truncate">
                   {MUSIC_LABELS[arena.musicStyle]}
                 </div>
               </motion.button>

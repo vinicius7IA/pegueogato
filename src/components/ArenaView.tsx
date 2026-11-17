@@ -253,11 +253,11 @@ export function ArenaView({
   const p2Low = p2Pct <= 28;
 
   const stageViewport = (
-    <div className="relative flex-1 min-h-0 w-full overflow-hidden bg-[#0b0d14]">
+    <div className="relative flex-1 min-h-0 w-full overflow-hidden bg-sf-ink">
       <div ref={mountRef} className="absolute inset-0 w-full h-full" />
 
       {engineError && (
-        <div className="absolute inset-0 z-40 bg-[#07080d]/95 flex items-center justify-center p-4">
+        <div className="absolute inset-0 z-40 bg-sf-bg/95 flex items-center justify-center p-4">
           <StreetPanel tone="crimson" chamfer="lg" className="w-full max-w-sm p-6 text-center space-y-4">
             <h3 className="font-display italic text-2xl font-black text-white">
               ERRO AO CARREGAR ARENA 3D
@@ -282,8 +282,8 @@ export function ArenaView({
       {/* Finisher Cinematic Letterbox */}
       {hud.isFinisherSlowmo && (
         <>
-          <div className="pointer-events-none absolute top-0 inset-x-0 h-10 bg-black z-10 border-b border-[#ff462e]/60" />
-          <div className="pointer-events-none absolute bottom-0 inset-x-0 h-10 bg-black z-10 border-t border-[#ff462e]/60" />
+          <div className="pointer-events-none absolute top-0 inset-x-0 h-10 bg-black z-10 border-b border-sf-crimson/60" />
+          <div className="pointer-events-none absolute bottom-0 inset-x-0 h-10 bg-black z-10 border-t border-sf-crimson/60" />
         </>
       )}
 
@@ -295,10 +295,10 @@ export function ArenaView({
               key={idx}
               className={`absolute border-2 ${
                 rect.kind === 'hit'
-                  ? 'border-[#ff462e] bg-[#ff462e]/20'
+                  ? 'border-sf-crimson bg-sf-crimson/20'
                   : rect.kind === 'parry'
-                    ? 'border-[#ffc815] bg-[#ffc815]/25'
-                    : 'border-[#00d4ff] bg-[#00d4ff]/15'
+                    ? 'border-sf-gold bg-sf-gold/25'
+                    : 'border-sf-cyan bg-sf-cyan/15'
               }`}
               style={{
                 left: `${rect.x}%`,
@@ -318,15 +318,15 @@ export function ArenaView({
             key={pop.id}
             className={`absolute -translate-x-1/2 -translate-y-1/2 font-display italic font-black tracking-tight drop-shadow-[0_3px_0_rgba(0,0,0,0.95)] ${
               pop.kind === 'parry'
-                ? 'text-xl text-[#ffc815]'
+                ? 'text-xl text-sf-gold'
                 : pop.kind === 'finisher'
-                  ? 'text-4xl text-[#ff462e]'
+                  ? 'text-4xl text-sf-crimson'
                   : pop.kind === 'super'
-                    ? 'text-3xl text-[#c084fc]'
+                    ? 'text-3xl text-sf-violet'
                     : pop.kind === 'counter'
-                      ? 'text-2xl text-[#ff8800]'
+                      ? 'text-2xl text-sf-amber'
                       : pop.kind === 'slap'
-                        ? 'text-2xl text-[#ff5520]'
+                        ? 'text-2xl text-sf-orange'
                         : 'text-xl text-white'
             }`}
             style={{
@@ -347,7 +347,7 @@ export function ArenaView({
           <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between gap-2 text-xs sm:text-sm font-display italic font-black text-white drop-shadow-[0_2px_0_rgba(0,0,0,0.95)]">
               <span className="truncate uppercase tracking-wide flex items-center gap-1.5">
-                <span className="inline-block w-1.5 h-3.5 bg-[#ffc815] -skew-x-12 shrink-0" />
+                <span className="inline-block w-1.5 h-3.5 bg-sf-gold -skew-x-12 shrink-0" />
                 {p1Meta.name}
                 {arcadeStage ? ` · FASE ${arcadeStage}/4` : ''}
               </span>
@@ -357,7 +357,7 @@ export function ArenaView({
                     key={i}
                     className={`w-2.5 h-2.5 rotate-45 border ${
                       hud.p1Rounds > i
-                        ? 'bg-[#ffc815] border-white'
+                        ? 'bg-sf-gold border-white'
                         : 'bg-black/80 border-white/35'
                     }`}
                   />
@@ -366,16 +366,16 @@ export function ArenaView({
             </div>
 
             {/* Slanted P1 Vitality Bar with Trailing Red Drain */}
-            <div className="relative h-4 sm:h-5 w-full bg-[#06070b]/95 border-b-2 border-[#ffc815]/60 sf-hp-p1 overflow-hidden shadow-[0_4px_14px_rgba(0,0,0,0.85)]">
+            <div className="relative h-4 sm:h-5 w-full bg-sf-ink/95 border-b-2 border-sf-gold/60 sf-hp-p1 overflow-hidden shadow-[0_4px_14px_rgba(0,0,0,0.85)]">
               <div
-                className="absolute inset-y-0 left-0 bg-[#ff462e] transition-all duration-700 ease-out"
+                className="absolute inset-y-0 left-0 bg-sf-crimson transition-all duration-700 ease-out"
                 style={{ width: `${p1Pct}%` }}
               />
               <div
                 className={`relative h-full transition-all duration-100 ${
                   p1Low
-                    ? 'bg-gradient-to-r from-red-600 via-[#ff462e] to-orange-400'
-                    : 'bg-gradient-to-r from-[#ff8c00] via-[#ffc815] to-[#ffe66d]'
+                    ? 'bg-gradient-to-r from-red-600 via-sf-crimson to-orange-400'
+                    : 'bg-gradient-to-r from-sf-amber via-sf-gold to-[#ffe66d]'
                 }`}
                 style={{ width: `${p1Pct}%` }}
               />
@@ -383,12 +383,12 @@ export function ArenaView({
 
             {/* P1 Segmented Super Drive Bar + Guard Stun */}
             <div className="flex items-center gap-2 pr-3">
-              <div className="relative h-2 flex-1 bg-[#06070b]/95 border border-white/15 -skew-x-12 overflow-hidden">
+              <div className="relative h-2 flex-1 bg-sf-ink/95 border border-white/15 -skew-x-12 overflow-hidden">
                 <div
                   className={`h-full transition-all duration-100 ${
                     hud.p1Energy >= 100
-                      ? 'bg-gradient-to-r from-[#ff462e] via-[#ffc815] to-white'
-                      : 'bg-gradient-to-r from-[#0ea5e9] to-[#00d4ff]'
+                      ? 'bg-gradient-to-r from-sf-crimson via-sf-gold to-white'
+                      : 'bg-gradient-to-r from-[#0ea5e9] to-sf-cyan'
                   }`}
                   style={{ width: `${hud.p1Energy}%` }}
                 />
@@ -400,13 +400,13 @@ export function ArenaView({
                 </div>
               </div>
               {hud.p1Energy >= 100 && (
-                <span className="font-display italic text-[10px] font-black text-[#ffc815] tracking-wider whitespace-nowrap">
+                <span className="font-display italic text-[10px] font-black text-sf-gold tracking-wider whitespace-nowrap">
                   SUPER MAX
                 </span>
               )}
               {hud.p1Stun > 5 && (
                 <div className="h-1.5 w-12 bg-black/90 border border-white/15 -skew-x-12 overflow-hidden">
-                  <div className="h-full bg-[#ffc815]" style={{ width: `${hud.p1Stun}%` }} />
+                  <div className="h-full bg-sf-gold" style={{ width: `${hud.p1Stun}%` }} />
                 </div>
               )}
             </div>
@@ -414,7 +414,7 @@ export function ArenaView({
 
           {/* Center Championship Timer + Pause */}
           <div className="flex flex-col items-center gap-1 shrink-0">
-            <div className="sf-chamfer-sm bg-[#090b12]/95 border-2 border-[#ffc815]/70 px-3.5 sm:px-4 py-1 shadow-[0_6px_18px_rgba(0,0,0,0.9)]">
+            <div className="sf-chamfer-sm bg-sf-ink/95 border-2 border-sf-gold/70 px-3.5 sm:px-4 py-1 shadow-[0_6px_18px_rgba(0,0,0,0.9)]">
               <div className="font-mono-num text-xl sm:text-2xl font-black text-white leading-none tracking-tight text-center">
                 {mode === 'training' ? '∞' : String(hud.timer).padStart(2, '0')}
               </div>
@@ -426,7 +426,7 @@ export function ArenaView({
                 togglePause();
               }}
               aria-label="Pausar"
-              className="pointer-events-auto px-2.5 py-1 sf-chamfer-sm bg-[#10131c]/95 border border-white/20 hover:border-[#ffc815] text-slate-200 hover:text-[#ffc815] transition-colors focus-visible:outline-2 focus-visible:outline-[#ffc815]"
+              className="pointer-events-auto px-2.5 py-1 sf-chamfer-sm bg-sf-surface/95 border border-white/20 hover:border-sf-gold text-slate-200 hover:text-sf-gold transition-colors focus-visible:outline-2 focus-visible:outline-sf-gold"
             >
               <Pause className="w-3.5 h-3.5" />
             </button>
@@ -436,7 +436,7 @@ export function ArenaView({
           <div className="flex flex-col gap-1">
             <div className="flex items-center flex-row-reverse justify-between gap-2 text-xs sm:text-sm font-display italic font-black text-white drop-shadow-[0_2px_0_rgba(0,0,0,0.95)]">
               <span className="truncate uppercase tracking-wide flex items-center flex-row-reverse gap-1.5">
-                <span className="inline-block w-1.5 h-3.5 bg-[#00d4ff] skew-x-12 shrink-0" />
+                <span className="inline-block w-1.5 h-3.5 bg-sf-cyan skew-x-12 shrink-0" />
                 {p2Meta.name}
               </span>
               <div className="flex items-center gap-1.5 shrink-0">
@@ -445,7 +445,7 @@ export function ArenaView({
                     key={i}
                     className={`w-2.5 h-2.5 rotate-45 border ${
                       hud.p2Rounds > i
-                        ? 'bg-[#00d4ff] border-white'
+                        ? 'bg-sf-cyan border-white'
                         : 'bg-black/80 border-white/35'
                     }`}
                   />
@@ -454,16 +454,16 @@ export function ArenaView({
             </div>
 
             {/* Slanted P2 Vitality Bar with Trailing Red Drain */}
-            <div className="relative h-4 sm:h-5 w-full bg-[#06070b]/95 border-b-2 border-[#00d4ff]/60 sf-hp-p2 overflow-hidden shadow-[0_4px_14px_rgba(0,0,0,0.85)]">
+            <div className="relative h-4 sm:h-5 w-full bg-sf-ink/95 border-b-2 border-sf-cyan/60 sf-hp-p2 overflow-hidden shadow-[0_4px_14px_rgba(0,0,0,0.85)]">
               <div
-                className="ml-auto h-full bg-[#ff462e] transition-all duration-700 ease-out"
+                className="ml-auto h-full bg-sf-crimson transition-all duration-700 ease-out"
                 style={{ width: `${p2Pct}%` }}
               />
               <div
                 className={`absolute inset-y-0 right-0 transition-all duration-100 ${
                   p2Low
-                    ? 'bg-gradient-to-l from-red-600 via-[#ff462e] to-orange-400'
-                    : 'bg-gradient-to-l from-[#0284c7] via-[#00d4ff] to-[#a5f3fc]'
+                    ? 'bg-gradient-to-l from-red-600 via-sf-crimson to-orange-400'
+                    : 'bg-gradient-to-l from-[#0284c7] via-sf-cyan to-[#a5f3fc]'
                 }`}
                 style={{ width: `${p2Pct}%` }}
               />
@@ -471,9 +471,9 @@ export function ArenaView({
 
             {/* P2 Super Bar */}
             <div className="flex items-center flex-row-reverse gap-2 pl-3">
-              <div className="relative h-2 flex-1 bg-[#06070b]/95 border border-white/15 skew-x-12 overflow-hidden">
+              <div className="relative h-2 flex-1 bg-sf-ink/95 border border-white/15 skew-x-12 overflow-hidden">
                 <div
-                  className="ml-auto h-full bg-gradient-to-l from-[#9d4edd] to-[#00d4ff] transition-all duration-100"
+                  className="ml-auto h-full bg-gradient-to-l from-sf-purple to-sf-cyan transition-all duration-100"
                   style={{ width: `${hud.p2Energy}%` }}
                 />
                 <div className="pointer-events-none absolute inset-0 grid grid-cols-3">
@@ -484,7 +484,7 @@ export function ArenaView({
               </div>
               {hud.p2Stun > 5 && (
                 <div className="h-1.5 w-12 bg-black/90 border border-white/15 skew-x-12 overflow-hidden">
-                  <div className="ml-auto h-full bg-[#ffc815]" style={{ width: `${hud.p2Stun}%` }} />
+                  <div className="ml-auto h-full bg-sf-gold" style={{ width: `${hud.p2Stun}%` }} />
                 </div>
               )}
             </div>
@@ -512,8 +512,8 @@ export function ArenaView({
                 }}
                 className={`px-2.5 py-1 sf-chamfer-sm text-[10px] font-black uppercase border transition-colors ${
                   dummyMode === d.id
-                    ? 'bg-[#ffc815] text-black border-white'
-                    : 'bg-[#090b12]/90 text-slate-300 border-white/18 hover:border-[#ffc815]/50'
+                    ? 'bg-sf-gold text-black border-white'
+                    : 'bg-sf-ink/90 text-slate-300 border-white/18 hover:border-sf-gold/50'
                 }`}
               >
                 {d.label}
@@ -528,8 +528,8 @@ export function ArenaView({
               }}
               className={`px-2.5 py-1 sf-chamfer-sm text-[10px] font-black uppercase border flex items-center gap-1 transition-colors ${
                 showHitboxes
-                  ? 'bg-[#ff462e] text-white border-white/60'
-                  : 'bg-[#090b12]/90 text-slate-300 border-white/18 hover:border-[#ff462e]/60'
+                  ? 'bg-sf-crimson text-white border-white/60'
+                  : 'bg-sf-ink/90 text-slate-300 border-white/18 hover:border-sf-crimson/60'
               }`}
             >
               <Eye className="w-3 h-3" /> Hitbox
@@ -541,7 +541,7 @@ export function ArenaView({
       {/* Quote Speech Callout */}
       {hud.quoteText && (
         <div
-          className={`pointer-events-none absolute top-22 z-20 max-w-xs px-3.5 py-2 sf-chamfer-sm bg-[#090b12]/92 border-2 border-[#ffc815]/65 text-xs font-bold text-amber-100 sf-arcade-shadow ${
+          className={`pointer-events-none absolute top-22 z-20 max-w-xs px-3.5 py-2 sf-chamfer-sm bg-sf-ink/92 border-2 border-sf-gold/65 text-xs font-bold text-amber-100 sf-arcade-shadow ${
             hud.quoteSide === 'right' ? 'right-4 text-right' : 'left-4 text-left'
           }`}
         >
@@ -554,7 +554,7 @@ export function ArenaView({
         <div className="pointer-events-none absolute top-24 left-4 sm:left-8 z-20 text-left">
           {hud.p1Combo >= 2 && (
             <div className="animate-hit-pop flex items-baseline gap-2">
-              <span className="font-display italic text-5xl sm:text-6xl font-black text-[#ffc815] drop-shadow-[0_4px_0_rgba(0,0,0,0.95)] leading-none">
+              <span className="font-display italic text-5xl sm:text-6xl font-black text-sf-gold drop-shadow-[0_4px_0_rgba(0,0,0,0.95)] leading-none">
                 {hud.p1Combo}
               </span>
               <span className="font-display italic text-2xl font-black text-white uppercase tracking-wider drop-shadow-[0_3px_0_rgba(0,0,0,0.95)]">
@@ -563,7 +563,7 @@ export function ArenaView({
             </div>
           )}
           {hud.calloutText && (
-            <div className="mt-0.5 inline-block px-2.5 py-0.5 bg-[#ff462e] text-white font-display italic text-lg sm:text-xl font-black tracking-wider -skew-x-12 shadow-[3px_3px_0_rgba(0,0,0,0.9)]">
+            <div className="mt-0.5 inline-block px-2.5 py-0.5 bg-sf-crimson text-white font-display italic text-lg sm:text-xl font-black tracking-wider -skew-x-12 shadow-[3px_3px_0_rgba(0,0,0,0.9)]">
               {hud.calloutText}
             </div>
           )}
@@ -575,7 +575,7 @@ export function ArenaView({
         <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center p-4">
           <div
             key={hud.bannerText}
-            className="animate-hit-pop sf-chamfer-lg sf-speed-lines px-8 sm:px-12 py-4 bg-[#090b12]/92 border-y-4 border-[#ffc815] text-center shadow-[0_16px_48px_rgba(0,0,0,0.95)]"
+            className="animate-hit-pop sf-chamfer-lg sf-speed-lines px-8 sm:px-12 py-4 bg-sf-ink/92 border-y-4 border-sf-gold text-center shadow-[0_16px_48px_rgba(0,0,0,0.95)]"
           >
             <h2 className="font-display italic text-4xl sm:text-6xl font-black tracking-wider text-white drop-shadow-[0_4px_0_#ff462e]">
               {hud.bannerText}
@@ -618,10 +618,10 @@ export function ArenaView({
               <div className="space-y-2.5 max-h-68 overflow-y-auto pr-1 text-xs">
                 {(Object.values(p1Def.specialMoves) as Array<{ name: string; command: string; description: string }>).map(
                   (mv, i) => (
-                    <div key={i} className="p-3 sf-chamfer-sm bg-[#090b12] border border-white/12">
+                    <div key={i} className="p-3 sf-chamfer-sm bg-sf-ink border border-white/12">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="font-black text-[#ffc815]">{mv.name}</span>
-                        <span className="font-mono-num text-[10px] font-bold text-[#00d4ff] bg-black/70 px-2 py-0.5 sf-chamfer-sm border border-[#00d4ff]/30">
+                        <span className="font-black text-sf-gold">{mv.name}</span>
+                        <span className="font-mono-num text-[10px] font-bold text-sf-cyan bg-black/70 px-2 py-0.5 sf-chamfer-sm border border-sf-cyan/30">
                           {mv.command}
                         </span>
                       </div>
@@ -682,9 +682,9 @@ export function ArenaView({
 
   if (isPortraitLayout) {
     return (
-      <div className="w-full h-full flex flex-col bg-[#07080d] overflow-hidden">
+      <div className="w-full h-full flex flex-col bg-sf-bg overflow-hidden">
         {stageViewport}
-        <div className="h-[225px] shrink-0 bg-[#0b0d15] border-t-2 border-[#ffc815]/40">
+        <div className="h-[225px] shrink-0 bg-[#0b0d15] border-t-2 border-sf-gold/40">
           <CombatControls
             controlScheme={settings.controlScheme}
             keyBindings={settings.keyBindings}
@@ -710,6 +710,6 @@ export function ArenaView({
   }
 
   return (
-    <div className="w-full h-full flex flex-col overflow-hidden bg-[#0b0d14]">{stageViewport}</div>
+    <div className="w-full h-full flex flex-col overflow-hidden bg-sf-ink">{stageViewport}</div>
   );
 }

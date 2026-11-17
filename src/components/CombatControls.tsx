@@ -315,7 +315,7 @@ export function CombatControls({
       {/* Left: Clean 360 Arcade Stick */}
       <div className="pointer-events-auto flex flex-col items-start">
         <div
-          className="touch-control relative w-28 h-28 rounded-full bg-[#090b12]/80 border-2 border-[#ffc815]/45 flex items-center justify-center shadow-[0_8px_24px_rgba(0,0,0,0.8)]"
+          className="touch-control relative w-28 h-28 rounded-full bg-sf-ink/80 border-2 border-sf-gold/45 flex items-center justify-center shadow-[0_8px_24px_rgba(0,0,0,0.8)]"
           onPointerDown={(e) => {
             const rect = e.currentTarget.getBoundingClientRect();
             stickOriginRef.current = {
@@ -363,7 +363,7 @@ export function CombatControls({
           />
           <div
             ref={stickKnobRef}
-            className="w-12 h-12 rounded-full bg-gradient-to-b from-[#ffc815] to-[#ff8c00] border-2 border-white shadow-[0_4px_14px_rgba(255,200,21,0.45)] transition-transform duration-75"
+            className="w-12 h-12 rounded-full bg-gradient-to-b from-sf-gold to-sf-amber border-2 border-white shadow-[0_4px_14px_rgba(255,200,21,0.45)] transition-transform duration-75"
           />
         </div>
       </div>
@@ -399,7 +399,7 @@ export function CombatControls({
             onPointerDown={() => setTouchAction('finisher', true)}
             onPointerUp={() => setTouchAction('finisher', false)}
             onPointerCancel={() => setTouchAction('finisher', false)}
-            className="touch-control px-4 py-1.5 sf-chamfer-sm bg-gradient-to-r from-[#ff462e] to-red-700 border border-[#ffc815] text-white text-[11px] font-black tracking-wide shadow-[0_4px_18px_rgba(255,70,46,0.55)] active:scale-95 animate-hit-pop"
+            className="touch-control px-4 py-1.5 sf-chamfer-sm bg-gradient-to-r from-sf-crimson to-red-700 border border-sf-gold text-white text-[11px] font-black tracking-wide shadow-[0_4px_18px_rgba(255,70,46,0.55)] active:scale-95 animate-hit-pop"
           >
             FINAL: {finisherName.split(' ')[0]}
           </button>
@@ -409,7 +409,7 @@ export function CombatControls({
             onPointerDown={() => setTouchAction('powerMove', true)}
             onPointerUp={() => setTouchAction('powerMove', false)}
             onPointerCancel={() => setTouchAction('powerMove', false)}
-            className="touch-control px-4 py-1.5 sf-chamfer-sm bg-gradient-to-r from-[#ffc815] to-[#ff8800] border border-white text-black text-[11px] font-black tracking-wide shadow-[0_4px_16px_rgba(255,200,21,0.45)] active:scale-95 animate-hit-pop"
+            className="touch-control px-4 py-1.5 sf-chamfer-sm bg-gradient-to-r from-sf-gold to-sf-amber border border-white text-black text-[11px] font-black tracking-wide shadow-[0_4px_16px_rgba(255,200,21,0.45)] active:scale-95 animate-hit-pop"
           >
             {powerName.toUpperCase()}
           </button>
@@ -458,7 +458,7 @@ export function CombatControls({
               setTouchAction('block', false);
               setTouchAction('parry', false);
             }}
-            className="touch-control w-16 h-14 sf-chamfer-sm bg-[#09324a]/95 border border-[#00d4ff]/70 text-[11px] font-black text-[#00d4ff] active:scale-90"
+            className="touch-control w-16 h-14 sf-chamfer-sm bg-[#09324a]/95 border border-sf-cyan/70 text-[11px] font-black text-sf-cyan active:scale-90"
           >
             DEFESA
           </button>
@@ -478,7 +478,7 @@ export function CombatControls({
             onPointerDown={() => setTouchAction('punchLight', true)}
             onPointerUp={() => setTouchAction('punchLight', false)}
             onPointerCancel={() => setTouchAction('punchLight', false)}
-            className="touch-control w-18 h-16 sf-chamfer-sm bg-gradient-to-br from-[#ffc815] to-[#ff8c00] border-2 border-white text-black font-display italic text-sm font-black shadow-lg active:scale-90"
+            className="touch-control w-18 h-16 sf-chamfer-sm bg-gradient-to-br from-sf-gold to-sf-amber border-2 border-white text-black font-display italic text-sm font-black shadow-lg active:scale-90"
           >
             SOCO
           </button>
@@ -496,14 +496,14 @@ export function CombatControls({
       {showTouch ? (
         touchButtonDeck
       ) : (
-        <div className="mx-auto mb-3 px-4 py-1.5 sf-chamfer-sm bg-[#090b12]/90 border border-white/18 text-[11px] text-slate-200 flex items-center gap-3 shadow-lg">
+        <div className="mx-auto mb-3 px-4 py-1.5 sf-chamfer-sm bg-sf-ink/90 border border-white/18 text-[11px] text-slate-200 flex items-center gap-3 shadow-lg">
           {activeMethod === 'xbox' ? (
             <span>
-              <strong className="text-[#ffc815]">CONTROLE:</strong> LS Mover/Pular · X/Y Soco · A/RT Chute · B Defesa · LB Esquiva Boxe (→+LB Agarrar) · RB Super
+              <strong className="text-sf-gold">CONTROLE:</strong> LS Mover/Pular · X/Y Soco · A/RT Chute · B Defesa · LB Esquiva Boxe (→+LB Agarrar) · RB Super
             </span>
           ) : (
             <span>
-              <strong className="text-[#ffc815]">TECLADO:</strong> {formatKeyShort(keyBindings.left)}/{formatKeyShort(keyBindings.right)} Mover ·{' '}
+              <strong className="text-sf-gold">TECLADO:</strong> {formatKeyShort(keyBindings.left)}/{formatKeyShort(keyBindings.right)} Mover ·{' '}
               {formatKeyShort(keyBindings.up)} Pular · {formatKeyShort(keyBindings.down)} Agachar ·{' '}
               {formatKeyShort(keyBindings.punchLight)}/{formatKeyShort(keyBindings.punchHeavy)} Soco ·{' '}
               {formatKeyShort(keyBindings.kickLight)}/{formatKeyShort(keyBindings.kickHeavy)} Chute ·{' '}

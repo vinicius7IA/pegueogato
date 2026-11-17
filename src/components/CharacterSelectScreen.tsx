@@ -125,13 +125,13 @@ export function CharacterSelectScreen({
   };
 
   return (
-    <div className="w-full h-full overflow-y-auto bg-[#07080d] text-slate-100 flex flex-col sf-halftone-bg">
+    <div className="w-full h-full overflow-y-auto bg-sf-bg text-slate-100 flex flex-col sf-halftone-bg">
       <ScreenHeader
         title="SELEÇÃO DE LUTADORES"
         subtitle={`${FIGHTERS_LIST.length}/${FIGHTER_ROSTER_CAPACITY} lutadores disponíveis`}
         onBack={onBack}
         centerSlot={
-          <div className="px-3.5 py-1 sf-chamfer-sm bg-[#090b12] border border-[#ffc815]/50 font-mono-num text-base font-black text-[#ffc815]">
+          <div className="px-3.5 py-1 sf-chamfer-sm bg-sf-ink border border-sf-gold/50 font-mono-num text-base font-black text-sf-gold">
             {String(countdown).padStart(2, '0')}s
           </div>
         }
@@ -163,7 +163,7 @@ export function CharacterSelectScreen({
             <StreetPanel
               tone={slotTab === 'p1' ? 'gold' : 'neutral'}
               chamfer="md"
-              className="h-full p-4 flex flex-col justify-between gap-3 bg-gradient-to-br from-[#ffc815]/14 via-[#10131c] to-[#090b11]"
+              className="h-full p-4 flex flex-col justify-between gap-3 bg-gradient-to-br from-sf-gold/14 via-sf-surface to-sf-ink"
             >
               <div className="flex items-center gap-3.5">
                 {p1Meta.showPortraitPhoto && FIGHTERS[p1Fighter].portraitUrl ? (
@@ -171,7 +171,7 @@ export function CharacterSelectScreen({
                     src={FIGHTERS[p1Fighter].portraitUrl}
                     alt={p1Meta.name}
                     referrerPolicy="no-referrer"
-                    className="w-20 h-24 sf-chamfer-sm object-cover object-top border border-[#ffc815]/60 shrink-0"
+                    className="w-20 h-24 sf-chamfer-sm object-cover object-top border border-sf-gold/60 shrink-0"
                   />
                 ) : (
                   <div
@@ -182,7 +182,7 @@ export function CharacterSelectScreen({
                   </div>
                 )}
                 <div className="min-w-0">
-                  <div className="text-[11px] font-black tracking-widest text-[#ffc815]">
+                  <div className="text-[11px] font-black tracking-widest text-sf-gold">
                     JOGADOR 1
                   </div>
                   <div className="font-display italic text-2xl sm:text-3xl font-black text-white leading-none truncate mt-0.5">
@@ -203,7 +203,7 @@ export function CharacterSelectScreen({
           <StreetPanel
             tone={slotTab === 'p1' ? 'gold' : 'cyan'}
             chamfer="lg"
-            className="relative h-64 lg:h-68 bg-[#090b11]"
+            className="relative h-64 lg:h-68 bg-sf-ink"
           >
             <img
               src={salvadorBackdrop}
@@ -222,14 +222,14 @@ export function CharacterSelectScreen({
               <button
                 type="button"
                 onClick={cycleActiveSkin}
-                className="flex items-center gap-1 text-[11px] font-black uppercase text-[#ffc815] bg-black/80 border border-[#ffc815]/45 px-2.5 py-1 sf-chamfer-sm hover:bg-black transition-colors"
+                className="flex items-center gap-1 text-[11px] font-black uppercase text-sf-gold bg-black/80 border border-sf-gold/45 px-2.5 py-1 sf-chamfer-sm hover:bg-black transition-colors"
               >
                 Trocar Skin
               </button>
               <button
                 type="button"
                 onClick={cycleActivePower}
-                className="flex items-center gap-1 text-[11px] font-black uppercase text-[#00d4ff] bg-black/80 border border-[#00d4ff]/45 px-2.5 py-1 sf-chamfer-sm hover:bg-black transition-colors"
+                className="flex items-center gap-1 text-[11px] font-black uppercase text-sf-cyan bg-black/80 border border-sf-cyan/45 px-2.5 py-1 sf-chamfer-sm hover:bg-black transition-colors"
               >
                 <Sparkles className="w-3 h-3" /> {POWERS[activePower].shortName}
               </button>
@@ -242,9 +242,9 @@ export function CharacterSelectScreen({
                   gameAudio.playClick();
                   onOpenInventory();
                 }}
-                className="flex items-center gap-1 text-[11px] font-bold text-white bg-black/80 border border-white/22 px-2.5 py-1 sf-chamfer-sm hover:border-[#ffc815]"
+                className="flex items-center gap-1 text-[11px] font-bold text-white bg-black/80 border border-white/22 px-2.5 py-1 sf-chamfer-sm hover:border-sf-gold"
               >
-                <Package className="w-3 h-3 text-[#ffc815]" /> Inventário
+                <Package className="w-3 h-3 text-sf-gold" /> Inventário
               </button>
               <span className="hidden sm:flex items-center gap-1 text-[10px] font-bold text-slate-300 bg-black/70 px-2 py-1 sf-chamfer-sm pointer-events-none">
                 <RotateCw className="w-3 h-3" /> 3D
@@ -253,7 +253,7 @@ export function CharacterSelectScreen({
 
             <div className="absolute bottom-3 left-3.5 right-3.5 flex items-end justify-between gap-2 pointer-events-none z-10">
               <div className="min-w-0">
-                <div className="text-[11px] font-bold text-[#ffc815] truncate">
+                <div className="text-[11px] font-bold text-sf-gold truncate">
                   {slotTab === 'p1' ? 'Editando P1' : 'Editando Rival'} · Maestria Nv.{mastery.level} ·{' '}
                   {activeDef.masteryTitles[mastery.titleIdx]}
                 </div>
@@ -261,7 +261,7 @@ export function CharacterSelectScreen({
                   {activeMeta.name}
                 </div>
               </div>
-              <div className="px-3 py-1 sf-chamfer-sm bg-gradient-to-br from-[#ff462e] to-[#ffc815] text-black font-display italic text-2xl font-black shrink-0 shadow-lg">
+              <div className="px-3 py-1 sf-chamfer-sm bg-gradient-to-br from-sf-crimson to-sf-gold text-black font-display italic text-2xl font-black shrink-0 shadow-lg">
                 VS
               </div>
             </div>
@@ -278,7 +278,7 @@ export function CharacterSelectScreen({
             <StreetPanel
               tone={slotTab === 'p2' ? 'cyan' : 'neutral'}
               chamfer="md"
-              className="h-full p-4 flex flex-col justify-between gap-3 bg-gradient-to-bl from-[#00d4ff]/14 via-[#10131c] to-[#090b11]"
+              className="h-full p-4 flex flex-col justify-between gap-3 bg-gradient-to-bl from-sf-cyan/14 via-sf-surface to-sf-ink"
             >
               <div className="flex items-center flex-row-reverse text-right gap-3.5">
                 {p2Meta.showPortraitPhoto && FIGHTERS[p2Fighter].portraitUrl ? (
@@ -286,7 +286,7 @@ export function CharacterSelectScreen({
                     src={FIGHTERS[p2Fighter].portraitUrl}
                     alt={p2Meta.name}
                     referrerPolicy="no-referrer"
-                    className="w-20 h-24 sf-chamfer-sm object-cover object-top border border-[#00d4ff]/60 shrink-0"
+                    className="w-20 h-24 sf-chamfer-sm object-cover object-top border border-sf-cyan/60 shrink-0"
                   />
                 ) : (
                   <div
@@ -297,7 +297,7 @@ export function CharacterSelectScreen({
                   </div>
                 )}
                 <div className="min-w-0">
-                  <div className="text-[11px] font-black tracking-widest text-[#00d4ff]">
+                  <div className="text-[11px] font-black tracking-widest text-sf-cyan">
                     DESAFIANTE (P2)
                   </div>
                   <div className="font-display italic text-2xl sm:text-3xl font-black text-white leading-none truncate mt-0.5">
@@ -338,25 +338,25 @@ export function CharacterSelectScreen({
                     if (slotTab === 'p1') onSelectP1(id);
                     else onSelectP2(id);
                   }}
-                  className={`group relative sf-chamfer-sm border-2 overflow-hidden text-center transition-all duration-150 focus-visible:outline-2 focus-visible:outline-[#ffc815] active:scale-95 ${
+                  className={`group relative sf-chamfer-sm border-2 overflow-hidden text-center transition-all duration-150 focus-visible:outline-2 focus-visible:outline-sf-gold active:scale-95 ${
                     isP1 && isP2
-                      ? 'border-[#ff462e] bg-[#1a1524] shadow-md'
+                      ? 'border-sf-crimson bg-[#1a1524] shadow-md'
                       : isP1
-                        ? 'border-[#ffc815] bg-[#1b1a14] shadow-md'
+                        ? 'border-sf-gold bg-[#1b1a14] shadow-md'
                         : isP2
-                          ? 'border-[#00d4ff] bg-[#101c24] shadow-md'
-                          : 'border-white/14 bg-[#10131c] hover:border-white/40'
+                          ? 'border-sf-cyan bg-[#101c24] shadow-md'
+                          : 'border-white/14 bg-sf-surface hover:border-white/40'
                   } ${!unlocked ? 'opacity-35 grayscale cursor-not-allowed' : ''}`}
                 >
                   {(isP1 || isP2) && (
                     <div className="absolute top-1 left-1 right-1 flex justify-between pointer-events-none z-10 font-mono-num">
                       {isP1 && (
-                        <span className="px-1.5 py-0.5 bg-[#ffc815] text-black text-[9px] font-black leading-none">
+                        <span className="px-1.5 py-0.5 bg-sf-gold text-black text-[9px] font-black leading-none">
                           P1
                         </span>
                       )}
                       {isP2 && (
-                        <span className="ml-auto px-1.5 py-0.5 bg-[#00d4ff] text-black text-[9px] font-black leading-none">
+                        <span className="ml-auto px-1.5 py-0.5 bg-sf-cyan text-black text-[9px] font-black leading-none">
                           P2
                         </span>
                       )}
@@ -377,7 +377,7 @@ export function CharacterSelectScreen({
                       {meta.name.slice(0, 2)}
                     </div>
                   )}
-                  <div className="py-1.5 px-1 text-[11px] font-extrabold truncate bg-[#090b11] text-white border-t border-white/10">
+                  <div className="py-1.5 px-1 text-[11px] font-extrabold truncate bg-sf-ink text-white border-t border-white/10">
                     {meta.name.replace('O ', '')}
                   </div>
                 </button>
@@ -388,7 +388,7 @@ export function CharacterSelectScreen({
             <button
               type="button"
               onClick={handleRandomPick}
-              className="sf-chamfer-sm border-2 border-dashed border-[#ffc815]/55 bg-[#10131c] hover:bg-[#181d2c] hover:border-[#ffc815] flex flex-col items-center justify-center p-2 gap-1.5 text-[#ffc815] transition-colors focus-visible:outline-2 focus-visible:outline-[#ffc815] active:scale-95"
+              className="sf-chamfer-sm border-2 border-dashed border-sf-gold/55 bg-sf-surface hover:bg-[#181d2c] hover:border-sf-gold flex flex-col items-center justify-center p-2 gap-1.5 text-sf-gold transition-colors focus-visible:outline-2 focus-visible:outline-sf-gold active:scale-95"
             >
               <Shuffle className="w-5 h-5" />
               <span className="font-display italic text-sm font-black tracking-wide">
@@ -413,22 +413,22 @@ export function CharacterSelectScreen({
 
           <StreetPanel chamfer="md" className="p-4 flex flex-col justify-between gap-3">
             <div className="flex items-center justify-between gap-2 text-xs">
-              <span className="font-display italic text-lg font-black text-[#ffc815] tracking-wide">
+              <span className="font-display italic text-lg font-black text-sf-gold tracking-wide">
                 GOLPES ASSINATURA
               </span>
               <span className="text-slate-400 font-semibold truncate">{activeDef.style}</span>
             </div>
             <div className="grid grid-cols-2 gap-2.5 text-xs">
-              <div className="p-3 sf-chamfer-sm bg-[#090b11] border border-white/10">
+              <div className="p-3 sf-chamfer-sm bg-sf-ink border border-white/10">
                 <div className="font-black text-white truncate">
                   {activeDef.specialMoves.special_1.name}
                 </div>
-                <div className="text-[#00d4ff] font-mono-num text-[11px] font-bold mt-1">
+                <div className="text-sf-cyan font-mono-num text-[11px] font-bold mt-1">
                   {activeDef.specialMoves.special_1.command}
                 </div>
               </div>
-              <div className="p-3 sf-chamfer-sm bg-[#090b11] border border-[#ff462e]/35">
-                <div className="font-black text-[#ff462e] truncate">{activeDef.finisherName}</div>
+              <div className="p-3 sf-chamfer-sm bg-sf-ink border border-sf-crimson/35">
+                <div className="font-black text-sf-crimson truncate">{activeDef.finisherName}</div>
                 <div className="text-slate-300 font-mono-num text-[11px] font-bold mt-1">
                   100% Energia
                 </div>
@@ -457,7 +457,7 @@ export function CharacterSelectScreen({
               onOpenStageSelect();
             }}
           >
-            <MapPin className="w-4 h-4 text-[#ffc815]" />
+            <MapPin className="w-4 h-4 text-sf-gold" />
             Arena: {ARENAS[arenaId].shortName}
           </ActionButton>
 

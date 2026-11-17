@@ -1,10 +1,26 @@
 @import "tailwindcss";
 
+/* Design tokens -> utilitários Tailwind (bg-sf-gold, text-sf-cyan, border-sf-crimson/45...) */
+@theme {
+  --color-sf-bg: #07080d;
+  --color-sf-ink: #090b11;
+  --color-sf-surface: #10131c;
+  --color-sf-raised: #171c29;
+  --color-sf-gold: #ffc815;
+  --color-sf-amber: #ff8c00;
+  --color-sf-orange: #ff5520;
+  --color-sf-crimson: #ff462e;
+  --color-sf-cyan: #00d4ff;
+  --color-sf-purple: #9d4edd;
+  --color-sf-violet: #c084fc;
+  --font-display: 'Barlow Condensed', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --min-touch: 44px;
+}
+
 @layer base {
   :root {
-    --font-display: 'Barlow Condensed', sans-serif;
     --font-sans: 'Plus Jakarta Sans', sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
 
     /* Street Fighter Inspired AAA Fighting Design Tokens */
     --sf-bg: #07080d;

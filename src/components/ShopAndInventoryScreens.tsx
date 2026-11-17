@@ -49,7 +49,7 @@ export function ShopScreen({
   };
 
   return (
-    <div className="w-full h-full overflow-y-auto bg-[#07080d] text-slate-100 flex flex-col sf-halftone-bg">
+    <div className="w-full h-full overflow-y-auto bg-sf-bg text-slate-100 flex flex-col sf-halftone-bg">
       <ScreenHeader
         title="LOJA DA ARENA"
         subtitle="Desbloqueie lutadores, trajes especiais e poderes de Salvador"
@@ -86,7 +86,7 @@ export function ShopScreen({
                   className="p-5 flex flex-col justify-between gap-4"
                 >
                   <div>
-                    <div className="text-[11px] font-black uppercase tracking-wider text-[#ffc815]">
+                    <div className="text-[11px] font-black uppercase tracking-wider text-sf-gold">
                       {b.badge}
                     </div>
                     <h3 className="font-display italic text-2xl font-black text-white mt-0.5">
@@ -94,11 +94,11 @@ export function ShopScreen({
                     </h3>
                     <p className="text-xs text-slate-400 mt-1.5">{b.description}</p>
                     <div className="flex items-center gap-3 mt-3 font-mono-num text-xs font-bold">
-                      <span className="text-[#ffc815]">+{b.coins.toLocaleString('pt-BR')} Moedas</span>
+                      <span className="text-sf-gold">+{b.coins.toLocaleString('pt-BR')} Moedas</span>
                       <span aria-hidden="true" className="text-white/20">
                         ·
                       </span>
-                      <span className="text-[#00d4ff]">+{b.diamonds} Diamantes</span>
+                      <span className="text-sf-cyan">+{b.diamonds} Diamantes</span>
                     </div>
                   </div>
                   <ActionButton
@@ -196,7 +196,7 @@ export function ShopScreen({
                   className="p-4 flex items-center justify-between gap-3"
                 >
                   <div className="min-w-0">
-                    <div className="text-[11px] font-black uppercase tracking-wider text-[#ffc815]">
+                    <div className="text-[11px] font-black uppercase tracking-wider text-sf-gold">
                       {fMeta.name}
                     </div>
                     <h3 className="font-display italic text-xl font-black text-white truncate">
@@ -284,7 +284,7 @@ export function ShopScreen({
       {pendingPack && (
         <ModalFrame tone="gold" maxWidthClass="max-w-xs">
           <div className="text-center space-y-2">
-            <div className="text-[11px] font-black tracking-widest text-[#ffc815] uppercase">
+            <div className="text-[11px] font-black tracking-widest text-sf-gold uppercase">
               Compra Simulada
             </div>
             <h3 className="font-display italic text-3xl font-black text-white">
@@ -339,7 +339,7 @@ export function InventoryScreen({
   const skinsForFighter = SKINS.filter((s) => s.fighterId === activeFighter);
 
   return (
-    <div className="w-full h-full overflow-y-auto bg-[#07080d] text-slate-100 flex flex-col sf-halftone-bg">
+    <div className="w-full h-full overflow-y-auto bg-sf-bg text-slate-100 flex flex-col sf-halftone-bg">
       <ScreenHeader
         title="INVENTÁRIO"
         subtitle="Personalize trajes e poderes de combate em 3D"
@@ -367,7 +367,7 @@ export function InventoryScreen({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-          <StreetPanel tone="gold" chamfer="lg" className="h-72 md:h-84 bg-[#090b11]">
+          <StreetPanel tone="gold" chamfer="lg" className="h-72 md:h-84 bg-sf-ink">
             <FighterPreview3D
               fighterId={activeFighter}
               skinId={equippedSkin}
@@ -395,15 +395,15 @@ export function InventoryScreen({
                     }}
                     className={`w-full p-3.5 sf-chamfer-sm border text-left flex items-center justify-between transition-colors ${
                       equipped
-                        ? 'bg-[#ffc815]/15 border-[#ffc815]'
+                        ? 'bg-sf-gold/15 border-sf-gold'
                         : unlocked
-                          ? 'bg-[#10131c] border-white/12 hover:border-white/35'
-                          : 'bg-[#090b11] border-white/6 opacity-45 cursor-not-allowed'
+                          ? 'bg-sf-surface border-white/12 hover:border-white/35'
+                          : 'bg-sf-ink border-white/6 opacity-45 cursor-not-allowed'
                     }`}
                   >
                     <span className="font-extrabold text-sm text-white">{sk.name}</span>
                     {equipped ? (
-                      <span className="text-xs font-black text-[#ffc815] uppercase">Equipada</span>
+                      <span className="text-xs font-black text-sf-gold uppercase">Equipada</span>
                     ) : !unlocked ? (
                       <Lock className="w-3.5 h-3.5 text-slate-500" />
                     ) : null}
@@ -414,7 +414,7 @@ export function InventoryScreen({
 
             <div className="space-y-2">
               <h2 className="text-xs font-black tracking-wider text-slate-400 uppercase flex items-center gap-1.5">
-                <Shield className="w-3.5 h-3.5 text-[#00d4ff]" /> Poderes Desbloqueados
+                <Shield className="w-3.5 h-3.5 text-sf-cyan" /> Poderes Desbloqueados
               </h2>
               {profile.unlockedPowers.map((pid) => {
                 const pw = POWERS[pid];
@@ -429,13 +429,13 @@ export function InventoryScreen({
                     }}
                     className={`w-full p-3.5 sf-chamfer-sm border text-left flex items-center justify-between transition-colors ${
                       equipped
-                        ? 'bg-[#ff462e]/18 border-[#ff5520]'
-                        : 'bg-[#10131c] border-white/12 hover:border-white/35'
+                        ? 'bg-sf-crimson/18 border-sf-orange'
+                        : 'bg-sf-surface border-white/12 hover:border-white/35'
                     }`}
                   >
                     <span className="font-extrabold text-sm text-white">{pw.name}</span>
                     {equipped && (
-                      <span className="text-xs font-black text-[#ff5520] uppercase">Equipado</span>
+                      <span className="text-xs font-black text-sf-orange uppercase">Equipado</span>
                     )}
                   </button>
                 );
