@@ -164,7 +164,7 @@ export function ResultScreen({
                 onNextArcadeStage();
               }}
             >
-              PRÓXIMA FASE ARCADE ({(summary.arcadeStage || 1) + 1}/{ARCADE_LADDER.length})
+              PRÓXIMA LUTA ({(summary.arcadeStage || 1) + 1}/{ARCADE_LADDER.length})
             </ActionButton>
           )}
 

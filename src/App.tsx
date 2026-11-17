@@ -19,8 +19,11 @@ import { motion } from 'motion/react';
 import { Component, type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import salvadorBackdrop from './assets/images/salvador_arena_cinematic_1794790674658.jpg';
 import { ArenaView } from './components/ArenaView';
-import { CharacterSelectScreen } from './components/CharacterSelectScreen';
+import { CharacterSelectScreen, type SelectFlow } from './components/CharacterSelectScreen';
 import { FighterPreview3D } from './components/FighterPreview3D';
+import { MainMenu, type MenuOption } from './components/MainMenu';
+import { CreditsScreen } from './components/CreditsScreen';
+import { BracketScreen } from './components/BracketScreen';
 import { MultiplayerScreen } from './components/MultiplayerScreen';
 import {
   ProfileScreen,
@@ -34,6 +37,7 @@ import { gameAudio } from './game/audio';
 import {
   ACHIEVEMENTS,
   ARCADE_LADDER,
+  TOURNAMENT_LADDER,
   isPlayableFighter,
   ARENAS,
   FIGHTERS,
@@ -121,6 +125,9 @@ function AppShell() {
   const [p2Fighter, setP2Fighter] = useState<FighterId>('maluco');
   const [arenaId, setArenaId] = useState<ArenaId>('farol_barra');
   const [matchMode, setMatchMode] = useState<MatchMode>('vs_ai');
+  /** Modo escolhido no menu: define o fluxo da seleção e da partida. */
+  const [flow, setFlow] = useState<SelectFlow>('arcade');
+  const ladder = flow === 'torneio' ? TOURNAMENT_LADDER : ARCADE_LADDER;
   const [aiDifficulty, setAiDifficulty] = useState<AiDifficulty>(settings.aiDifficulty);
   const [arcadeStage, setArcadeStage] = useState<number>(1);
   const [p2Nickname, setP2Nickname] = useState<string>('IA de Salvador');
@@ -470,15 +477,45 @@ function AppShell() {
   };
 
   const launchArcadeStage = (stageNum: number) => {
-    const ladderStage = ARCADE_LADDER[Math.max(0, Math.min(ARCADE_LADDER.length - 1, stageNum - 1))];
+    const ladderStage = ladder[Math.max(0, Math.min(ladder.length - 1, stageNum - 1))];
     setArcadeStage(ladderStage.stage);
     setMatchMode('arcade');
     setP2Fighter(ladderStage.opponentId);
     setArenaId(ladderStage.arenaId);
     setAiDifficulty(ladderStage.difficulty);
     setOnlineLoadout(null);
-    setP2Nickname(`Arcade ${ladderStage.stage}/4`);
+    setP2Nickname(flow === 'torneio' ? ladderStage.title.split(' · ')[1] : `Arcade ${ladderStage.stage}/${ladder.length}`);
     setScreen('arena');
+  };
+
+  const handleMenuSelect = (opt: MenuOption) => {
+    gameAudio.unlockAudio();
+    if (opt === 'config') {
+      setScreen('settings');
+      return;
+    }
+    if (opt === 'creditos') {
+      setScreen('credits');
+      return;
+    }
+    setFlow(opt);
+    setScreen('select');
+  };
+
+  /** Arcade começa direto; Torneio passa pela chave antes de cada luta. */
+  const startLadder = () => {
+    if (flow === 'torneio') {
+      setArcadeStage(1);
+      setScreen('bracket');
+    } else {
+      launchArcadeStage(1);
+    }
+  };
+
+  const launchFromStageSelect = () => {
+    if (flow === 'versus') launchQuickFight('local_2p');
+    else if (flow === 'treino') launchQuickFight('training');
+    else launchQuickFight('vs_ai', aiDifficulty);
   };
 
   const launchQuickFight = (mode: MatchMode, diff: AiDifficulty = settings.aiDifficulty) => {
@@ -561,7 +598,7 @@ function AppShell() {
               SALVADOR · BAHIA · LIGA DE RUA 3D
             </div>
             <h1 className="font-display italic text-6xl sm:text-8xl font-black tracking-wide text-white drop-shadow-[0_6px_0_#ff462e]">
-              BAHIA STREET
+              BAHIA STRETAT
             </h1>
             <p className="text-xs sm:text-sm font-medium text-slate-200 max-w-md mx-auto">
               Luta de rua baiana em tempo real com 8 lutadores e 10 arenas de Salvador.
@@ -601,7 +638,7 @@ function AppShell() {
                     Registro de Lutador
                   </div>
                   <h1 className="font-display italic text-5xl font-black text-white drop-shadow-[0_3px_0_#ff462e]">
-                    BAHIA STREET
+                    BAHIA STRETAT
                   </h1>
                   <p className="text-xs text-slate-400">
                     Escolha seu apelido para o ranking de Salvador e salas online.
@@ -740,7 +777,9 @@ function AppShell() {
               equippedPowers: { ...prev.equippedPowers, [fid]: pid },
             }))
           }
+          flow={flow}
           onOpenStageSelect={() => setScreen('stage_select')}
+          onStartLadder={startLadder}
           onStartFight={(mode, diff) => {
             launchQuickFight(mode, diff);
           }}
@@ -758,7 +797,7 @@ function AppShell() {
         <StageSelectScreen
           selectedArenaId={arenaId}
           onSelectArena={setArenaId}
-          onConfirmFight={() => launchQuickFight('vs_ai', aiDifficulty)}
+          onConfirmFight={launchFromStageSelect}
           onBack={() => setScreen('select')}
         />
       );
@@ -855,10 +894,35 @@ function AppShell() {
             lastResult.mode === 'arcade' &&
             lastResult.winner === 'p1' &&
             (lastResult.arcadeStage || 1) < ARCADE_LADDER.length
-              ? () => launchArcadeStage((lastResult.arcadeStage || 1) + 1)
+              ? () => {
+                  const next = (lastResult.arcadeStage || 1) + 1;
+                  if (flow === 'torneio') {
+                    setArcadeStage(next);
+                    setScreen('bracket');
+                  } else {
+                    launchArcadeStage(next);
+                  }
+                }
               : undefined
           }
           onBackToMenu={() => setScreen('menu')}
+        />
+      );
+    }
+
+    if (screen === 'credits') {
+      return <CreditsScreen onBack={() => setScreen('menu')} />;
+    }
+
+    if (screen === 'bracket') {
+      return (
+        <BracketScreen
+          ladder={TOURNAMENT_LADDER}
+          currentStage={arcadeStage}
+          p1Fighter={p1Fighter}
+          p1Name={profile.nickname}
+          onFight={() => launchArcadeStage(arcadeStage)}
+          onBack={() => setScreen('menu')}
         />
       );
     }
@@ -891,316 +955,14 @@ function AppShell() {
       );
     }
 
-    // Tela 1 — Menu Principal (Street Fighter Fighting Ground Hub: Paisagem Widescreen ou Retrato Mobile)
+    // Menu principal BAHIA STRETAT
     return (
-      <div className="relative w-full h-full flex flex-col bg-sf-bg overflow-hidden sf-halftone-bg">
-        <img
-          src={salvadorBackdrop}
-          alt="Fundo Pelourinho Salvador"
-          referrerPolicy="no-referrer"
-          className="absolute inset-0 w-full h-full object-cover opacity-38 pointer-events-none"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-sf-bg/82 via-sf-bg/52 to-sf-bg/96 pointer-events-none" />
-
-        <header className="relative z-10 flex items-center justify-between gap-4 px-4 sm:px-6 py-3 border-b border-white/12 bg-[#080a10]/92 shrink-0 sf-speed-lines">
-          <div className="leading-none min-w-0">
-            <span className="font-display italic text-2xl sm:text-3xl font-black tracking-wide text-white drop-shadow-[0_2px_0_#ff462e] whitespace-nowrap">
-              BAHIA STREET
-            </span>
-          </div>
-
-          <CurrencyStrip coins={profile.coins} diamonds={profile.diamonds} />
-
-          <div className="flex items-center gap-2 shrink-0">
-            <ActionButton
-              variant="steel"
-              size="sm"
-              aria-label="Perfil"
-              onClick={() => {
-                gameAudio.playClick();
-                setScreen('profile');
-              }}
-            >
-              <User className="w-3.5 h-3.5 text-sf-gold" />
-              <span className="hidden sm:inline">{profile.nickname}</span>
-              {readyDailyCount > 0 && (
-                <span className="text-[10px] font-mono-num font-black text-emerald-400">
-                  +{readyDailyCount}
-                </span>
-              )}
-            </ActionButton>
-            <ActionButton
-              variant="steel"
-              size="sm"
-              aria-label="Configurações"
-              onClick={() => {
-                gameAudio.playClick();
-                setScreen('settings');
-              }}
-            >
-              <Settings className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Ajustes</span>
-            </ActionButton>
-          </div>
-        </header>
-
-        {/* Corpo principal adaptável: 3 colunas em Paisagem/Desktop, empilhado em Retrato */}
-        <div
-          className={`relative z-10 flex-1 min-h-0 p-3 sm:p-5 flex ${
-            isPortraitLayout
-              ? 'flex-col justify-between gap-3'
-              : 'flex-col lg:grid lg:grid-cols-[1fr_minmax(340px,400px)_1fr] lg:items-stretch gap-4'
-          }`}
-        >
-          {/* Preview P1 (Esquerda no Desktop/Paisagem; dupla superior no Retrato) */}
-          <div
-            className={
-              isPortraitLayout
-                ? 'grid grid-cols-2 gap-2.5 flex-1 min-h-0'
-                : 'contents'
-            }
-          >
-            <StreetPanel
-              tone="gold"
-              chamfer="lg"
-              className="relative bg-gradient-to-b from-black/40 to-black/90 min-h-[185px]"
-            >
-              <FighterPreview3D
-                fighterId={p1Fighter}
-                skinId={profile.equippedSkins[p1Fighter] || FIGHTERS[p1Fighter].defaultSkinId}
-                authorizationMode={settings.authorizationMode}
-                autoRotate
-              />
-              <span className="absolute top-3 left-3 text-[10px] font-black tracking-wider text-black bg-sf-gold px-2.5 py-0.5 sf-chamfer-sm pointer-events-none">
-                P1 · VOCÊ
-              </span>
-              <button
-                type="button"
-                aria-label="Lutador P1 anterior"
-                onClick={() => cycleFighter('p1', -1)}
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 p-2 sf-chamfer-sm bg-black/75 border border-white/20 text-white hover:border-sf-gold hover:text-sf-gold transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                aria-label="Próximo lutador P1"
-                onClick={() => cycleFighter('p1', 1)}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 sf-chamfer-sm bg-black/75 border border-white/20 text-white hover:border-sf-gold hover:text-sf-gold transition-colors"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-              <div className="absolute bottom-3 inset-x-3 text-center pointer-events-none">
-                <div className="font-display italic text-xl sm:text-3xl font-black text-sf-gold drop-shadow-[0_2px_0_rgba(0,0,0,0.95)] truncate">
-                  {p1Meta.name}
-                </div>
-                <div className="text-[11px] font-semibold text-slate-300 truncate hidden sm:block">
-                  {FIGHTERS[p1Fighter].signaturePowerName}
-                </div>
-              </div>
-            </StreetPanel>
-
-            {isPortraitLayout && (
-              <StreetPanel
-                tone="cyan"
-                chamfer="lg"
-                className="relative bg-gradient-to-b from-black/40 to-black/90 min-h-[185px]"
-              >
-                <FighterPreview3D
-                  fighterId={p2Fighter}
-                  skinId={profile.equippedSkins[p2Fighter] || FIGHTERS[p2Fighter].defaultSkinId}
-                  authorizationMode={settings.authorizationMode}
-                  autoRotate
-                />
-                <span className="absolute top-3 right-3 text-[10px] font-black tracking-wider text-black bg-sf-cyan px-2.5 py-0.5 sf-chamfer-sm pointer-events-none">
-                  RIVAL
-                </span>
-                <button
-                  type="button"
-                  aria-label="Rival anterior"
-                  onClick={() => cycleFighter('p2', -1)}
-                  className="absolute left-2.5 top-1/2 -translate-y-1/2 p-2 sf-chamfer-sm bg-black/75 border border-white/20 text-white hover:border-sf-cyan"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  aria-label="Próximo rival"
-                  onClick={() => cycleFighter('p2', 1)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 sf-chamfer-sm bg-black/75 border border-white/20 text-white hover:border-sf-cyan"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-                <div className="absolute bottom-3 inset-x-3 text-center pointer-events-none">
-                  <div className="font-display italic text-xl font-black text-sf-cyan drop-shadow-[0_2px_0_rgba(0,0,0,0.95)] truncate">
-                    {p2Meta.name}
-                  </div>
-                </div>
-              </StreetPanel>
-            )}
-          </div>
-
-          {/* Painel Central de Modos & Arena */}
-          <div className="flex flex-col justify-center gap-3 shrink-0">
-            <button
-              type="button"
-              onClick={cycleArena}
-              className="w-full py-2.5 px-3.5 sf-chamfer-sm bg-sf-surface/95 border border-white/16 hover:border-sf-gold/60 flex items-center justify-between text-xs transition-colors"
-            >
-              <span className="flex items-center gap-2 font-extrabold text-white truncate">
-                <MapPin className="w-4 h-4 text-sf-gold shrink-0" />
-                {ARENAS[arenaId].name}
-              </span>
-              <span className="text-[11px] font-black text-sf-gold uppercase shrink-0 ml-2">
-                Trocar Arena
-              </span>
-            </button>
-
-            <ActionButton
-              variant="gold"
-              size="hero"
-              className="w-full"
-              onClick={() => launchQuickFight('vs_ai', settings.aiDifficulty)}
-            >
-              <Swords className="w-7 h-7" /> LUTA RÁPIDA
-            </ActionButton>
-
-            <div className="grid grid-cols-2 gap-2.5">
-              <ActionButton
-                variant="clash"
-                size="md"
-                className="w-full"
-                onClick={() => launchQuickFight('arcade')}
-              >
-                <Flame className="w-4 h-4" /> ARCADE (4 FASES)
-              </ActionButton>
-              <ActionButton
-                variant="steel"
-                size="md"
-                className="w-full border-sf-cyan/40 text-sf-cyan"
-                onClick={() => launchQuickFight('training')}
-              >
-                <Dumbbell className="w-4 h-4" /> MODO TREINO
-              </ActionButton>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2.5">
-              <ActionButton
-                variant="steel"
-                size="md"
-                className="w-full"
-                onClick={() => {
-                  gameAudio.playClick();
-                  setScreen('select');
-                }}
-              >
-                <Users className="w-4 h-4 text-sf-gold" /> LUTADORES
-              </ActionButton>
-              <ActionButton
-                variant="steel"
-                size="md"
-                className="w-full"
-                onClick={() => {
-                  gameAudio.playClick();
-                  setScreen('stage_select');
-                }}
-              >
-                <MapPin className="w-4 h-4 text-emerald-400" /> 10 ARENAS SSA
-              </ActionButton>
-            </div>
-
-            {!isPortraitLayout && (
-              <div className="hidden lg:flex items-center justify-between px-3.5 py-2.5 sf-chamfer-sm bg-sf-ink/90 border border-white/12 text-xs text-slate-300">
-                <span className="flex items-center gap-2 font-mono-num font-bold">
-                  <Trophy className="w-3.5 h-3.5 text-sf-gold" />
-                  Nv.{profile.level} · {profile.wins}V/{profile.losses}D · {profile.rankPoints} PTS
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    gameAudio.playClick();
-                    setScreen('profile');
-                  }}
-                  className="text-sf-gold font-extrabold hover:underline flex items-center gap-1"
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  {readyDailyCount > 0 ? `${readyDailyCount} desafio pronto` : 'Desafios'}
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Preview P2 à direita no Desktop/Paisagem */}
-          {!isPortraitLayout && (
-            <StreetPanel
-              tone="cyan"
-              chamfer="lg"
-              className="hidden lg:block relative bg-gradient-to-b from-black/40 to-black/90 min-h-[185px]"
-            >
-              <FighterPreview3D
-                fighterId={p2Fighter}
-                skinId={profile.equippedSkins[p2Fighter] || FIGHTERS[p2Fighter].defaultSkinId}
-                authorizationMode={settings.authorizationMode}
-                autoRotate
-              />
-              <span className="absolute top-3 right-3 text-[10px] font-black tracking-wider text-black bg-sf-cyan px-2.5 py-0.5 sf-chamfer-sm pointer-events-none">
-                P2 · RIVAL
-              </span>
-              <button
-                type="button"
-                aria-label="Rival anterior"
-                onClick={() => cycleFighter('p2', -1)}
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 p-2 sf-chamfer-sm bg-black/75 border border-white/20 text-white hover:border-sf-cyan hover:text-sf-cyan transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                aria-label="Próximo rival"
-                onClick={() => cycleFighter('p2', 1)}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 sf-chamfer-sm bg-black/75 border border-white/20 text-white hover:border-sf-cyan hover:text-sf-cyan transition-colors"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-              <div className="absolute bottom-3 inset-x-3 text-center pointer-events-none">
-                <div className="font-display italic text-3xl font-black text-sf-cyan drop-shadow-[0_2px_0_rgba(0,0,0,0.95)] truncate">
-                  {p2Meta.name}
-                </div>
-                <div className="text-[11px] font-semibold text-slate-300 truncate">
-                  {FIGHTERS[p2Fighter].signaturePowerName}
-                </div>
-              </div>
-            </StreetPanel>
-          )}
-        </div>
-
-        <nav className="relative z-10 grid grid-cols-4 border-t border-white/12 bg-sf-ink/96 shrink-0">
-          {(
-            [
-              { id: 'select', label: 'Lutadores', icon: Users },
-              { id: 'shop', label: 'Loja', icon: ShoppingBag },
-              { id: 'multiplayer', label: 'Online', icon: Globe },
-              { id: 'profile', label: 'Perfil', icon: Trophy },
-            ] as const
-          ).map((item) => {
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => {
-                  gameAudio.playClick();
-                  setScreen(item.id);
-                }}
-                className="py-2.5 sm:py-3 flex flex-col items-center gap-1 text-xs font-extrabold text-slate-300 hover:text-sf-gold hover:bg-white/4 border-t-2 border-transparent hover:border-sf-gold transition-colors"
-              >
-                <Icon className="w-4 h-4" />
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-        </nav>
-      </div>
+      <MainMenu
+        onSelect={handleMenuSelect}
+        onOpenShop={() => setScreen('shop')}
+        onOpenProfile={() => setScreen('profile')}
+        onOpenOnline={() => setScreen('multiplayer')}
+      />
     );
   };
 

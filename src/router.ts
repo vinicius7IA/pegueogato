@@ -20,10 +20,12 @@ export const ROUTES: Record<ScreenId, string> = {
   multiplayer: '/online',
   result: '/resultado',
   settings: '/ajustes',
+  bracket: '/torneio',
+  credits: '/creditos',
 };
 
 export const SCREEN_TITLES: Record<ScreenId, string> = {
-  splash: 'BAHIA STREET — Luta 3D Arcade',
+  splash: 'BAHIA STRETAT — Luta 3D Arcade',
   login: 'Entrar',
   menu: 'Menu',
   select: 'Lutadores',
@@ -35,10 +37,12 @@ export const SCREEN_TITLES: Record<ScreenId, string> = {
   multiplayer: 'Online',
   result: 'Resultado',
   settings: 'Ajustes',
+  bracket: 'Torneio',
+  credits: 'Créditos',
 };
 
 /** Telas que exigem uma partida em andamento: nunca restauradas por URL/voltar. */
-const MATCH_ONLY: ScreenId[] = ['arena', 'result'];
+const MATCH_ONLY: ScreenId[] = ['arena', 'result', 'bracket'];
 /** Telas livres para quem ainda não fez o cadastro. */
 const PUBLIC: ScreenId[] = ['splash', 'login'];
 
@@ -96,7 +100,7 @@ export function useScreenRouter(onboarded: boolean) {
     document.title =
       screen === 'splash'
         ? SCREEN_TITLES.splash
-        : `${SCREEN_TITLES[screen]} · BAHIA STREET`;
+        : `${SCREEN_TITLES[screen]} · BAHIA STRETAT`;
   }, [screen]);
 
   const setScreen = useCallback((next: ScreenId) => {

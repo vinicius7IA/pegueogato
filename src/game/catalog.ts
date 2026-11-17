@@ -236,7 +236,7 @@ export const POWERS: Record<PowerId, PowerDefinition> = {
   },
   golpe_especial: {
     id: 'golpe_especial',
-    name: 'Bahia Street Supremo',
+    name: 'Bahia Stretat Supremo',
     shortName: 'Supremo',
     description: 'Investida máxima com explosão dourada e impacto sísmico.',
     energyCost: 85,
@@ -325,6 +325,14 @@ export const ARCADE_LADDER: ArcadeStageDef[] = [
   { stage: 2, opponentId: 'policial', arenaId: 'farol_barra', difficulty: 'medium', title: 'Chuta-Porta no Farol' },
   { stage: 3, opponentId: 'maluco', arenaId: 'pituba', difficulty: 'medium', title: 'Confusão no Shopping' },
   { stage: 4, opponentId: 'policial', arenaId: 'farol_barra', difficulty: 'hard', title: 'Final no Farol da Barra' },
+];
+
+/** Torneio Baiano: chave eliminatória com 4 lutas contra adversários apelidados. */
+export const TOURNAMENT_LADDER: ArcadeStageDef[] = [
+  { stage: 1, opponentId: 'maluco', arenaId: 'favela_salvador', difficulty: 'easy', title: 'Oitavas · Gato da Ribeira' },
+  { stage: 2, opponentId: 'policial', arenaId: 'pituba', difficulty: 'medium', title: 'Quartas · Segurança do Iguatemi' },
+  { stage: 3, opponentId: 'maluco', arenaId: 'favela_salvador', difficulty: 'medium', title: 'Semifinal · Relâmpago da Laje' },
+  { stage: 4, opponentId: 'policial', arenaId: 'farol_barra', difficulty: 'hard', title: 'Final · Rei da Barra' },
 ];
 
 export function generateDailyChallenges(): DailyChallenge[] {

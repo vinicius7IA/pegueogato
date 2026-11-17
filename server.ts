@@ -557,7 +557,7 @@ async function startServer() {
 
   const PORT = Number(process.env.PORT) || 3000;
   server.listen(PORT, '0.0.0.0', () => {
-    console.log(`BAHIA STREET server running on http://localhost:${PORT}`);
+    console.log(`BAHIA STRETAT server running on http://localhost:${PORT}`);
   });
 }
 

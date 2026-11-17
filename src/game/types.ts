@@ -10,7 +10,9 @@ export type ScreenId =
   | 'profile'
   | 'multiplayer'
   | 'result'
-  | 'settings';
+  | 'settings'
+  | 'bracket'
+  | 'credits';
 
 export type FighterId =
   | 'policial'

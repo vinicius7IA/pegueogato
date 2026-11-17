@@ -6,7 +6,11 @@ import { gameAudio } from '../game/audio';
 import { FIGHTER_ROSTER_CAPACITY, FIGHTERS, FIGHTERS_LIST, getDisplayFighterMeta, isPlayableFighter } from '../game/catalog';
 import { AiDifficulty, ArenaId, FighterId, MatchMode, PlayerProfile, PowerId } from '../game/types';
 
+export type SelectFlow = 'arcade' | 'versus' | 'torneio' | 'treino';
+
 interface CharacterSelectScreenProps {
+  flow: SelectFlow;
+  onStartLadder: () => void;
   profile: PlayerProfile;
   initialDifficulty: AiDifficulty;
   authorizationMode: boolean;
@@ -24,6 +28,13 @@ interface CharacterSelectScreenProps {
 }
 
 type Step = 'p1' | 'p2';
+
+const FLOW_LABEL: Record<SelectFlow, string> = {
+  arcade: 'ARCADE',
+  versus: 'VERSUS',
+  torneio: 'TORNEIO',
+  treino: 'TREINO',
+};
 
 const SIDE = {
   p1: { label: '1P', color: 'var(--color-sf-p1)', text: 'text-sf-p1', border: 'border-sf-p1', bg: 'bg-sf-p1' },
@@ -58,6 +69,8 @@ function FighterArt({ id, side, authorizationMode }: { id: FighterId; side: Step
 }
 
 export function CharacterSelectScreen({
+  flow,
+  onStartLadder,
   profile,
   authorizationMode,
   p1Fighter,
@@ -77,10 +90,14 @@ export function CharacterSelectScreen({
     else onSelectP2(id);
   };
 
+  // Arcade e Torneio: só o P1 escolhe; a CPU segue a escada de adversários.
+  const ladderMode = flow === 'arcade' || flow === 'torneio';
   const confirm = () => {
     gameAudio.playSelectSnap();
-    if (step === 'p1') setStep('p2');
-    else onOpenStageSelect();
+    if (step === 'p1') {
+      if (ladderMode) onStartLadder();
+      else setStep('p2');
+    } else onOpenStageSelect();
   };
 
   const back = () => {
@@ -142,7 +159,9 @@ export function CharacterSelectScreen({
               </motion.div>
 
               <div className={`absolute bottom-2 ${left ? 'left-4 sm:left-8' : 'right-4 sm:right-8 text-right'} max-w-[90%]`}>
-                <span className={`inline-block px-1.5 font-mono-num text-xs font-black text-white ${s.bg}`}>{s.label}</span>
+                <span className={`inline-block px-1.5 font-mono-num text-xs font-black text-white ${s.bg}`}>
+                  {side === 'p2' && flow !== 'versus' ? 'CPU' : s.label}
+                </span>
                 <div className="font-display italic font-black uppercase leading-[0.88] text-[clamp(2rem,11vh,5rem)] drop-shadow-[0_4px_0_rgba(0,0,0,0.9)]">
                   {shown ? meta.name.replace(/^O /, '') : '???'}
                 </div>
@@ -166,7 +185,13 @@ export function CharacterSelectScreen({
             SELEÇÃO DE PERSONAGEM
           </div>
           <div className={`text-[11px] sm:text-xs font-black tracking-widest ${ui.text}`}>
-            {step === 'p1' ? 'JOGADOR 1 · ESCOLHA SEU LUTADOR' : 'ESCOLHA O RIVAL'}
+            {step === 'p1'
+              ? `${FLOW_LABEL[flow]} · JOGADOR 1, ESCOLHA SEU LUTADOR`
+              : flow === 'versus'
+                ? 'VERSUS · JOGADOR 2, ESCOLHA SEU LUTADOR'
+                : flow === 'treino'
+                  ? 'TREINO · ESCOLHA O BONECO'
+                  : 'ESCOLHA O RIVAL'}
           </div>
         </div>
       </main>
@@ -232,7 +257,7 @@ export function CharacterSelectScreen({
           className={`min-h-11 w-[min(100%,320px)] font-display italic font-black text-xl tracking-wider text-white ${ui.bg} active:scale-95 focus-visible:outline-2 focus-visible:outline-white shadow-[0_4px_0_rgba(0,0,0,0.6)]`}
           style={{ clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)' }}
         >
-          {step === 'p1' ? 'CONFIRMAR' : 'CONFIRMAR E ESCOLHER ARENA'}
+          {step === 'p1' ? (ladderMode ? 'CONFIRMAR E LUTAR' : 'CONFIRMAR') : 'CONFIRMAR E ESCOLHER CENÁRIO'}
         </button>
       </section>
     </div>

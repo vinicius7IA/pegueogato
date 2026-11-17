@@ -364,7 +364,7 @@ export function ArenaView({
           <div className="text-6xl animate-pulse">📱↻</div>
           <div className="font-display italic font-black text-3xl text-sf-gold">GIRE O CELULAR</div>
           <p className="text-sm text-slate-300 max-w-xs">
-            O Bahia Street é jogado com o celular deitado (horizontal).
+            O Bahia Stretat é jogado com o celular deitado (horizontal).
           </p>
         </div>
       )}
@@ -503,6 +503,7 @@ export function ArenaView({
           touchLayoutScale={settings.touchLayoutScale}
           touchButtonsOffsetY={settings.touchButtonsOffsetY}
           p1Energy={hud.p1Energy}
+          p2Energy={hud.p2Energy}
           powerName={p1Power.shortName}
           powerCost={p1Power.energyCost}
           finisherName={p1Def.finisherName}
@@ -602,6 +603,7 @@ export function ArenaView({
             touchLayoutScale={settings.touchLayoutScale}
             touchButtonsOffsetY={settings.touchButtonsOffsetY}
             p1Energy={hud.p1Energy}
+            p2Energy={hud.p2Energy}
             powerName={p1Power.shortName}
             powerCost={p1Power.energyCost}
             finisherName={p1Def.finisherName}

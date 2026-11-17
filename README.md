@@ -1,4 +1,4 @@
-# BAHIA STREET
+# BAHIA STRETAT
 
 Jogo de luta 3D arcade (React + Vite + Three.js) com servidor Express/WebSocket para multiplayer e ranking.
 
