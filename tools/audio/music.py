@@ -299,3 +299,155 @@ def defeat_jingle():
     s.hit(16, pad_chord([52, 55, 59], 24 * s.step), 0.45)
     s.hit(20, surdo(True), 0.7)
     return s.render(0.8, 0.3)
+
+
+# ============================================================ PAGODE BAIANO DE LUTA
+# Instrumentos extras: cavaquinho (Karplus-Strong), pandeiro, tamborim, timbau, apito e gritos.
+from scipy import signal as _sig  # noqa: E402
+
+
+def pluck(freq, dur, bright=0.5):
+    """Corda dedilhada (Karplus-Strong vetorizado via filtro IIR)."""
+    n = int(dur * SR)
+    period = max(2, int(SR / freq))
+    burst = np.zeros(n)
+    burst[:period] = rng.uniform(-1, 1, period)
+    burst[:period] = lowpass(burst[:period], 2500 + 6000 * bright) if period > 30 else burst[:period]
+    a = np.zeros(period + 2)
+    a[0] = 1
+    a[period] = -0.498
+    a[period + 1] = -0.498
+    y = _sig.lfilter([1.0], a, burst)
+    return y * env_exp(dur, dur * 0.6)
+
+
+def cavaco(notes, dur=0.14, up=False):
+    """Acorde de cavaquinho batido (palhetada rápida com pequeno atraso entre cordas)."""
+    out = np.zeros(int((dur + 0.05) * SR))
+    order = notes[::-1] if up else notes
+    for i, n in enumerate(order):
+        place(out, pluck(note_freq(n), dur, 0.7) * 0.5, i * 0.006)
+    return highpass(out, 250)
+
+
+def pandeiro(accent=False):
+    d = 0.09
+    jingle = bandpass(noise(d), 5000, 11000) * env_exp(d, 0.025 if not accent else 0.04)
+    pele = osc(glide(210, 160, d), d) * env_exp(d, 0.03) * (0.6 if accent else 0.25)
+    return jingle * (0.5 if accent else 0.3) + pele
+
+
+def tamborim():
+    d = 0.06
+    return osc(glide(900, 760, d), d) * env_exp(d, 0.015) * 0.4 + highpass(noise(d), 3000) * env_exp(d, 0.008) * 0.3
+
+
+def timbau(slap=False):
+    d = 0.16
+    if slap:
+        return bandpass(noise(d), 800, 5000) * env_exp(d, 0.02) * 0.8 + osc(glide(380, 280, d), d) * env_exp(d, 0.03) * 0.4
+    return osc(glide(230, 170, d), d) * env_exp(d, 0.07) * 0.7 + bandpass(noise(d), 300, 1500) * env_exp(d, 0.02) * 0.2
+
+
+def apito(trill=True):
+    d = 0.5 if trill else 0.25
+    t = np.arange(int(d * SR)) / SR
+    f = 2900 + (np.sign(np.sin(2 * np.pi * 22 * t)) * 120 if trill else 0)
+    return osc(f, d) * env_adsr(d, 0.01, 0.05, 0.8, 0.08) * 0.22 + bandpass(noise(d), 2500, 3500) * env_adsr(d, 0.01, 0.05, 0.6, 0.08) * 0.05
+
+
+def riser(dur):
+    x = highpass(noise(dur), 600) * np.linspace(0, 1, int(dur * SR)) ** 2
+    tone = osc(glide(200, 1600, dur), dur, "saw") * np.linspace(0, 0.3, int(dur * SR))
+    return lowpass(x + tone, 8000) * 0.5
+
+
+def impact():
+    d = 0.9
+    boom = osc(glide(90, 30, d), d) * env_exp(d, 0.25)
+    crash = highpass(noise(d), 3000) * env_exp(d, 0.3) * 0.5
+    return drive(boom * 1.3 + crash, 2.0)
+
+
+def pagode_luta(bpm, key, prog, hook_a, hook_b, bars=24, shouts=None, lead="pulse25", heavy=1.0):
+    """
+    Pagode baiano com cara de luta:
+    - bateria/percussão: surdo, timbau (grave e tapa), pandeiro em semicolcheias, tamborim, palmas;
+    - cavaquinho batido, baixo sincopado, metais nas viradas, gancho melódico;
+    - a cada 8 compassos: subida (riser) + impacto e breque com gritos "Ei!".
+    """
+    s = Song(bpm, bars, swing=0.2)
+    for bar in range(bars):
+        root, minor = prog[bar % len(prog)]
+        b = bar * 16
+        breque = bar % 8 == 7
+        # --- percussão
+        if not breque:
+            for k in (0, 10):
+                s.hit(b + k, kick(), 0.9 * heavy)
+            s.hit(b + 0, surdo(True), 0.8)
+            s.hit(b + 8, surdo(False), 0.75)
+            s.hit(b + 7, surdo(True), 0.45)
+            for k in (4, 12):
+                s.hit(b + k, clap(), 0.75)
+            for k, sl in ((2, False), (3, True), (6, False), (9, True), (11, True), (14, False), (15, True)):
+                s.hit(b + k, timbau(sl), 0.65)
+            for k in range(16):
+                s.hit(b + k, pandeiro(k % 4 == 2), 0.7)
+            for k in (1, 4, 7, 10, 13):
+                s.hit(b + k, tamborim(), 0.35)
+        else:
+            # breque: só tapas secos e grito, depois a volta
+            for k in (0, 2, 4):
+                s.hit(b + k, timbau(True), 0.9)
+                s.hit(b + k, stab([n + 12 for n in chord_notes(root, minor)], 0.14), 0.7)
+            if shouts:
+                s.hit(b + 6, shouts[bar // 8 % len(shouts)], 0.9)
+            s.hit(b + 8, riser(8 * s.step), 0.8)
+        if bar % 8 == 0 and bar > 0:
+            s.hit(b + 0, impact(), 0.7)
+            s.hit(b + 0, apito(True), 0.8)
+        # --- harmonia: cavaquinho batido + baixo
+        if not breque:
+            chord = [n + 12 for n in chord_notes(root, minor)] + [root + 24]
+            for k, up in ((0, False), (2, True), (3, False), (6, True), (8, False), (10, True), (11, False), (14, True)):
+                s.hit(b + k, cavaco(chord, 0.12, up), 0.55)
+            play_bass(s, bar, root - 24, [(0, 0, 2), (3, 0, 1), (5, 7, 1), (6, 12, 2), (8, 0, 2), (11, 3 if minor else 4, 1), (12, 5, 2), (14, 7, 2)], 900)
+            if bar % 4 == 3:
+                for k in (12, 14):
+                    s.hit(b + k, stab([n + 12 for n in chord_notes(root, minor)], 0.16), 0.55)
+        # --- gancho melódico (entra depois da introdução)
+        if bar >= 4 and not breque:
+            hook = hook_a if (bar // 4) % 2 == 0 else hook_b
+            play_melody(s, bar, [(st, n + key, ln) for st, n, ln in hook], lead, 0.48)
+    return s.render(0.82, 0.08)
+
+
+HOOK_A = [(0, 72, 2), (2, 72, 1), (3, 75, 2), (6, 72, 1), (8, 70, 2), (10, 67, 2), (12, 70, 3)]
+HOOK_B = [(0, 75, 3), (3, 77, 1), (4, 79, 4), (8, 77, 2), (10, 75, 2), (12, 72, 4)]
+
+
+def stage_farol():
+    """Farol da Barra: pagodão de luta em Lá menor, brilhante, 138 bpm."""
+    return pagode_luta(138, -3, [(57, True), (53, False), (55, False), (57, True)], HOOK_A, HOOK_B, shouts=_SHOUTS)
+
+
+def stage_favela():
+    """Favela: pagode pesado em Mi menor, 142 bpm, mais grave e agressivo."""
+    hook_a = [(0, 72, 1), (2, 72, 1), (3, 72, 1), (4, 75, 2), (7, 72, 1), (8, 77, 2), (11, 75, 1), (12, 72, 4)]
+    return pagode_luta(142, -8, [(52, True), (52, True), (60, False), (59, False)], hook_a, HOOK_B, shouts=_SHOUTS, lead="square", heavy=1.15)
+
+
+def stage_shopping():
+    """Shopping: pagode com timbre eletrônico em Sol menor, 136 bpm."""
+    hook_b = [(0, 79, 2), (2, 77, 2), (4, 75, 2), (6, 74, 2), (8, 75, 4), (12, 79, 4)]
+    return pagode_luta(136, -5, [(55, True), (51, False), (53, False), (50, False)], HOOK_A, hook_b, shouts=_SHOUTS, lead="saw")
+
+
+_SHOUTS: list = []
+
+
+def set_shouts(samples):
+    """Gritos ("Ei!", "Vai!", "Bora!") gravados pelo gerador de vozes, usados nos breques."""
+    _SHOUTS.clear()
+    _SHOUTS.extend(samples)

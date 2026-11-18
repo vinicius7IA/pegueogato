@@ -283,6 +283,8 @@ def gen_stages():
 
 def gen_music():
     print("músicas")
+    # gritos do breque do pagode (coro curto)
+    music.set_shouts([chorus(t, pitches=(0.9, 1.0, 1.12), length=0.9)[: int(0.9 * SR)] for t in ("Ei! Ei!", "Vai, vai!", "Bora!")])
     export("music/menu_theme", music.menu_theme(), 0.85)
     export("music/select", music.select_theme(), 0.8)
     export("music/stage_farol", music.stage_farol(), 0.8)
