@@ -1,4 +1,5 @@
 import { Asset } from 'expo-asset';
+import { setAudioModeAsync } from 'expo-audio';
 import * as FileSystem from 'expo-file-system/legacy';
 import { useKeepAwake } from 'expo-keep-awake';
 import * as ScreenOrientation from 'expo-screen-orientation';
@@ -22,6 +23,8 @@ export default function App() {
 
   useEffect(() => {
     ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE).catch(() => {});
+    // Som do jogo toca mesmo com o iPhone no silencioso e mistura com outros apps
+    setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'mixWithOthers', shouldPlayInBackground: false }).catch(() => {});
     (async () => {
       try {
         const asset = Asset.fromModule(require('./assets/game.html'));

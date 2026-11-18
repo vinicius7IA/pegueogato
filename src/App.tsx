@@ -198,18 +198,8 @@ function AppShell() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  // Global first-gesture audio unlock
-  useEffect(() => {
-    const unlock = () => {
-      gameAudio.unlockAudio();
-    };
-    window.addEventListener('pointerdown', unlock, { once: true });
-    window.addEventListener('keydown', unlock, { once: true });
-    return () => {
-      window.removeEventListener('pointerdown', unlock);
-      window.removeEventListener('keydown', unlock);
-    };
-  }, []);
+  // Destrava o áudio no primeiro toque (celular, WebView do Expo, iPhone no silencioso)
+  useEffect(() => gameAudio.installUnlock(), []);
 
   // Auto-advance animated Splash screen
   useEffect(() => {

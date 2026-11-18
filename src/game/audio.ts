@@ -48,6 +48,64 @@ class ArcadeAudioEngine {
     }
   }
 
+  private silentEl: HTMLAudioElement | null = null;
+
+  /**
+   * Destrava o som em qualquer gesto (touchstart/touchend/click/tecla) até o AudioContext rodar.
+   * - toca um buffer vazio dentro do gesto (exigência do iOS/WKWebView);
+   * - pede sessão de "reprodução" (Safari 17+) e mantém um <audio> mudo em loop,
+   *   para o iPhone tocar mesmo com a chave de silencioso;
+   * - retoma o áudio quando o app volta do segundo plano.
+   * Retorna a função que remove os ouvintes.
+   */
+  public installUnlock(): () => void {
+    const events = ['touchstart', 'touchend', 'pointerdown', 'mousedown', 'click', 'keydown'];
+    const opts = { capture: true, passive: true } as const;
+    const handler = () => {
+      this.unlockAudio();
+      const ctx = this.ctx;
+      if (ctx) {
+        try {
+          const buf = ctx.createBuffer(1, 1, 22050);
+          const src = ctx.createBufferSource();
+          src.buffer = buf;
+          src.connect(ctx.destination);
+          src.start(0);
+        } catch {
+          /* ok */
+        }
+        ctx.resume().catch(() => {});
+      }
+      try {
+        const nav = navigator as Navigator & { audioSession?: { type: string } };
+        if (nav.audioSession) nav.audioSession.type = 'playback';
+      } catch {
+        /* sem audioSession */
+      }
+      if (!this.silentEl) {
+        try {
+          const el = new Audio(silentWavDataUri());
+          el.loop = true;
+          el.setAttribute('playsinline', '');
+          el.play().catch(() => {});
+          this.silentEl = el;
+        } catch {
+          /* sem <audio> */
+        }
+      }
+      if (ctx && ctx.state === 'running') events.forEach((e) => window.removeEventListener(e, handler, opts));
+    };
+    const onVisible = () => {
+      if (!document.hidden) this.ctx?.resume().catch(() => {});
+    };
+    events.forEach((e) => window.addEventListener(e, handler, opts));
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      events.forEach((e) => window.removeEventListener(e, handler, opts));
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }
+
   public unlockAudio(): void {
     this.unlocked = true;
     const ctx = this.ensureContext();
@@ -732,3 +790,28 @@ class ArcadeAudioEngine {
 }
 
 export const gameAudio = new ArcadeAudioEngine();
+
+/** WAV mudo (0,5 s, 8 kHz, 8 bits) gerado na hora, para o truque do <audio> no iPhone. */
+function silentWavDataUri(): string {
+  const n = 4000;
+  const bytes = new Uint8Array(44 + n);
+  const view = new DataView(bytes.buffer);
+  const str = (o: number, t: string) => [...t].forEach((c, i) => (bytes[o + i] = c.charCodeAt(0)));
+  str(0, 'RIFF');
+  view.setUint32(4, 36 + n, true);
+  str(8, 'WAVE');
+  str(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, 8000, true);
+  view.setUint32(28, 8000, true);
+  view.setUint16(32, 1, true);
+  view.setUint16(34, 8, true);
+  str(36, 'data');
+  view.setUint32(40, n, true);
+  bytes.fill(128, 44);
+  let bin = '';
+  bytes.forEach((b) => (bin += String.fromCharCode(b)));
+  return 'data:audio/wav;base64,' + btoa(bin);
+}
